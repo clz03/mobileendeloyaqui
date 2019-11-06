@@ -1,5 +1,5 @@
 import React, { useState, useEffect} from 'react';
-import {View, Text, StyleSheet, Dimensions, TouchableHighlight } from 'react-native';
+import {View, Text, StyleSheet, Dimensions, TouchableHighlight, FlatList, ActivityIndicator } from 'react-native';
 import {AsyncStorage} from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
@@ -7,35 +7,96 @@ const screenHeight = Math.round(Dimensions.get('window').height);
 
 export default function AccountLogged({ navigation }) {
 
-  const [email, setEmail] = useState("");
+  // const [email, setEmail] = useState("");
   const [nome, setNome] = useState("");
-
-  async function getStorageValue() {
-    setEmail(await AsyncStorage.getItem('eloyuseremail'));
-    setNome(await AsyncStorage.getItem('eloyusernome'));
-  }
+  const [evento, setEvento] = useState([]);  
+  const [loading, setLoading] = useState(false);
 
   async function handleLogout(){
-      await AsyncStorage.removeItem('eloyuseremail');
-      await AsyncStorage.removeItem('eloyusernome');
-      navigation.navigate('Register');
+    await AsyncStorage.removeItem('eloyuseremail');
+    await AsyncStorage.removeItem('eloyusernome');
+    navigation.navigate('Register');
   }
 
   useEffect(() => {
+
+    setLoading(true);
+
+    async function getStorageValue() {
+      // setEmail(await AsyncStorage.getItem('eloyuseremail'));
+      setNome(await AsyncStorage.getItem('eloyusernome'));
+    }
+
+    async function loadEventos() {
+      //const response = await fetch(
+      //  'https://backendeloyaqui.herokuapp.com/eventos' 
+      //);
+
+      //const data = await response.json();
+
+      const data = [
+        {
+          '_id': '1',
+          'title': 'Barbearia do Rody',
+          'start': '2019-11-04',
+          'end': '2019-11-05',
+          'summary': 'Corte comum'
+        },
+        {
+          '_id': '2',
+          'title': 'Vi Pé e Mão',
+          'start': '2019-11-04',
+          'end': '2019-11-05',
+          'summary': 'Depilação'
+        }
+      ]
+
+      setEvento(data);
+      setLoading(false);
+    }
+
     getStorageValue();
+    loadEventos();
+    
   }, []);
 
   return (
     
         <View style={styles.backContainer}>
-          
           <View style={styles.container}>
-            <Text style={styles.txtTitle}>Seja Bem vindo</Text>
-            <Text style={styles.txtTitleDesc}>{nome}</Text>
-            <Text style={styles.txtTitleDesc}>Em breve teremos novidades para os inscritos no Eloy Aqui</Text>
+            <Text style={styles.txtTitle}>Seja Bem Vindo, {nome}</Text>
+
             <TouchableHighlight style={styles.btnEntrar} onPress={handleLogout}>
-                <Text style={styles.textoEntrar}>Logout</Text>
-              </TouchableHighlight>
+              <Text style={styles.textoEntrar}>Sair</Text>
+            </TouchableHighlight>
+
+            <Text style={styles.txtTitleDesc}>Meus Agendamentos</Text>
+
+            <View style={styles.container}>
+              <FlatList
+              data={evento}
+              keyExtractor={evento => String(evento._id)}
+              ListHeaderComponent={
+                loading ? (
+                  <ActivityIndicator size="large" style={styles.backImageHeader}/>
+                ) : (
+                  ""
+                )
+              }
+              renderItem={({ item }) => (                
+                <View style={styles.Item}>
+                <Text style={styles.textDescPrinc}>{item.title}</Text>
+                  <View style={styles.containerGeral}>
+                    <View style={styles.txtContainer}>
+                      <Text style={styles.textDesc}>{item.start.substring(8,10) + "/" + item.start.substring(5,7) + "/" + item.start.substring(0,4) + " - " + item.end.substring(8,10) + "/" + item.end.substring(5,7) + "/" + item.end.substring(0,4)}</Text>
+                      <Text style={styles.textDesc}>{item.summary}</Text>
+                    </View>
+                  </View>
+                </View>
+                )}            
+              />
+            </View>
+
           </View>
         </View>
   );
@@ -48,30 +109,20 @@ var styles = StyleSheet.create({
     paddingHorizontal: 0,
   },
 
-  backHeader: {
-    height: screenHeight*0.1,
-    alignContent:'center',
-    alignItems:'center',
-    backgroundColor:'#471a88',
-    },
-
   container: {
     flexDirection: 'column',
     flex: 1,
     backgroundColor:'#fff'
   },
 
-  textMenuTitleHeader: {
-    fontSize:17,
-    color: '#fff',
-    paddingTop:10,
-    textAlign:'center'
+  containerGeral:{
+    flexDirection:'row',
   },
 
   txtTitle:{
     color:'#000',
     fontSize:25,
-    marginTop:20,
+    marginTop:10,
     textAlign:'center',
     fontWeight:'bold'
   },
@@ -79,49 +130,41 @@ var styles = StyleSheet.create({
   txtTitleDesc:{
     color:'#000',
     fontSize:20,
-    marginTop:20,
+    marginTop:10,
+    marginBottom:10,
     marginLeft:5,
-    marginRight:5,
     textAlign:'center',
   },
 
-  labelLogin:{
-    color:'#471a88',
-    marginLeft: screenWidth * 0.05,
-    marginTop:25,
+  textDescPrinc: {
+    fontSize: 14,
+    fontWeight:'bold',
+    marginBottom:5,
+    marginTop:5
   },
 
-  inputLogin:{
-    height: 40, 
-    width:screenWidth * 0.90,
-    marginLeft: screenWidth * 0.05,
-    marginTop:2,
-    borderColor: '#471a88', 
-    borderWidth: 1,
-    borderRadius:5
+  textDesc: {
+    fontSize: 13,
   },
 
-  labelSenha:{
-    color:'#471a88',
-    marginLeft: screenWidth * 0.05,
-    marginTop:10,
+  Item: {
+    height:screenHeight * 0.1,
+    backgroundColor:'#fff',
+    borderBottomColor:'#d5d5d5',
+    borderBottomWidth:1,
+    paddingLeft: 10,
   },
 
-  inputSenha:{
-    height: 40, 
-    width:screenWidth * 0.90,
-    marginLeft: screenWidth * 0.05,
-    marginTop:2,
-    borderColor: '#471a88', 
-    borderWidth: 1,
-    borderRadius:5
+  txtContainer:{
+    width:screenWidth *0.7,
   },
+
+
 
   btnEntrar:{
     width: screenWidth * 0.50,
     backgroundColor:'#471a88',
     height:35,
-    marginLeft: screenWidth * 0.05,
     marginTop: 15,
     borderRadius:6,
     alignSelf:'center'

@@ -20,6 +20,7 @@ export default function Detail({ navigation }) {
   const [pedonline, setPedonline] = useState([]);
   const [prod, setProd] = useState([]);
   const [cupom, setCupom] = useState([]);
+  const [evento, setEvento] = useState([]);
   
   const idestab = navigation.getParam('idestab');
 
@@ -33,7 +34,7 @@ export default function Detail({ navigation }) {
       const data = await response.json();
       setEstab(data);
       setPlano(data[0].plano);
-      setPlano(data[0].pedonline);
+      setPedonline(data[0].pedonline);
     }
 
      async function loadProd() {
@@ -54,11 +55,20 @@ export default function Detail({ navigation }) {
       setCupom(data3);
     }
 
+    // async function loadEvento() {
+    //   const response4 = await fetch(
+    //     'https://backendeloyaqui.herokuapp.com/eventos/estabelecimento/' + idestab
+    //   );
+ 
+    //   const data4 = await response4.json();
+    //   setEvento(data4);
+    // }
+
     loadEstab();
-    //if(plano > 0) {   
     loadProd();
     loadCupom();
-    //}
+    // loadEvento();
+
   }, []);
 
 
@@ -135,27 +145,61 @@ export default function Detail({ navigation }) {
                     )}
                 </Tab>
       
-                {plano > 0 && 
-                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Destaques</Text></TabHeading>}>
+                {plano > 0 && pedonline == 1 &&
+                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Destaques/Cupons</Text></TabHeading>}>
                                        
                     <ScrollView>
-                    {prod.length > 0 ? prod.map(prod => 
-                        <View key={prod._id} style={styles.container2}>
-                          <ImageBackground source={{uri: prod.imagem }} style={styles.backImageDestaq}>
-                            <Text style={styles.textDestaq}>{prod.nome}</Text>
-                            <Text style={styles.textDesc}>{prod.descr}</Text>
-                            <Text style={styles.textDesc}>{prod.preco}</Text>
-                          </ImageBackground>
-                        </View>
-                      ) : <Text style={styles.txtNoData}>Em breve novos Destaques. Fique de olho !</Text>
-                    }
+
+                      {prod.length > 0 ? prod.map(prod => 
+                          <View key={prod._id} style={styles.container2}>
+                            <ImageBackground source={{uri: prod.imagem }} style={styles.backImageDestaq}>
+                              <Text style={styles.textDestaq}>{prod.nome}</Text>
+                              <Text style={styles.textDesc}>{prod.descr}</Text>
+                              <Text style={styles.textDesc}>{prod.preco}</Text>
+                            </ImageBackground>
+                          </View>
+                        ) : <Text style={styles.txtNoData}>Em breve novos Destaques. Fique de olho !</Text>
+                      }
+
+                      {cupom.length > 0 ? cupom.map(cupom => 
+                          <View style={styles.cupomItem} key={cupom._id}>
+                            <View style={styles.barraLateralVerde}></View>
+                            <View style={styles.ticket}>
+                              <Text style={styles.ticketText}>{cupom.premio}</Text>
+                              <Text style={styles.dadosTextRegras}>*Apresentar o cupom no estabelecimento*</Text>
+                              <Text style={styles.dadosTextRegras}>*Válido até {cupom.validade}*</Text>
+                            </View>   
+                          </View>
+                        ) : <Text style={styles.txtNoData}>Em breve novos Cupons. Fique de olho !</Text>
+                      }
+
                     </ScrollView>
                     
                   </Tab>
                 }
              
+               {plano > 0 && pedonline ==  0 &&
+                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Destaques</Text></TabHeading>}>
+                                       
+                    <ScrollView>
 
-                {plano > 0 && 
+                      {prod.length > 0 ? prod.map(prod => 
+                          <View key={prod._id} style={styles.container2}>
+                            <ImageBackground source={{uri: prod.imagem }} style={styles.backImageDestaq}>
+                              <Text style={styles.textDestaq}>{prod.nome}</Text>
+                              <Text style={styles.textDesc}>{prod.descr}</Text>
+                              <Text style={styles.textDesc}>{prod.preco}</Text>
+                            </ImageBackground>
+                          </View>
+                        ) : <Text style={styles.txtNoData}>Em breve novos Destaques. Fique de olho !</Text>
+                      }
+
+                    </ScrollView>
+                    
+                  </Tab>
+                }
+
+                {plano > 0 && pedonline == 0 &&
                   <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Descontos</Text></TabHeading>}>
                     <ScrollView style={[ styles.container ]}>
                       
@@ -170,6 +214,17 @@ export default function Detail({ navigation }) {
                         </View>
                       ) : <Text style={styles.txtNoData}>Em breve novos Cupons. Fique de olho !</Text>
                     }
+                      
+                    </ScrollView>
+                  </Tab>
+                }
+
+                {pedonline == 1 && 
+
+                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Agendar</Text></TabHeading>}>
+                    <ScrollView style={[ styles.container ]}>
+                      
+                      
                       
                     </ScrollView>
                   </Tab>

@@ -88,6 +88,10 @@ export default function Search({ navigation }) {
   );
 }
 
+Search.navigationOptions = () => ({
+  headerTitle:'Teste'
+});
+
 var styles = StyleSheet.create({
   
   container: {

@@ -15,13 +15,11 @@ export default function Register({ navigation }) {
   const [erroValidador3, setErroValidador3] = useState("");
 
   async function CheckRedirect(){
-    const Svalue = await AsyncStorage.getItem('eloyuseremail');
-    if (Svalue != null) {
+    if (await AsyncStorage.getItem('eloyuseremail') != null)
       navigation.navigate('AccountLogged');
-    }
   }
 
-  async function handleRegistered(){
+  function handleRegistered(){
     navigation.navigate('Login');
   }
 
@@ -65,8 +63,7 @@ export default function Register({ navigation }) {
     }
 
     await fetch(
-     // 'https://backendeloyaqui.herokuapp.com/usuarios', {
-        'http://localhost:8080/usuarios', {
+       'https://backendeloyaqui.herokuapp.com/usuarios', {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -93,44 +90,42 @@ useEffect(() => {
   return (
     
         <View style={styles.backContainer}>
-          
           <KeyboardAvoidingView style={styles.container} behavior="position">
-            {/* <Text style={styles.txtTitle}>Cadastre-se</Text> */}
             <Text style={styles.txtTitleDesc}>Em breve teremos novidades para os inscritos no Eloy Aqui</Text>
-
             <View>
-
               <Text style={styles.labelLogin}>Nome</Text>
-                <TextInput 
-                  style={ styles.inputLogin } 
-                  autoCorrect={true} 
-                  value={nome}
-                  onChangeText={(text) => setNome(text)}
-                />
-                <Text style={styles.labelError}>{erroValidador2}</Text>
+              <TextInput 
+                style={ styles.inputLogin } 
+                maxLength={35}
+                autoCorrect={true} 
+                value={nome}
+                onChangeText={(text) => setNome(text)}
+              />
+              <Text style={styles.labelError}>{erroValidador2}</Text>
 
-                <Text style={styles.labelLogin}>E-mail</Text>
-                <TextInput 
-                  style={ styles.inputLogin } 
-                  autoCapitalize='none' 
-                  autoCorrect={false} 
-                  keyboardType="email-address"
-                  value={email}
-                  onChangeText={(text) => setEmail(text)}
-                />
-                <Text style={styles.labelError}>{erroValidador}</Text>
+              <Text style={styles.labelLogin}>E-mail</Text>
+              <TextInput 
+                style={ styles.inputLogin } 
+                maxLength={35}
+                autoCapitalize='none' 
+                autoCorrect={false} 
+                keyboardType="email-address"
+                value={email}
+                onChangeText={(text) => setEmail(text)}
+              />
+              <Text style={styles.labelError}>{erroValidador}</Text>
 
-                <Text style={styles.labelLogin}>Senha</Text>
-                <TextInput 
-                  style={ styles.inputLogin } 
-                  autoCapitalize='none'
-                  secureTextEntry={true}
-                  autoCorrect={false} 
-                  value={senha}
-                  onChangeText={(text) => setSenha(text)}
-                />
-                <Text style={styles.labelError}>{erroValidador3}</Text>
-
+              <Text style={styles.labelLogin}>Senha</Text>
+              <TextInput 
+                style={ styles.inputLogin } 
+                maxLength={20}
+                autoCapitalize='none'
+                secureTextEntry={true}
+                autoCorrect={false} 
+                value={senha}
+                onChangeText={(text) => setSenha(text)}
+              />
+              <Text style={styles.labelError}>{erroValidador3}</Text>
 
               <TouchableHighlight style={styles.btnEntrar} onPress={handleSubmit}>
                 <Text style={styles.textoEntrar}>Cadastrar</Text>
@@ -142,7 +137,6 @@ useEffect(() => {
             </View>
 
           </KeyboardAvoidingView>
-          
         </View>
   );
 }
@@ -154,24 +148,9 @@ var styles = StyleSheet.create({
     paddingHorizontal: 0,
   },
 
-
-  backHeader: {
-    height: screenHeight*0.1,
-    alignContent:'center',
-    alignItems:'center',
-    backgroundColor:'#471a88',
-    },
-
   container: {
     flexDirection: 'column',
     backgroundColor:'#fff'
-  },
-
-  textMenuTitleHeader: {
-    fontSize:17,
-    color: '#fff',
-    paddingTop:10,
-    textAlign:'center'
   },
 
   txtTitle:{
@@ -207,22 +186,6 @@ var styles = StyleSheet.create({
     width:screenWidth * 0.90,
     marginLeft: screenWidth * 0.05,
     marginTop:0,
-    borderColor: '#471a88', 
-    borderWidth: 1,
-    borderRadius:5
-  },
-
-  labelSenha:{
-    color:'#471a88',
-    marginLeft: screenWidth * 0.05,
-    marginTop:10,
-  },
-
-  inputSenha:{
-    height: 40, 
-    width:screenWidth * 0.90,
-    marginLeft: screenWidth * 0.05,
-    marginTop:2,
     borderColor: '#471a88', 
     borderWidth: 1,
     borderRadius:5
