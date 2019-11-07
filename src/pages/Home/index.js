@@ -30,7 +30,7 @@ export default function Home({ navigation }) {
   }, []);
 
   async function handleSubmit() {
-    navigation.navigate('Search', { busca: search })
+    navigation.navigate('Search', { busca: search, title: search })
   };
 
   state = {showIndicator:false}

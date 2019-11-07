@@ -1,5 +1,5 @@
 import React from 'react';
-import { createAppContainer } from 'react-navigation'
+import { createAppContainer, createSwitchNavigator } from 'react-navigation'
 import { createBottomTabNavigator } from 'react-navigation-tabs'
 import { createStackNavigator } from 'react-navigation-stack'
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -13,13 +13,14 @@ import News from './pages/News';
 import NewsDetail from './pages/NewsDetail';
 import Search from './pages/Search'; 
 import Detail from './pages/Detail';
+import Agenda from './pages/Agenda';
 
 const PagesNavigator = createStackNavigator({
   Search:{
     screen: Search,
     navigationOptions: {
       headerStyle: {backgroundColor:'#471a88'},
-      headerTitle:'Estabelecimentos',
+      title:'Estabelecimentos',
       headerTitleStyle: {color:'#fff'},
       headerTintColor: '#fff'
     },
@@ -78,38 +79,44 @@ const Newsnavigator = createStackNavigator({
   initialRouteName:'News'
 });
 
-const Accountnavigator = createStackNavigator({
-  Register:{
-    screen: Register,
+const Agendanavigator = createStackNavigator({
+  Agenda:{
+    screen: Agenda,
     navigationOptions: {
       headerStyle: {backgroundColor:'#471a88'},
-      headerTitle:'Cadastre-se',
-      headerTitleStyle: {color:'#fff'},
-      headerTintColor: '#fff',
-      headerLeft: null
-    },
-  },
-  AccountLogged:{
-    screen: AccountLogged,
-    navigationOptions: {
-      headerStyle: {backgroundColor:'#471a88'},
-      headerTitle:'Meu Perfil',
-      headerTitleStyle: {color:'#fff'},
-      headerTintColor: '#fff',
-      headerLeft: null
-    },
-  },
-  Login:{
-    screen: Login,
-    navigationOptions: {
-      headerStyle: {backgroundColor:'#471a88'},
-      headerTitle:'Meu Perfil',
+      headerTitle:'Agendar',
       headerTitleStyle: {color:'#fff'},
       headerTintColor: '#fff'
     },
   },
 },{
+  initialRouteName:'Agenda'
+});
+
+const Accountnavigator = createSwitchNavigator({
+  Register:{
+    screen: Register
+  },
+  AccountLogged:{
+    screen: AccountLogged
+  },
+  Login:{
+    screen: Login
+  },
+},{
   initialRouteName:'Register'
+})
+
+const AccountnavigatorStack = createStackNavigator({
+  Account:{
+    screen: Accountnavigator,
+    navigationOptions: {
+      headerStyle: {backgroundColor:'#471a88'},
+      headerTitle:'Meu Perfil',
+      headerTitleStyle: {color:'#fff'},
+      headerTintColor: '#fff',
+    },
+  }
 })
 
 const Routes = createAppContainer(
@@ -132,6 +139,15 @@ const Routes = createAppContainer(
             },
           },
         },
+        Agenda:{
+          screen: Agendanavigator,
+          navigationOptions: {
+            title: 'Agendar',
+            tabBarIcon: ({ focused, tintColor }) => {
+              return <Icon name='insert-invitation' size={24} color={tintColor} />;
+            },
+          },
+        },
         News:{
           screen: Newsnavigator,
           navigationOptions: {
@@ -142,7 +158,7 @@ const Routes = createAppContainer(
           },
         },
         Account:{
-          screen: Accountnavigator,
+          screen: AccountnavigatorStack,
           navigationOptions: {
             title: 'Meu Perfil',
             tabBarIcon: ({ focused, tintColor }) => {

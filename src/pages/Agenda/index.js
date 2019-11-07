@@ -10,11 +10,7 @@ export function isIphone5() {
   );
 };
 
-export default function Search({ navigation }) {
- 
-  const cat_id = navigation.getParam('cat_id');
-  const busca = navigation.getParam('busca');
-  const cat_nome = navigation.getParam('title');
+export default function Agenda({ navigation }) {
   
   const [estab, setEstab] = useState([]);   
   const [page, setPage] = useState(1);   
@@ -26,7 +22,7 @@ export default function Search({ navigation }) {
     
     if(totalCount && pageNumber > totalCount) return;
 
-    const query = (busca == undefined ? 'https://backendeloyaqui.herokuapp.com/estabelecimentos/categoria/' + cat_id + `?page=${pageNumber}` : 'https://backendeloyaqui.herokuapp.com/estabelecimentos/busca/' + busca + `?page=${pageNumber}`);
+    const query = 'https://backendeloyaqui.herokuapp.com/estabelecimentos/agendamentos/' + `?page=${pageNumber}`;
     const response = await fetch(
       query
     );
@@ -39,9 +35,6 @@ export default function Search({ navigation }) {
   };
 
   useEffect(() => {
-    navigation.setParams({ 
-      categoria: cat_nome
-    }); 
     setLoading(true);
     loadPage();
   }, []);
@@ -89,14 +82,6 @@ export default function Search({ navigation }) {
       />
     </View>
   );
-}
-
-Search.navigationOptions = ({ navigation }) => {
-  return {
-    headerTitle: () => (
-      <Text style={styles.txtPedido}>{navigation.getParam('categoria')}</Text>
-    ),
-  }
 }
 
 

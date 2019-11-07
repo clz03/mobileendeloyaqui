@@ -91,6 +91,7 @@ useEffect(() => {
     
         <View style={styles.backContainer}>
           <KeyboardAvoidingView style={styles.container} behavior="position">
+          <Text style={styles.txtTitle}>Cadastre-se</Text>
             <Text style={styles.txtTitleDesc}>Em breve teremos novidades para os inscritos no Eloy Aqui</Text>
             <View>
               <Text style={styles.labelLogin}>Nome</Text>

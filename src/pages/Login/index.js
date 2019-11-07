@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {View, Text, StyleSheet, Dimensions, TextInput, TouchableHighlight } from 'react-native';
+import {View, Text, StyleSheet, Dimensions, TextInput, TouchableHighlight, TouchableOpacity } from 'react-native';
 import {AsyncStorage} from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
@@ -25,7 +25,7 @@ export default function Login({ navigation }) {
   }
 
   async function handleRegistered(){
-    navigation.navigate('AccountLogged');
+    navigation.navigate('Register');
   }
 
   async function handleSubmit() {
@@ -95,9 +95,16 @@ export default function Login({ navigation }) {
                 />
                 <Text style={styles.labelError}>{erroValidador}</Text>
 
+              <TouchableOpacity>
+                <Text>Esqueci minha senha</Text>
+              </TouchableOpacity>
 
               <TouchableHighlight style={styles.btnEntrar} onPress={handleSubmit}>
                 <Text style={styles.textoEntrar}>Entrar</Text>
+              </TouchableHighlight>
+
+              <TouchableHighlight style={styles.btnEntrar} onPress={handleRegistered}>
+                <Text style={styles.textoEntrar}>Não tenho cadastro</Text>
               </TouchableHighlight>
 
             </View>

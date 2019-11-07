@@ -112,7 +112,9 @@ export default function Detail({ navigation }) {
                             <Text style={styles.tabTitle}></Text>
                             
                             <View style={[ styles.container ]}>
-                              
+                            
+                            {estab.whatsapp.length > 0 &&
+
                               <TouchableOpacity onPress={() => Linking.openURL(`whatsapp://send?phone=+55${estab.whatsapp}`)}>
                                 <View style={styles.menuItem}>
                                   <Image style={styles.imgwhats} source={require('./assets/whatsapp-logo.png')} />
@@ -121,13 +123,19 @@ export default function Detail({ navigation }) {
                                 </View>
                               </TouchableOpacity>
 
-                              <TouchableOpacity onPress={() => Linking.openURL(`instagram://user?username=${estab.instagram}`)}>
+                            }
+                            {estab.instagram.length > 0 &&
+                             
+                             <TouchableOpacity onPress={() => Linking.openURL(`instagram://user?username=${estab.instagram}`)}>
                                 <View style={styles.menuItem}>
                                   <Image style={styles.imginstagram} source={require('./assets/instagram-logo.png')} />
                                   <Text style={styles.tabSubRS}>Acompanhar</Text>
                                   <Text style={styles.tabSubRS}>{estab.instagram}</Text>
                                 </View>
                               </TouchableOpacity>
+
+                            }
+                            {estab.facebook.length > 0 &&
 
                               <TouchableOpacity onPress={() => Linking.openURL(`fb://page/${estab.facebook}`)}>
                                 <View style={styles.menuItem}>
@@ -136,7 +144,8 @@ export default function Detail({ navigation }) {
                                   <Text style={styles.tabSubRS}>{estab.facebook}</Text>
                                 </View>
                               </TouchableOpacity>
-                          
+                              
+                            }
                             </View>
                           </>
                         }

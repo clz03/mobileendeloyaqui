@@ -1,5 +1,6 @@
 import React, { useState, useEffect} from 'react';
 import {View, Text, StyleSheet, Dimensions, TouchableHighlight, FlatList, ActivityIndicator } from 'react-native';
+import {Container, Tab, Tabs, TabHeading } from 'native-base';
 import {AsyncStorage} from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
@@ -70,32 +71,44 @@ export default function AccountLogged({ navigation }) {
               <Text style={styles.textoEntrar}>Sair</Text>
             </TouchableHighlight>
 
-            <Text style={styles.txtTitleDesc}>Meus Agendamentos</Text>
-
-            <View style={styles.container}>
-              <FlatList
-              data={evento}
-              keyExtractor={evento => String(evento._id)}
-              ListHeaderComponent={
-                loading ? (
-                  <ActivityIndicator size="large" style={styles.backImageHeader}/>
-                ) : (
-                  ""
-                )
-              }
-              renderItem={({ item }) => (                
-                <View style={styles.Item}>
-                <Text style={styles.textDescPrinc}>{item.title}</Text>
-                  <View style={styles.containerGeral}>
-                    <View style={styles.txtContainer}>
-                      <Text style={styles.textDesc}>{item.start.substring(8,10) + "/" + item.start.substring(5,7) + "/" + item.start.substring(0,4) + " - " + item.end.substring(8,10) + "/" + item.end.substring(5,7) + "/" + item.end.substring(0,4)}</Text>
-                      <Text style={styles.textDesc}>{item.summary}</Text>
+            <Container>
+                <Tabs initialPage={0} locked={true}>
+                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Meus Agendamentos</Text></TabHeading>}>
+                    <View style={styles.container}>
+                      <FlatList
+                      data={evento}
+                      keyExtractor={evento => String(evento._id)}
+                      ListHeaderComponent={
+                        loading ? (
+                          <ActivityIndicator size="large" style={styles.backImageHeader}/>
+                        ) : (
+                          ""
+                        )
+                      }
+                      renderItem={({ item }) => (                
+                        <View style={styles.Item}>
+                        <Text style={styles.textDescPrinc}>{item.title}</Text>
+                          <View style={styles.containerGeral}>
+                            <View style={styles.txtContainer}>
+                              <Text style={styles.textDesc}>{item.start.substring(8,10) + "/" + item.start.substring(5,7) + "/" + item.start.substring(0,4) + " - " + item.end.substring(8,10) + "/" + item.end.substring(5,7) + "/" + item.end.substring(0,4)}</Text>
+                              <Text style={styles.textDesc}>{item.summary}</Text>
+                            </View>
+                          </View>
+                        </View>
+                        )}            
+                      />
                     </View>
-                  </View>
-                </View>
-                )}            
-              />
-            </View>
+                  </Tab>
+
+
+                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Meus Cupons</Text></TabHeading>}>
+                    <View style={styles.container}>
+                      
+                    </View>
+                  </Tab>
+                </Tabs>
+              </Container>
+            
 
           </View>
         </View>
@@ -166,6 +179,7 @@ var styles = StyleSheet.create({
     backgroundColor:'#471a88',
     height:35,
     marginTop: 15,
+    marginBottom: 15,
     borderRadius:6,
     alignSelf:'center'
   },
