@@ -84,7 +84,7 @@ const Agendanavigator = createStackNavigator({
     screen: Agenda,
     navigationOptions: {
       headerStyle: {backgroundColor:'#471a88'},
-      headerTitle:'Agendar',
+      headerTitle:'Disponíveis para Agendar',
       headerTitleStyle: {color:'#fff'},
       headerTintColor: '#fff'
     },
@@ -130,21 +130,21 @@ const Routes = createAppContainer(
             },
           },
         },
-        Reward:{
-          screen: Cupomnavigator,
-          navigationOptions: {
-            title: 'Cupons',
-            tabBarIcon: ({ focused, tintColor }) => {
-              return <Icon name='style' size={24} color={tintColor} />;
-            },
-          },
-        },
         Agenda:{
           screen: Agendanavigator,
           navigationOptions: {
             title: 'Agendar',
             tabBarIcon: ({ focused, tintColor }) => {
               return <Icon name='insert-invitation' size={24} color={tintColor} />;
+            },
+          },
+        },
+        Reward:{
+          screen: Cupomnavigator,
+          navigationOptions: {
+            title: 'Cupons',
+            tabBarIcon: ({ focused, tintColor }) => {
+              return <Icon name='style' size={24} color={tintColor} />;
             },
           },
         },

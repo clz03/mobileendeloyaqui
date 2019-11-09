@@ -22,7 +22,7 @@ export default function Agenda({ navigation }) {
     
     if(totalCount && pageNumber > totalCount) return;
 
-    const query = 'https://backendeloyaqui.herokuapp.com/estabelecimentos/agendamentos/' + `?page=${pageNumber}`;
+    const query = 'https://backendeloyaqui.herokuapp.com/estabelecimentos/com/agendamento/habilitado' + `?page=${pageNumber}`;
     const response = await fetch(
       query
     );

@@ -1,8 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, ScrollView, ImageBackground, Image, StyleSheet, Dimensions, TouchableOpacity, Linking, Platform } from 'react-native';
+import { 
+  View, 
+  Text, 
+  ScrollView, 
+  ImageBackground, 
+  Image, 
+  StyleSheet, 
+  Dimensions, 
+  TouchableOpacity, 
+  TouchableHighlight,
+  Linking, 
+  Platform, 
+  FlatList } 
+from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {Container, Tab, Tabs, TabHeading } from 'native-base';
+import CalendarStrip from 'react-native-calendar-strip';
+import moment from 'moment';
+import 'moment/locale/pt-br';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
@@ -21,6 +37,7 @@ export default function Detail({ navigation }) {
   const [prod, setProd] = useState([]);
   const [cupom, setCupom] = useState([]);
   const [evento, setEvento] = useState([]);
+  const [loading, setLoading] = useState(false);
   
   const idestab = navigation.getParam('idestab');
 
@@ -55,22 +72,91 @@ export default function Detail({ navigation }) {
       setCupom(data3);
     }
 
-    // async function loadEvento() {
+     async function loadEvento() {
+      setLoading(true);
     //   const response4 = await fetch(
     //     'https://backendeloyaqui.herokuapp.com/eventos/estabelecimento/' + idestab
     //   );
  
     //   const data4 = await response4.json();
     //   setEvento(data4);
-    // }
+      const data = [
+        {
+          '_id': '1',
+          'slot': 'Agendar às 08:00',
+          'status': 'D',
+          'summary': 'Corte comum'
+        },
+        {
+          '_id': '2',
+          'slot': 'Agendar às 09:00',
+          'status': 'I',
+          'summary': 'Corte comum'
+        },
+        {
+          '_id': '3',
+          'slot': 'Agendar às 10:00',
+          'status': 'I',
+          'summary': 'Corte comum'
+        },
+        {
+          '_id': '4',
+          'slot': 'Agendar às 11:00',
+          'status': 'D',
+          'summary': 'Corte comum'
+        },
+        {
+          '_id': '5',
+          'slot': 'Agendar às 12:00',
+          'status': 'D',
+          'summary': 'Corte comum'
+        },
+        {
+          '_id': '6',
+          'slot': 'Agendar às 13:00',
+          'status': 'D',
+          'summary': 'Corte comum'
+        },
+        {
+          '_id': '7',
+          'slot': 'Agendar às 14:00',
+          'status': 'I',
+          'summary': 'Corte comum'
+        },
+        {
+          '_id': '8',
+          'slot': 'Agendar às 17:00',
+          'status': 'I',
+          'summary': 'Corte comum'
+        },
+        {
+          '_id': '9',
+          'slot': 'Agendar às 16:00',
+          'status': 'I',
+          'summary': 'Corte comum'
+        },
+        {
+          '_id': '10',
+          'slot': 'Agendar às 17:00',
+          'status': 'I',
+          'summary': 'Corte comum'
+        }
+      ]
+      setEvento(data);
+      setLoading(false);
+    }
 
     loadEstab();
     loadProd();
     loadCupom();
-    // loadEvento();
+    loadEvento();
 
   }, []);
 
+  function eventClicked(event) {
+    //On Click oC a event showing alert from here
+    alert(event);
+  }
 
   return (    
             <View style={styles.backContainer}>  
@@ -231,11 +317,51 @@ export default function Detail({ navigation }) {
                 {pedonline == 1 && 
 
                   <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Agendar</Text></TabHeading>}>
-                    <ScrollView style={[ styles.container ]}>
-                      
-                      
-                      
-                    </ScrollView>
+
+                    <View style={styles.backContainer}>               
+                  
+                    <CalendarStrip
+                      calendarAnimation={{type: 'sequence', duration: 30}}
+                      daySelectionAnimation={{type: 'border', duration: 200, borderWidth: 1, borderHighlightColor: 'white'}}
+                      style={{height: 90, paddingTop: 8, paddingBottom: 10}}
+                      calendarHeaderStyle={{color: 'black'}}
+                      calendarColor={'#eaeaea'}
+                      dateNumberStyle={{color: 'black'}}
+                      dateNameStyle={{color: 'black'}}
+                      highlightDateNumberStyle={{color: 'purple'}}
+                      highlightDateNameStyle={{color: 'purple'}}
+                      disabledDateNameStyle={{color: 'grey'}}
+                      disabledDateNumberStyle={{color: 'grey'}}
+                      maxDate={moment().add(30, 'days') }
+                      minDate={moment()}
+                      iconContainer={{flex: 0.1}}
+                    />
+                   
+                   <FlatList
+                    scrollEnabled={true}
+                    data={evento}
+                    keyExtractor={evento => String(evento._id)}
+                    ListBottomComponent={
+                      loading ? (
+                        <ActivityIndicator size="large" style={styles.backImageHeader}/>
+                      ) : (
+                        ""
+                      )
+                    }
+                    renderItem={({ item }) => (
+                      <TouchableHighlight underlayColor={"#d3d3d3"}>
+                        <View style={styles.ItemAgenda}>
+                          <Text style={styles.textMenu}>{item.slot}</Text>
+                          { 
+                            item.status == 'D' ? <Text style={styles.textMenuGreen}>Disponível</Text> : <Text style={styles.textMenuRed}>Indisponível</Text>
+                          }
+                        </View>
+                      </TouchableHighlight>
+                    )}            
+                  />
+
+                    </View>  
+                    
                   </Tab>
                 }
 
@@ -263,6 +389,21 @@ var styles = StyleSheet.create({
     color:'#fff',
     fontSize:20,
     paddingLeft:15
+  },
+
+  textMenu: {
+    fontSize:13,
+    color: '#000'
+  },
+
+  textMenuGreen: {
+    fontSize:13,
+    color: 'green'
+  },
+
+  textMenuRed: {
+    fontSize:13,
+    color: 'red'
   },
 
   tabTitle: {
@@ -337,6 +478,21 @@ var styles = StyleSheet.create({
     borderColor:'#d3d3d3',
     marginTop:10,
     marginLeft:6
+  },
+
+  ItemAgenda:{
+    width: screenWidth *0.95,
+    height: screenHeight*0.10,
+    backgroundColor: '#e5e5e5',
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignContent:'center',
+    textAlign:'center',
+    borderRadius:10,
+    borderWidth:1,
+    borderColor:'#d3d3d3',
+    marginTop:10,
+    marginLeft:8
   },
 
   menuItemDestaq:{
