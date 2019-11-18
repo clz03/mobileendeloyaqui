@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Dimensions, Platform, ActivityIndicator, Image } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Dimensions, Platform, ActivityIndicator, Image, TouchableHighlight } from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
@@ -12,16 +12,14 @@ export function isIphone5() {
 
 export default function Reward() {
 
-
   const [cupom, setCupom] = useState([]);  
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);   
   const [totalCount, setTotalCount] = useState(0);   
   const [refreshing, setRefreshing] = useState(false);
 
-
   async function loadPage(pageNumber = page, shouldRefresh = false){
- 
+
     if(totalCount && pageNumber > totalCount) return;
  
     const response = await fetch(
@@ -46,45 +44,51 @@ export default function Reward() {
     setRefreshing(false);
   }
 
+  function handleCupom(){
+
+  };
+
   return (
     
         <View style={styles.backContainer}>
           <View style={styles.container}>
 
-
           <FlatList
-          data={cupom}
-          keyExtractor={cupom => String(cupom._id)}
-          onEndReached={() => loadPage()}
-          onEndReachedThreshold={0.1}
-          onRefresh={refreshList}
-          refreshing={refreshing}
-          ListHeaderComponent={
-            loading ? (
-              <ActivityIndicator size="large" style={styles.LoadingIndicator} />
-            ) : (
-              ""
-            )
-          }
-          renderItem={({ item }) => (
+            data={cupom}
+            keyExtractor={cupom => String(cupom._id)}
+            onEndReached={() => loadPage()}
+            onEndReachedThreshold={0.1}
+            onRefresh={refreshList}
+            refreshing={refreshing}
+            ListHeaderComponent={
+              loading ? (
+                <ActivityIndicator size="large" style={styles.LoadingIndicator} />
+              ) : (
+                ""
+              )
+            }
+            renderItem={({ item }) => (
           
-            
               <View style={styles.menuItem}>
                 <View style={styles.barraLateralVerde}></View>
 
                 <View style={styles.dados}>
-                  <Text style={styles.ticketText}>{item.premio}</Text>
+                  <Text numberOfLines={1} style={styles.ticketText}>{item.premio}</Text>
                   <View style={styles.containerGeral}>
                     <View style={styles.imgContainer}>
                       <Image style={styles.imagem} source={{uri: item.idestabelecimento.imagem }}></Image>
                     </View>
                     <View style={styles.txtContainer}>
                       <Text style={styles.dadosTextTitle}>Estabelecimento:</Text>
-                      <Text style={styles.dadosText}>{item.idestabelecimento.nome} ({item.idestabelecimento.tipo}-{item.idestabelecimento.subtipo})</Text>
-                      <Text style={styles.dadosTextSub}>{item.idestabelecimento.rua}, {item.idestabelecimento.numero}</Text>
-                      <Text style={styles.dadosTextRegras}>*Apresentar o cupom no estabelecimento*</Text>
+                      <Text numberOfLines={1} style={styles.dadosText}>{item.idestabelecimento.nome} ({item.idestabelecimento.tipo}-{item.idestabelecimento.subtipo})</Text>
+                      <Text numberOfLines={1} style={styles.dadosTextSub}>{item.idestabelecimento.rua}, {item.idestabelecimento.numero}</Text>
+                      {/* <Text style={styles.dadosTextRegras}>*Apresentar o cupom no estabelecimento*</Text> */}
                       <Text style={styles.dadosTextRegras}>*Válido até {item.validade.substring(8,10) + "/" + item.validade.substring(5,7) + "/" + item.validade.substring(0,4)}*</Text>
+                      <TouchableHighlight style={styles.btnEntrar} onPress={handleCupom}>
+                        <Text style={styles.textoEntrar}>Eu Quero !</Text>
+                      </TouchableHighlight>
                     </View>
+
                   </View>
                 </View>
 
@@ -121,7 +125,7 @@ var styles = StyleSheet.create({
   menuItem:{
     flexDirection: 'row',
     width: screenWidth *0.93,
-    height: isIphone5() ? screenHeight*0.30 : screenHeight*0.25,
+    height: isIphone5() ? screenHeight*0.35 : screenHeight*0.20,
     backgroundColor: '#fff',
     borderRadius:10,
     borderWidth:1,
@@ -206,5 +210,22 @@ var styles = StyleSheet.create({
   txtContainer:{
     width:screenWidth *0.69,
   },
+
+  btnEntrar:{
+    width: screenWidth * 0.30,
+    backgroundColor:'green',
+    height:30,
+    marginTop: 10,
+    marginRight:8,
+    borderRadius:6,
+    alignSelf:'flex-end'
+  },
+
+  textoEntrar:{
+    color:'#fff',
+    textAlign:'center',
+    fontSize:16,
+    marginTop:5
+  }
 
 });

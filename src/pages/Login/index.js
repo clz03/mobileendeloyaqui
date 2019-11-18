@@ -10,18 +10,11 @@ export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erroValidador, setErroValidador] = useState("");
+  const [erroValidador2, setErroValidador2] = useState("");
 
   async function CheckRedirect(){
-    const remove = false;
-
-    if (remove) {
-      await AsyncStorage.removeItem('useremail');
-    } else {
-      const Svalue = await AsyncStorage.getItem('useremail');
-      if (Svalue != null) {
-        navigation.navigate('AccountLogged', { email: Svalue });
-      }
-    }
+    if (await AsyncStorage.getItem('eloyuseremail') != null)
+      navigation.navigate('AccountLogged');
   }
 
   async function handleRegistered(){
@@ -31,12 +24,17 @@ export default function Login({ navigation }) {
   async function handleSubmit() {
 
     if(email == '') {
-      setErroValidador('e-mail não pode ser vazio');
+      setErroValidador('preencha seu e-mail');
       return;
-    } else {
-      setErroValidador('');
     }
 
+    if(senha == '') {
+      setErroValidador2('preencha sua senha');
+      return;
+    } else {
+      setErroValidador2('');
+    }
+    
     const reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/ ;
     if(reg.test(email) === false){
       setErroValidador('e-mail não está válido. Por favor verifique');
@@ -46,19 +44,28 @@ export default function Login({ navigation }) {
     }
 
     const responseApi = await fetch(
-      'https://backendeloyaqui.herokuapp.com/usuarios', {
+      'https://backendeloyaqui.herokuapp.com/authenticate', {
         method: 'POST',
         headers: {
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: email
+          email: email,
+          senha: senha
         }),
     });
 
-    await AsyncStorage.setItem('useremail', email);
-    navigation.navigate('AccountLogged')
+    const data = await responseApi.json();
+
+    if (responseApi.ok) {
+      await AsyncStorage.setItem('eloyuseremail', email);
+      await AsyncStorage.setItem('eloyusernome', data.nome);
+      navigation.navigate('AccountLogged')
+    } else {
+      setErroValidador2(data.error);
+    }
+
 }
 
   CheckRedirect();
@@ -93,9 +100,9 @@ export default function Login({ navigation }) {
                   value={senha}
                   onChangeText={(text) => setSenha(text)}
                 />
-                <Text style={styles.labelError}>{erroValidador}</Text>
+                <Text style={styles.labelError}>{erroValidador2}</Text>
 
-              <TouchableOpacity>
+              <TouchableOpacity style={styles.labelLogin}>
                 <Text>Esqueci minha senha</Text>
               </TouchableOpacity>
 

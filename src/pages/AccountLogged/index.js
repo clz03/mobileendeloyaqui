@@ -172,7 +172,9 @@ var styles = StyleSheet.create({
     width:screenWidth *0.7,
   },
 
-
+  tabHeading: {
+    backgroundColor: "#eaeaea"
+  },
 
   btnEntrar:{
     width: screenWidth * 0.50,

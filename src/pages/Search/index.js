@@ -1,5 +1,5 @@
 import React, { useState, useEffect }  from 'react';
-import { View, Text, StyleSheet, TouchableHighlight, Image, Dimensions, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableHighlight, Image, Dimensions, FlatList, ActivityIndicator } from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
@@ -113,16 +113,6 @@ var styles = StyleSheet.create({
     marginTop:15
   },
 
-  Item: {
-    height:65,
-    backgroundColor:'#fff',
-    borderBottomColor:'#d5d5d5',
-    borderBottomWidth:1,
-    paddingTop: 10,
-    paddingLeft: 10,
-
-  },
-
   ItemImg: {
     height:110,
     backgroundColor:'#fff',
@@ -130,7 +120,6 @@ var styles = StyleSheet.create({
     borderBottomWidth:1,
     paddingTop: 10,
     paddingLeft: 10,
-
   },
 
   textTitle: {
@@ -148,12 +137,6 @@ var styles = StyleSheet.create({
     fontSize: 12,
     paddingTop:5,
     color:'green'
-  },
-
-  textDescFechado: {
-    fontSize: 12,
-    paddingTop:5,
-    color:'red'
   },
 
   containerGeral:{
@@ -178,17 +161,6 @@ var styles = StyleSheet.create({
     marginTop:5
   },
 
-  viewPedido:{
-    backgroundColor:'green',
-    width:screenWidth *0.23,
-    height:15,
-    borderRadius:5,
-    alignItems:'center'
-  },
-
-  viewTitle:{
-    width:screenWidth *0.73,
-  },
 
   txtPedido:{
     fontSize:17,

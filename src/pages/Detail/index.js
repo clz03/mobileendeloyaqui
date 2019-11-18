@@ -11,7 +11,8 @@ import {
   TouchableHighlight,
   Linking, 
   Platform, 
-  FlatList } 
+  FlatList,
+  ActivityIndicator } 
 from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -40,6 +41,17 @@ export default function Detail({ navigation }) {
   const [loading, setLoading] = useState(false);
   
   const idestab = navigation.getParam('idestab');
+
+  async function loadEvento(date) {
+    setLoading(true);
+     const response4 = await fetch(
+       'https://backendeloyaqui.herokuapp.com/eventos/dia/' + date + '/' + idestab
+      );
+
+     const data4 = await response4.json();
+     setEvento(data4);
+     setLoading(false);
+  }
 
   useEffect(() => {
     async function loadEstab() {
@@ -72,90 +84,18 @@ export default function Detail({ navigation }) {
       setCupom(data3);
     }
 
-     async function loadEvento() {
-      setLoading(true);
-    //   const response4 = await fetch(
-    //     'https://backendeloyaqui.herokuapp.com/eventos/estabelecimento/' + idestab
-    //   );
- 
-    //   const data4 = await response4.json();
-    //   setEvento(data4);
-      const data = [
-        {
-          '_id': '1',
-          'slot': 'Agendar às 08:00',
-          'status': 'D',
-          'summary': 'Corte comum'
-        },
-        {
-          '_id': '2',
-          'slot': 'Agendar às 09:00',
-          'status': 'I',
-          'summary': 'Corte comum'
-        },
-        {
-          '_id': '3',
-          'slot': 'Agendar às 10:00',
-          'status': 'I',
-          'summary': 'Corte comum'
-        },
-        {
-          '_id': '4',
-          'slot': 'Agendar às 11:00',
-          'status': 'D',
-          'summary': 'Corte comum'
-        },
-        {
-          '_id': '5',
-          'slot': 'Agendar às 12:00',
-          'status': 'D',
-          'summary': 'Corte comum'
-        },
-        {
-          '_id': '6',
-          'slot': 'Agendar às 13:00',
-          'status': 'D',
-          'summary': 'Corte comum'
-        },
-        {
-          '_id': '7',
-          'slot': 'Agendar às 14:00',
-          'status': 'I',
-          'summary': 'Corte comum'
-        },
-        {
-          '_id': '8',
-          'slot': 'Agendar às 17:00',
-          'status': 'I',
-          'summary': 'Corte comum'
-        },
-        {
-          '_id': '9',
-          'slot': 'Agendar às 16:00',
-          'status': 'I',
-          'summary': 'Corte comum'
-        },
-        {
-          '_id': '10',
-          'slot': 'Agendar às 17:00',
-          'status': 'I',
-          'summary': 'Corte comum'
-        }
-      ]
-      setEvento(data);
-      setLoading(false);
-    }
-
     loadEstab();
     loadProd();
     loadCupom();
-    loadEvento();
+    loadEvento(moment().format("YYYY-MM-DD"));
 
   }, []);
 
-  function eventClicked(event) {
-    //On Click oC a event showing alert from here
-    alert(event);
+  function handleAgendamento(data, hora, status) {
+    if(status == 'I')
+      alert("Horário Indisponível, por favor selecione outro horário");
+    else
+      alert("Agendar para " + data + "-" + hora + ":00 ?");
   }
 
   return (    
@@ -335,13 +275,14 @@ export default function Detail({ navigation }) {
                       maxDate={moment().add(30, 'days') }
                       minDate={moment()}
                       iconContainer={{flex: 0.1}}
+                      onDateSelected={date => loadEvento(moment(date).format("YYYY-MM-DD"))}
                     />
                    
                    <FlatList
                     scrollEnabled={true}
                     data={evento}
-                    keyExtractor={evento => String(evento._id)}
-                    ListBottomComponent={
+                    keyExtractor={evento => String(evento.id)}
+                    ListHeaderComponent={
                       loading ? (
                         <ActivityIndicator size="large" style={styles.backImageHeader}/>
                       ) : (
@@ -349,9 +290,9 @@ export default function Detail({ navigation }) {
                       )
                     }
                     renderItem={({ item }) => (
-                      <TouchableHighlight underlayColor={"#d3d3d3"}>
+                      <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { handleAgendamento(item.data,item.hora,item.status) }}>
                         <View style={styles.ItemAgenda}>
-                          <Text style={styles.textMenu}>{item.slot}</Text>
+                          <Text style={styles.textMenu}>Agendar para {item.hora}:00</Text>
                           { 
                             item.status == 'D' ? <Text style={styles.textMenuGreen}>Disponível</Text> : <Text style={styles.textMenuRed}>Indisponível</Text>
                           }

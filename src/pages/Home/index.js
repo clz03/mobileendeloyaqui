@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, FlatList, Text, Image, ImageBackground, StyleSheet, Dimensions, TextInput, TouchableHighlight, TouchableOpacity, ActivityIndicator } from 'react-native';
 
 import logo from './assets/eloy.png';
+import imgbg from './assets/bg3.jpeg';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
@@ -13,8 +14,6 @@ export default function Home({ navigation }) {
   const [loading, setLoading] = useState(false);
  
   useEffect(() => {
-    
-    setLoading(true);
 
     async function loadCat() {
       const response = await fetch(
@@ -25,6 +24,8 @@ export default function Home({ navigation }) {
       setCat(data);
       setLoading(false);
     }
+    
+    setLoading(true);
     loadCat();
     
   }, []);
@@ -38,7 +39,7 @@ export default function Home({ navigation }) {
   return (
     
       <View style={styles.backContainer}>
-        <ImageBackground source={require('./assets/bg3.jpeg')} style={styles.backImageHeader}>
+        <ImageBackground source={imgbg} style={styles.backImageHeader}>
           <Image source={logo} style={styles.logo}></Image>
           <View style={styles.containerSearch}>
             <TextInput 
@@ -96,10 +97,6 @@ var styles = StyleSheet.create({
   backContainer: {
     flex: 1,
     paddingHorizontal: 0
-  },
-
-  logoContainer: {
-    height:screenHeight * 0.42
   },
 
   backImageHeader: {
@@ -166,6 +163,5 @@ var styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   }
-
 
 });

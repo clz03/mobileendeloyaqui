@@ -89,6 +89,12 @@ const Agendanavigator = createStackNavigator({
       headerTintColor: '#fff'
     },
   },
+  Detail:{
+    screen: Detail,
+    navigationOptions: {
+      header: null,
+    },
+  },
 },{
   initialRouteName:'Agenda'
 });
