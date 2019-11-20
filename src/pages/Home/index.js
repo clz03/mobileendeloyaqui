@@ -136,7 +136,7 @@ var styles = StyleSheet.create({
   textMenu: {
     fontSize:13,
     paddingTop:10,
-    color: '#d2d2d2'
+    color: '#fff'
   },
 
   textSearch: {

@@ -79,6 +79,7 @@ export default function Register({ navigation }) {
 
     await AsyncStorage.setItem('eloyuseremail', email);
     await AsyncStorage.setItem('eloyusernome', nome);
+    await AsyncStorage.setItem('eloyuserid', data._id);
     navigation.navigate('AccountLogged')
 }
 

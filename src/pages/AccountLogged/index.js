@@ -8,57 +8,58 @@ const screenHeight = Math.round(Dimensions.get('window').height);
 
 export default function AccountLogged({ navigation }) {
 
-  // const [email, setEmail] = useState("");
   const [nome, setNome] = useState("");
   const [evento, setEvento] = useState([]);  
+  const [cupom, setCupom] = useState([]);  
   const [loading, setLoading] = useState(false);
 
   async function handleLogout(){
     await AsyncStorage.removeItem('eloyuseremail');
     await AsyncStorage.removeItem('eloyusernome');
-    navigation.navigate('Register');
+    await AsyncStorage.removeItem('eloyuserid');
+    navigation.navigate('Login');
+  }
+
+  async function getStorageValue() {
+    setNome(await AsyncStorage.getItem('eloyusernome'));
+  }
+
+  async function handleCancel(idevento) {
+    const responseApi = await fetch(
+      'https://backendeloyaqui.herokuapp.com/eventos/' + idevento, {
+        method: 'DELETE'
+    });
+
+    setLoading(true);
+    loadEventos();
+  }
+
+  async function loadEventos() {
+    const iduser = await AsyncStorage.getItem('eloyuserid');
+    const response = await fetch(
+      'https://backendeloyaqui.herokuapp.com/eventos/usuario/' + iduser
+    );
+    const data = await response.json();
+    setLoading(false);
+    setEvento(data);
+  }
+
+  async function loadCupons() {
+    const iduser = await AsyncStorage.getItem('eloyuserid');
+    const response = await fetch(
+      'https://backendeloyaqui.herokuapp.com/usercupons/usuario/' + iduser
+    );
+    const data = await response.json();
+
+    setCupom(data);
+    setLoading(false);
   }
 
   useEffect(() => {
-
     setLoading(true);
-
-    async function getStorageValue() {
-      // setEmail(await AsyncStorage.getItem('eloyuseremail'));
-      setNome(await AsyncStorage.getItem('eloyusernome'));
-    }
-
-    async function loadEventos() {
-      //const response = await fetch(
-      //  'https://backendeloyaqui.herokuapp.com/eventos' 
-      //);
-
-      //const data = await response.json();
-
-      const data = [
-        {
-          '_id': '1',
-          'title': 'Barbearia do Rody',
-          'start': '2019-11-04',
-          'end': '2019-11-05',
-          'summary': 'Corte comum'
-        },
-        {
-          '_id': '2',
-          'title': 'Vi Pé e Mão',
-          'start': '2019-11-04',
-          'end': '2019-11-05',
-          'summary': 'Depilação'
-        }
-      ]
-
-      setEvento(data);
-      setLoading(false);
-    }
-
     getStorageValue();
     loadEventos();
-    
+    loadCupons();
   }, []);
 
   return (
@@ -85,13 +86,18 @@ export default function AccountLogged({ navigation }) {
                           ""
                         )
                       }
+                      ListEmptyComponent={<Text style={styles.txtTitleDesc}>Você não tem agendamentos. Acesse os estabelecimentos e agende agora mesmo !</Text>}
                       renderItem={({ item }) => (                
                         <View style={styles.Item}>
-                        <Text style={styles.textDescPrinc}>{item.title}</Text>
+                        <Text style={styles.textDescPrinc}>{item.data.substring(8,10) + "/" + item.data.substring(5,7) + "/" + item.data.substring(0,4)}</Text>
                           <View style={styles.containerGeral}>
                             <View style={styles.txtContainer}>
-                              <Text style={styles.textDesc}>{item.start.substring(8,10) + "/" + item.start.substring(5,7) + "/" + item.start.substring(0,4) + " - " + item.end.substring(8,10) + "/" + item.end.substring(5,7) + "/" + item.end.substring(0,4)}</Text>
-                              <Text style={styles.textDesc}>{item.summary}</Text>
+                              <Text style={styles.textDesc}>{item.hora}:00</Text>
+                              <Text style={styles.textDesc}>{item.idestabelecimento.nome}</Text>
+                              <Text style={styles.textDesc}>{item.idestabelecimento.rua}, {item.idestabelecimento.numero}</Text>
+                              <TouchableHighlight style={styles.btnRemover} onPress={() => { handleCancel(item._id) }}>
+                                <Text style={styles.textoEntrar}>Cancelar</Text>
+                              </TouchableHighlight>
                             </View>
                           </View>
                         </View>
@@ -103,7 +109,32 @@ export default function AccountLogged({ navigation }) {
 
                   <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Meus Cupons</Text></TabHeading>}>
                     <View style={styles.container}>
-                      
+                    <FlatList
+                      data={cupom}
+                      keyExtractor={cupom => String(cupom._id)}
+                      ListHeaderComponent={
+                        loading ? (
+                          <ActivityIndicator size="large" style={styles.backImageHeader}/>
+                        ) : (
+                          ""
+                        )
+                      }
+                      ListEmptyComponent={<Text style={styles.txtTitleDesc}>Você não tem cupons.</Text>}
+                      renderItem={({ item }) => (                
+                        <View style={styles.Item}>
+                        <Text style={styles.textDescPrinc}>{item.idcupom.premio}</Text>
+                          <View style={styles.containerGeral}>
+                            <View style={styles.txtContainer}>
+                              <Text style={styles.textDesc}>Valido até: {item.idcupom.validade.substring(8,10) + "/" + item.idcupom.validade.substring(5,7) + "/" + item.idcupom.validade.substring(0,4)}</Text>
+                              <Text style={styles.textDesc}>{item.idestabelecimento.nome}</Text>
+                              <Text style={styles.textDesc}>{item.idestabelecimento.rua}, {item.idestabelecimento.numero}</Text>
+                              <Text style={styles.dadosTextRegras}>*{item.idcupom.regra}</Text>
+                              <Text style={styles.dadosTextRegras}>*Apresentar esse cupom no estabelecimento*</Text>
+                            </View>
+                          </View>
+                        </View>
+                        )}            
+                      />
                     </View>
                   </Tab>
                 </Tabs>
@@ -142,17 +173,14 @@ var styles = StyleSheet.create({
 
   txtTitleDesc:{
     color:'#000',
-    fontSize:20,
+    fontSize:14,
     marginTop:10,
-    marginBottom:10,
-    marginLeft:5,
-    textAlign:'center',
+    marginLeft:5
   },
 
   textDescPrinc: {
     fontSize: 14,
     fontWeight:'bold',
-    marginBottom:5,
     marginTop:5
   },
 
@@ -161,7 +189,7 @@ var styles = StyleSheet.create({
   },
 
   Item: {
-    height:screenHeight * 0.1,
+    height:screenHeight * 0.13,
     backgroundColor:'#fff',
     borderBottomColor:'#d5d5d5',
     borderBottomWidth:1,
@@ -191,7 +219,22 @@ var styles = StyleSheet.create({
     textAlign:'center',
     fontSize:18,
     marginTop:5
-  }
+  },
+
+  dadosTextRegras:{
+    color:'#5d5d5d',
+    marginLeft:0,
+    fontSize:10
+  },
+
+  btnRemover:{
+    width: screenWidth * 0.30,
+    backgroundColor:'red',
+    height:35,
+    marginTop: 5,
+    marginBottom: 5,
+    borderRadius:6
+  },
   
 
 });

@@ -1,8 +1,14 @@
 import React, { useState, useEffect }  from 'react';
-import { View, Text, StyleSheet, TouchableHighlight, Dimensions, FlatList, ActivityIndicator, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableHighlight, Dimensions, FlatList, ActivityIndicator, Image, Platform } from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
+
+export function isIphoneX() {
+  return (
+    Platform.OS === 'ios' && screenHeight >= 812
+  );
+}
 
 export default function Search({ navigation }) {
 
@@ -58,7 +64,7 @@ export default function Search({ navigation }) {
       renderItem={({ item }) => (
         <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('NewsDetail', { id: item._id }) }}>
           <View style={styles.ItemImg}>
-          <Text style={styles.textTitle}>{item.titulo}</Text>
+          <Text style={styles.textTitle} numberOfLines={1}>{item.titulo}</Text>
             <View style={styles.containerGeral}>
               <View style={styles.imgContainer}>
                 <Image style={styles.imagem} source={{uri: item.imagem }}></Image>
@@ -100,13 +106,12 @@ Item: {
 },
 
 ItemImg: {
-  height:130,
+  height: isIphoneX() ? screenHeight*0.125 : screenHeight*0.155,
   backgroundColor:'#fff',
   borderBottomColor:'#d5d5d5',
   borderBottomWidth:1,
-  paddingTop: 10,
-  paddingLeft: 10,
-
+  marginTop:8,
+  marginLeft:10,
 },
 
 textTitle: {

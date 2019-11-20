@@ -9,6 +9,7 @@ import Reward from './pages/Reward';
 import Register from './pages/Register';
 import AccountLogged from './pages/AccountLogged';
 import Login from './pages/Login';
+import ForgotPwd from './pages/ForgotPwd';
 import News from './pages/News';
 import NewsDetail from './pages/NewsDetail';
 import Search from './pages/Search'; 
@@ -109,8 +110,11 @@ const Accountnavigator = createSwitchNavigator({
   Login:{
     screen: Login
   },
+  ForgotPwd:{
+    screen: ForgotPwd
+  }
 },{
-  initialRouteName:'Register'
+  initialRouteName:'Login'
 })
 
 const AccountnavigatorStack = createStackNavigator({

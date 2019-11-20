@@ -17,7 +17,11 @@ export default function Login({ navigation }) {
       navigation.navigate('AccountLogged');
   }
 
-  async function handleRegistered(){
+  function handleForgotPwd(){
+    navigation.navigate('ForgotPwd');
+  }
+
+  function handleRegistered(){
     navigation.navigate('Register');
   }
 
@@ -61,6 +65,7 @@ export default function Login({ navigation }) {
     if (responseApi.ok) {
       await AsyncStorage.setItem('eloyuseremail', email);
       await AsyncStorage.setItem('eloyusernome', data.nome);
+      await AsyncStorage.setItem('eloyuserid', data._id);
       navigation.navigate('AccountLogged')
     } else {
       setErroValidador2(data.error);
@@ -102,7 +107,7 @@ export default function Login({ navigation }) {
                 />
                 <Text style={styles.labelError}>{erroValidador2}</Text>
 
-              <TouchableOpacity style={styles.labelLogin}>
+              <TouchableOpacity style={styles.labelLogin} onPress={handleForgotPwd}>
                 <Text>Esqueci minha senha</Text>
               </TouchableOpacity>
 

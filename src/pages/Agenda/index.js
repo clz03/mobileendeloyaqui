@@ -1,14 +1,14 @@
 import React, { useState, useEffect }  from 'react';
-import { View, Text, StyleSheet, TouchableHighlight, Image, Dimensions, FlatList, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableHighlight, Image, Dimensions, FlatList, ActivityIndicator, Platform } from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
 
-export function isIphone5() {
+export function isIphoneX() {
   return (
-    Platform.OS === 'ios' && screenWidth == 320
+    Platform.OS === 'ios' && screenHeight >= 812
   );
-};
+}
 
 export default function Agenda({ navigation }) {
   
@@ -109,13 +109,12 @@ var styles = StyleSheet.create({
   },
 
   ItemImg: {
-    height:110,
+    height: isIphoneX() ? screenHeight*0.125 : screenHeight*0.155,
     backgroundColor:'#fff',
     borderBottomColor:'#d5d5d5',
     borderBottomWidth:1,
-    paddingTop: 10,
-    paddingLeft: 10,
-
+    marginTop:8,
+    marginLeft:10,
   },
 
   textTitle: {

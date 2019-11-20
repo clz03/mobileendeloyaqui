@@ -12,7 +12,9 @@ import {
   Linking, 
   Platform, 
   FlatList,
-  ActivityIndicator } 
+  ActivityIndicator,
+  Alert,
+  AsyncStorage } 
 from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -23,12 +25,6 @@ import 'moment/locale/pt-br';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
-
-export function isIphone5() {
-  return (
-    Platform.OS === 'ios' && screenWidth == 320
-  );
-}
 
 export default function Detail({ navigation }) {
   
@@ -91,12 +87,76 @@ export default function Detail({ navigation }) {
 
   }, []);
 
-  function handleAgendamento(data, hora, status) {
-    if(status == 'I')
-      alert("Horário Indisponível, por favor selecione outro horário");
-    else
-      alert("Agendar para " + data + "-" + hora + ":00 ?");
+  async function handleAgendamento(data, hora, status) {
+
+    const useremail = await AsyncStorage.getItem('eloyuseremail');
+
+    if (useremail != null){
+      if(status == 'I'){
+        Alert.alert(
+          'Horário Indisponível',
+          'por favor selecione outro horário'
+        );
+      } else {
+        Alert.alert(
+          'Confirmação',
+          'Agendar para ' + data + '-' + hora + ':00 ?',
+          [
+            {text: 'Não'},
+            {text: 'Sim', onPress: () => confirmAgendamento(data, hora, useremail)}
+          ]
+        );
+      }
+    } else {
+      Alert.alert(
+        'Login',
+        'Para agendar é preciso fazer login',
+        [
+          {text: 'OK'},
+          {text: 'Ir para Login', onPress: () => navigation.navigate('Login')}
+        ]
+      );
+    }
   }
+
+  async function confirmAgendamento(data, hora, useremail) {
+
+      const iduser = await AsyncStorage.getItem('eloyuserid');
+
+      const response = await fetch(
+        'https://backendeloyaqui.herokuapp.com/usuarios/'+ iduser
+      );
+  
+      const datareturn = await response.json();
+
+      if(!datareturn[0].validado){
+        Alert.alert(
+          'Seu cadastro ainda não está validado',
+          'Por favor ative seu cadastro, verifique o e-mail recebido para ativar sua conta.'
+        );
+        return;
+      }
+
+      const responseApi = await fetch(
+        'https://backendeloyaqui.herokuapp.com/eventos', {
+          method: 'POST',
+          headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            data: data,
+            hora: hora,
+            comentario: useremail,
+            idestabelecimento: idestab,
+            idusuario: iduser
+          }),
+      });
+
+      if(responseApi.ok)
+        loadEvento(data);
+  }
+
 
   return (    
             <View style={styles.backContainer}>  
@@ -479,7 +539,7 @@ var styles = StyleSheet.create({
   cupomItem:{
     flexDirection: 'row',
     width: screenWidth *0.93,
-    height: isIphone5() ? screenHeight*0.20 : screenHeight*0.15,
+    height: screenHeight*0.15,
     backgroundColor: '#fff',
     borderRadius:10,
     borderWidth:1,
