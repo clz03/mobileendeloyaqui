@@ -1,13 +1,14 @@
 import React, { useState, useEffect }  from 'react';
-import { View, Text, StyleSheet, TouchableHighlight, Image, Dimensions, FlatList, Button } from 'react-native';
+import { View, Text, StyleSheet, Image, Dimensions, FlatList, ActivityIndicator } from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
-const screenHeight = Math.round(Dimensions.get('window').height);
+//const screenHeight = Math.round(Dimensions.get('window').height);
 
 export default function NewsDetail({ navigation }) {
  
   const noticia_id = navigation.getParam('id');
   const [noticia, setNoticia] = useState([]);  
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     async function loadNoticia() {
@@ -17,7 +18,9 @@ export default function NewsDetail({ navigation }) {
 
       const data = await response.json();
       setNoticia(data);
+      setLoading(false)
     }
+    setLoading(true)
     loadNoticia();
   }, []);
 
@@ -27,8 +30,14 @@ export default function NewsDetail({ navigation }) {
       <FlatList
         data={noticia}
         keyExtractor={noticia => String(noticia._id)}
+        ListHeaderComponent={
+          loading ? (
+            <ActivityIndicator size="large" style={styles.LoadingIndicator} />
+          ) : (
+            ""
+          )
+        }
         renderItem={({ item }) => (
-
           
             <View style={styles.ItemImg}>
             <Text style={styles.textTitle}>{item.titulo}</Text>
@@ -56,6 +65,12 @@ var styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor:'#fff'
+  },
+
+  LoadingIndicator:{
+    flex:1,
+    justifyContent:"center",
+    marginTop:15
   },
 
   Item: {

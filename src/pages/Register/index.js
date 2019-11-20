@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View, Text, StyleSheet, Dimensions, TextInput, TouchableHighlight, KeyboardAvoidingView } from 'react-native';
+import {View, Text, StyleSheet, Dimensions, TextInput, TouchableHighlight, KeyboardAvoidingView,ActivityIndicator } from 'react-native';
 import {AsyncStorage} from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
@@ -13,6 +13,7 @@ export default function Register({ navigation }) {
   const [erroValidador, setErroValidador] = useState("");
   const [erroValidador2, setErroValidador2] = useState("");
   const [erroValidador3, setErroValidador3] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function CheckRedirect(){
     if (await AsyncStorage.getItem('eloyuseremail') != null)
@@ -50,6 +51,7 @@ export default function Register({ navigation }) {
     }
     
     if(cError) return;
+    setLoading(true);
 
     const response = await fetch(
       'https://backendeloyaqui.herokuapp.com/usuarios/email/'+email 
@@ -57,12 +59,13 @@ export default function Register({ navigation }) {
 
     if(await response.json() > 0){
       setErroValidador('e-mail já cadastrado. Por favor verifique');
+      setLoading(false);
       return;
     } else {
       setErroValidador('');
     }
 
-    await fetch(
+    const apireturn = await fetch(
        'https://backendeloyaqui.herokuapp.com/usuarios', {
         method: 'POST',
         headers: {
@@ -77,10 +80,13 @@ export default function Register({ navigation }) {
         }),
     });
 
+    const responseJson = await apireturn.json();
+
     await AsyncStorage.setItem('eloyuseremail', email);
     await AsyncStorage.setItem('eloyusernome', nome);
-    await AsyncStorage.setItem('eloyuserid', data._id);
-    navigation.navigate('AccountLogged')
+    await AsyncStorage.setItem('eloyuserid', responseJson._id);
+    setLoading(false);
+    navigation.navigate('AccountLogged');
 }
 
 useEffect(() => {
@@ -136,6 +142,10 @@ useEffect(() => {
               <TouchableHighlight style={styles.btnEntrar} onPress={handleRegistered}>
                 <Text style={styles.textoEntrar}>Já tenho cadastro</Text>
               </TouchableHighlight>
+
+              {
+                loading && <ActivityIndicator size="large" style={styles.LoadingIndicator} />
+              }
             </View>
 
           </KeyboardAvoidingView>
@@ -153,6 +163,11 @@ var styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
     backgroundColor:'#fff'
+  },
+
+  LoadingIndicator:{
+    justifyContent:"center",
+    marginTop:25
   },
 
   txtTitle:{

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {View, Text, StyleSheet, Dimensions, TextInput, TouchableHighlight, TouchableOpacity } from 'react-native';
+import {View, Text, StyleSheet, Dimensions, TextInput, TouchableHighlight, TouchableOpacity, ActivityIndicator } from 'react-native';
 import {AsyncStorage} from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
@@ -11,6 +11,7 @@ export default function Login({ navigation }) {
   const [senha, setSenha] = useState("");
   const [erroValidador, setErroValidador] = useState("");
   const [erroValidador2, setErroValidador2] = useState("");
+  const [loading, setLoading] = useState(false);
 
   async function CheckRedirect(){
     if (await AsyncStorage.getItem('eloyuseremail') != null)
@@ -47,6 +48,8 @@ export default function Login({ navigation }) {
       setErroValidador('');
     }
 
+    setLoading(true);
+
     const responseApi = await fetch(
       'https://backendeloyaqui.herokuapp.com/authenticate', {
         method: 'POST',
@@ -66,10 +69,13 @@ export default function Login({ navigation }) {
       await AsyncStorage.setItem('eloyuseremail', email);
       await AsyncStorage.setItem('eloyusernome', data.nome);
       await AsyncStorage.setItem('eloyuserid', data._id);
+      setLoading(false);
       navigation.navigate('AccountLogged')
     } else {
       setErroValidador2(data.error);
+      setLoading(false);
     }
+
 
 }
 
@@ -84,7 +90,6 @@ export default function Login({ navigation }) {
             <Text style={styles.txtTitleDesc}>Em breve teremos novidades para os inscritos no Eloy Aqui</Text>
 
             <View style={styles.formAuth}>
-
 
                 <Text style={styles.labelLogin}>E-mail</Text>
                 <TextInput 
@@ -119,6 +124,11 @@ export default function Login({ navigation }) {
                 <Text style={styles.textoEntrar}>Não tenho cadastro</Text>
               </TouchableHighlight>
 
+              {
+                loading && <ActivityIndicator size="large" style={styles.LoadingIndicator} />
+              }
+
+
             </View>
 
           </View>
@@ -133,7 +143,11 @@ var styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: 0,
   },
-
+  
+  LoadingIndicator:{
+    justifyContent:"center",
+    marginTop:25
+  },
 
   backHeader: {
     height: screenHeight*0.1,

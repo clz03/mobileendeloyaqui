@@ -47,6 +47,7 @@ export default function Forgot({ navigation }) {
             'Esqueci minha senha',
             'Link de ativação da senha enviado para ' + email
           );
+        handleRegistered();
     } else {
       setErroValidador(data.error);
     }
