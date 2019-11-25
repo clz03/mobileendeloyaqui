@@ -44,7 +44,7 @@ export default function Register({ navigation }) {
     }
 
     if(senha == '') {
-      setErroValidador3('nome não pode ser vazio');
+      setErroValidador3('senha não pode ser vazio');
       cError = true;
     } else {
       setErroValidador3('');
@@ -52,18 +52,6 @@ export default function Register({ navigation }) {
     
     if(cError) return;
     setLoading(true);
-
-    const response = await fetch(
-      'https://backendeloyaqui.herokuapp.com/usuarios/email/'+email 
-    );
-
-    if(await response.json() > 0){
-      setErroValidador('e-mail já cadastrado. Por favor verifique');
-      setLoading(false);
-      return;
-    } else {
-      setErroValidador('');
-    }
 
     const apireturn = await fetch(
        'https://backendeloyaqui.herokuapp.com/usuarios', {
@@ -81,6 +69,14 @@ export default function Register({ navigation }) {
     });
 
     const responseJson = await apireturn.json();
+    
+    if (!apireturn.ok) {
+      setErroValidador(responseJson.error);
+      setLoading(false);
+      return;
+    } else {
+      setErroValidador('');
+    }
 
     await AsyncStorage.setItem('eloyuseremail', email);
     await AsyncStorage.setItem('eloyusernome', nome);
@@ -104,7 +100,7 @@ useEffect(() => {
               <Text style={styles.labelLogin}>Nome</Text>
               <TextInput 
                 style={ styles.inputLogin } 
-                maxLength={35}
+                maxLength={40}
                 autoCorrect={true} 
                 value={nome}
                 onChangeText={(text) => setNome(text)}
@@ -114,7 +110,7 @@ useEffect(() => {
               <Text style={styles.labelLogin}>E-mail</Text>
               <TextInput 
                 style={ styles.inputLogin } 
-                maxLength={35}
+                maxLength={40}
                 autoCapitalize='none' 
                 autoCorrect={false} 
                 keyboardType="email-address"

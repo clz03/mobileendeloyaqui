@@ -10,11 +10,11 @@ import {
   TouchableOpacity, 
   TouchableHighlight,
   Linking, 
-  Platform, 
   FlatList,
   ActivityIndicator,
   Alert,
-  AsyncStorage } 
+  AsyncStorage,
+  Modal } 
 from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -47,10 +47,9 @@ export default function Detail({ navigation }) {
      const data4 = await response4.json();
      setEvento(data4);
      setLoading(false);
-  }
+  };
 
-  useEffect(() => {
-    async function loadEstab() {
+  async function loadEstab() {
 
       const response = await fetch(
         'https://backendeloyaqui.herokuapp.com/estabelecimentos/' + idestab
@@ -60,26 +59,28 @@ export default function Detail({ navigation }) {
       setEstab(data);
       setPlano(data[0].plano);
       setPedonline(data[0].pedonline);
-    }
+    };
 
-     async function loadProd() {
-       const response2 = await fetch(
-         'https://backendeloyaqui.herokuapp.com/produtos/estabelecimento/' + idestab
-       );
-  
-       const data2 = await response2.json();
-       setProd(data2);
-     }
-
-     async function loadCupom() {
-      const response3 = await fetch(
-        'https://backendeloyaqui.herokuapp.com/cupons/estabelecimento/' + idestab
+    async function loadProd() {
+      const response2 = await fetch(
+        'https://backendeloyaqui.herokuapp.com/produtos/estabelecimento/' + idestab
       );
  
-      const data3 = await response3.json();
-      setCupom(data3);
-    }
+      const data2 = await response2.json();
+      setProd(data2);
+    };
 
+    async function loadCupom() {
+     const response3 = await fetch(
+       'https://backendeloyaqui.herokuapp.com/cupons/estabelecimento/' + idestab
+     );
+
+     const data3 = await response3.json();
+     setCupom(data3);
+   };
+
+  useEffect(() => {
+  
     loadEstab();
     loadProd();
     loadCupom();
@@ -128,14 +129,17 @@ export default function Detail({ navigation }) {
       );
   
       const datareturn = await response.json();
-
+      
       if(!datareturn[0].validado){
+        
         Alert.alert(
           'Seu cadastro ainda não está validado',
           'Por favor ative seu cadastro, verifique o e-mail recebido para ativar sua conta.'
         );
         return;
       }
+
+      setLoading(true);
 
       const responseApi = await fetch(
         'https://backendeloyaqui.herokuapp.com/eventos', {
@@ -155,6 +159,10 @@ export default function Detail({ navigation }) {
 
       if(responseApi.ok)
         loadEvento(data);
+
+      setLoading(false);
+
+      setTimeout(() => Alert.alert('Agendamento realizado!', 'Gerencie seus agendamentos no seu perfil'), 800);
   }
 
 
@@ -343,12 +351,24 @@ export default function Detail({ navigation }) {
                     data={evento}
                     keyExtractor={evento => String(evento.id)}
                     ListHeaderComponent={
-                      loading ? (
-                        <ActivityIndicator size="large" style={styles.backImageHeader}/>
+                      loading ? ( 
+                        <Modal
+                          transparent={true}
+                          animationType={'none'}
+                          visible={loading}>
+                          <View style={styles.modalBackground}>
+                            <View style={styles.activityIndicatorWrapper}>
+                              <ActivityIndicator
+                                animating={loading} />
+                                <Text style={styles.textMenuSmall}>processando</Text>
+                            </View>
+                          </View>
+                        </Modal>
                       ) : (
                         ""
                       )
                     }
+                    ListEmptyComponent={<Text style={styles.tabTitle}>Desculpe, o estabelecimento não possuí atendimento nesse dia.</Text>}
                     renderItem={({ item }) => (
                       <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { handleAgendamento(item.data,item.hora,item.status) }}>
                         <View style={styles.ItemAgenda}>
@@ -385,6 +405,23 @@ var styles = StyleSheet.create({
     height:screenHeight * 0.30,
   },
 
+  modalBackground: {
+    flex: 1,
+    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    backgroundColor: '#00000040'
+  },
+  activityIndicatorWrapper: {
+    backgroundColor: '#FFFFFF',
+    height: 100,
+    width: 100,
+    borderRadius: 10,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-around'
+  },
+
   textTitle: {
     marginTop: screenHeight * 0.05,
     color:'#fff',
@@ -395,6 +432,12 @@ var styles = StyleSheet.create({
   textMenu: {
     fontSize:13,
     color: '#000'
+  },
+
+  textMenuSmall: {
+    fontSize:10,
+    color: '#000',
+    alignItems: 'center',
   },
 
   textMenuGreen: {

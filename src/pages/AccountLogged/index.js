@@ -1,10 +1,16 @@
 import React, { useState, useEffect} from 'react';
-import {View, Text, StyleSheet, Dimensions, TouchableHighlight, FlatList, ActivityIndicator } from 'react-native';
+import {View, Text, StyleSheet, Dimensions, TouchableHighlight, FlatList, ActivityIndicator, Alert, Platform } from 'react-native';
 import {Container, Tab, Tabs, TabHeading } from 'native-base';
 import {AsyncStorage} from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
+
+export function isIphoneX() {
+  return (
+    Platform.OS === 'ios' && screenHeight >= 736
+  );
+}
 
 export default function AccountLogged({ navigation }) {
 
@@ -12,6 +18,7 @@ export default function AccountLogged({ navigation }) {
   const [evento, setEvento] = useState([]);  
   const [cupom, setCupom] = useState([]);  
   const [loading, setLoading] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   async function handleLogout(){
     await AsyncStorage.removeItem('eloyuseremail');
@@ -24,8 +31,20 @@ export default function AccountLogged({ navigation }) {
     setNome(await AsyncStorage.getItem('eloyusernome'));
   }
 
-  async function handleCancel(idevento) {
-    const responseApi = await fetch(
+  function handleCancel(idevento) {
+
+    Alert.alert(
+      'Confirmação',
+      'Deseja remover o agendamento ?',
+      [
+        {text: 'Não'},
+        {text: 'Sim', onPress: () => confirmCancel(idevento)}
+      ]
+    );
+  };
+
+  async function confirmCancel(idevento) {
+    await fetch(
       'https://backendeloyaqui.herokuapp.com/eventos/' + idevento, {
         method: 'DELETE'
     });
@@ -55,6 +74,18 @@ export default function AccountLogged({ navigation }) {
     setLoading(false);
   }
 
+  async function refreshList() {
+    setRefreshing(true);
+    await loadEventos();
+    setRefreshing(false);
+  }
+
+  async function refreshList2() {
+    setRefreshing(true);
+    await loadCupons();
+    setRefreshing(false);
+  }
+
   useEffect(() => {
     setLoading(true);
     getStorageValue();
@@ -66,7 +97,7 @@ export default function AccountLogged({ navigation }) {
     
         <View style={styles.backContainer}>
           <View style={styles.container}>
-            <Text style={styles.txtTitle}>Seja Bem Vindo, {nome}</Text>
+            <Text style={styles.txtTitle} numberOfLines={1}>Seja Bem Vindo, {nome}</Text>
 
             <TouchableHighlight style={styles.btnEntrar} onPress={handleLogout}>
               <Text style={styles.textoEntrar}>Sair</Text>
@@ -81,12 +112,14 @@ export default function AccountLogged({ navigation }) {
                       keyExtractor={evento => String(evento._id)}
                       ListHeaderComponent={
                         loading ? (
-                          <ActivityIndicator size="large" style={styles.backImageHeader}/>
+                          <ActivityIndicator size="large" style={styles.LoadingIndicator}/>
                         ) : (
                           ""
                         )
                       }
-                      ListEmptyComponent={<Text style={styles.txtTitleDesc}>Você não tem agendamentos. Acesse os estabelecimentos e agende agora mesmo !</Text>}
+                      onRefresh={refreshList}
+                      refreshing={refreshing}
+                      ListEmptyComponent={<Text style={styles.tabTitle}>Você não possuí agendamentos.</Text>}
                       renderItem={({ item }) => (                
                         <View style={styles.Item}>
                         <Text style={styles.textDescPrinc}>{item.data.substring(8,10) + "/" + item.data.substring(5,7) + "/" + item.data.substring(0,4)}</Text>
@@ -94,9 +127,9 @@ export default function AccountLogged({ navigation }) {
                             <View style={styles.txtContainer}>
                               <Text style={styles.textDesc}>{item.hora}:00</Text>
                               <Text style={styles.textDesc}>{item.idestabelecimento.nome}</Text>
-                              <Text style={styles.textDesc}>{item.idestabelecimento.rua}, {item.idestabelecimento.numero}</Text>
+                              <Text style={styles.textDesc} numberOfLines={1}>{item.idestabelecimento.rua}, {item.idestabelecimento.numero}</Text>
                               <TouchableHighlight style={styles.btnRemover} onPress={() => { handleCancel(item._id) }}>
-                                <Text style={styles.textoEntrar}>Cancelar</Text>
+                                <Text style={styles.textoRemover}>Cancelar</Text>
                               </TouchableHighlight>
                             </View>
                           </View>
@@ -114,12 +147,14 @@ export default function AccountLogged({ navigation }) {
                       keyExtractor={cupom => String(cupom._id)}
                       ListHeaderComponent={
                         loading ? (
-                          <ActivityIndicator size="large" style={styles.backImageHeader}/>
+                          <ActivityIndicator size="large" style={styles.LoadingIndicator}/>
                         ) : (
                           ""
                         )
                       }
-                      ListEmptyComponent={<Text style={styles.txtTitleDesc}>Você não tem cupons.</Text>}
+                      onRefresh={refreshList2}
+                      refreshing={refreshing}
+                      ListEmptyComponent={<Text style={styles.tabTitle}>Você não possuí cupons válidos.</Text>}
                       renderItem={({ item }) => (                
                         <View style={styles.Item}>
                         <Text style={styles.textDescPrinc}>{item.idcupom.premio}</Text>
@@ -165,8 +200,8 @@ var styles = StyleSheet.create({
 
   txtTitle:{
     color:'#000',
-    fontSize:25,
-    marginTop:10,
+    fontSize:22,
+    marginTop:screenHeight*0.015,
     textAlign:'center',
     fontWeight:'bold'
   },
@@ -174,14 +209,19 @@ var styles = StyleSheet.create({
   txtTitleDesc:{
     color:'#000',
     fontSize:14,
-    marginTop:10,
-    marginLeft:5
+    marginTop:screenHeight*0.01,
+    marginLeft:screenHeight*0.01,
   },
 
   textDescPrinc: {
     fontSize: 14,
     fontWeight:'bold',
-    marginTop:5
+    marginTop:screenHeight*0.005,
+  },
+
+  LoadingIndicator:{
+    justifyContent:"center",
+    marginTop:25
   },
 
   textDesc: {
@@ -189,15 +229,15 @@ var styles = StyleSheet.create({
   },
 
   Item: {
-    height:screenHeight * 0.13,
+    height: isIphoneX() ? screenHeight * 0.14 : screenHeight * 0.175,
     backgroundColor:'#fff',
     borderBottomColor:'#d5d5d5',
     borderBottomWidth:1,
-    paddingLeft: 10,
+    marginLeft: screenWidth*0.025
   },
 
   txtContainer:{
-    width:screenWidth *0.7,
+    width:screenWidth *0.95,
   },
 
   tabHeading: {
@@ -207,9 +247,9 @@ var styles = StyleSheet.create({
   btnEntrar:{
     width: screenWidth * 0.50,
     backgroundColor:'#471a88',
-    height:35,
-    marginTop: 15,
-    marginBottom: 15,
+    height: isIphoneX() ? screenHeight * 0.04 : screenHeight * 0.05,
+    marginTop: screenHeight*0.03,
+    marginBottom: screenHeight*0.03,
     borderRadius:6,
     alignSelf:'center'
   },
@@ -218,7 +258,7 @@ var styles = StyleSheet.create({
     color:'#fff',
     textAlign:'center',
     fontSize:18,
-    marginTop:5
+    marginTop:screenHeight*0.005
   },
 
   dadosTextRegras:{
@@ -227,14 +267,25 @@ var styles = StyleSheet.create({
     fontSize:10
   },
 
+  textoRemover:{
+    color:'#fff',
+    textAlign:'center',
+    fontSize:16,
+    marginTop:screenHeight*0.003
+  },
+
   btnRemover:{
     width: screenWidth * 0.30,
     backgroundColor:'red',
-    height:35,
-    marginTop: 5,
-    marginBottom: 5,
-    borderRadius:6
+    height: isIphoneX() ? screenHeight * 0.03 : screenHeight * 0.04,
+    marginTop: screenHeight*0.008,
+    borderRadius:4
   },
-  
+
+  tabTitle: {
+    paddingLeft: 10,
+    paddingTop:10,
+    color:'#707070'
+  },
 
 });

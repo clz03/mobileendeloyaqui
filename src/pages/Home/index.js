@@ -1,5 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, FlatList, Text, Image, ImageBackground, StyleSheet, Dimensions, TextInput, TouchableHighlight, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { 
+  SafeAreaView, 
+  View, 
+  FlatList, 
+  Text, 
+  Image, 
+  ImageBackground, 
+  StyleSheet, 
+  Dimensions, 
+  TextInput, 
+  TouchableHighlight, 
+  TouchableOpacity, 
+  ActivityIndicator, 
+  Alert } from 'react-native';
 
 import logo from './assets/eloy.png';
 import imgbg from './assets/bg3.jpeg';
@@ -31,7 +44,14 @@ export default function Home({ navigation }) {
   }, []);
 
   async function handleSubmit() {
-    navigation.navigate('Search', { busca: search, title: search })
+    if(search.length < 3){
+      Alert.alert(
+        'Busca inválida',
+        'Digite mais caracteres para uma busca mais aprimorada'
+      );
+    } else {
+      navigation.navigate('Search', { busca: search, title: search })
+    }
   };
 
   state = {showIndicator:false}

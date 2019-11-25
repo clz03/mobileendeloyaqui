@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import {View, Text, StyleSheet, Dimensions, TextInput, TouchableHighlight, Alert } from 'react-native';
+import {View, Text, StyleSheet, Dimensions, TextInput, TouchableHighlight, Alert, ActivityIndicator } from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
@@ -8,6 +8,7 @@ export default function Forgot({ navigation }) {
 
   const [email, setEmail] = useState("");  
   const [erroValidador, setErroValidador] = useState("");
+  const [loading, setLoading] = useState(false);
 
   function handleRegistered(){
     navigation.navigate('Login');
@@ -28,6 +29,8 @@ export default function Forgot({ navigation }) {
       setErroValidador('');
     }
 
+    setLoading(true);
+
     const responseApi = await fetch(
       'https://backendeloyaqui.herokuapp.com/forgotpwd', {
         method: 'POST',
@@ -47,10 +50,13 @@ export default function Forgot({ navigation }) {
             'Esqueci minha senha',
             'Link de ativação da senha enviado para ' + email
           );
+        setLoading(false);
         handleRegistered();
     } else {
+      setLoading(false);
       setErroValidador(data.error);
     }
+    
 
 }
 
@@ -85,6 +91,10 @@ export default function Forgot({ navigation }) {
                 <Text style={styles.textoEntrar}>Voltar</Text>
               </TouchableHighlight>
 
+              {
+                loading && <ActivityIndicator size="large" style={styles.LoadingIndicator} />
+              }
+
             </View>
 
           </View>
@@ -112,6 +122,11 @@ var styles = StyleSheet.create({
     flexDirection: 'column',
     flex: 1,
     backgroundColor:'#fff'
+  },
+
+  LoadingIndicator:{
+    justifyContent:"center",
+    marginTop:25
   },
 
   textMenuTitleHeader: {

@@ -97,6 +97,7 @@ export default function Login({ navigation }) {
                   autoCapitalize='none' 
                   autoCorrect={false} 
                   keyboardType="email-address"
+                  maxLength={40}
                   value={email}
                   onChangeText={(text) => setEmail(text)}
                 />
@@ -106,7 +107,9 @@ export default function Login({ navigation }) {
                 <TextInput 
                   style={ styles.inputLogin } 
                   autoCapitalize='none' 
-                  autoCorrect={false} 
+                  autoCorrect={false}
+                  maxLength={20}
+                  secureTextEntry={true}
                   value={senha}
                   onChangeText={(text) => setSenha(text)}
                 />
