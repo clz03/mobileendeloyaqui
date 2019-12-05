@@ -101,7 +101,7 @@ export default function Detail({ navigation }) {
       } else {
         Alert.alert(
           'Confirmação',
-          'Agendar para ' + data + '-' + hora + ':00 ?',
+          'Agendar para ' + data.substring(8,10) + "/" + data.substring(5,7) + "/" + data.substring(0,4) + ' - ' + hora + ':00 ?',
           [
             {text: 'Não'},
             {text: 'Sim', onPress: () => confirmAgendamento(data, hora, useremail)}
