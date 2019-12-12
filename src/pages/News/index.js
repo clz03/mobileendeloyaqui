@@ -8,7 +8,13 @@ export function isIphoneX() {
   return (
     Platform.OS === 'ios' && screenHeight >= 812
   );
-}
+};
+
+export function isAndroid() {
+  return (
+    Platform.OS !== 'ios'
+  );
+};
 
 export default function Search({ navigation }) {
 
@@ -106,7 +112,7 @@ Item: {
 },
 
 ItemImg: {
-  height: isIphoneX() ? screenHeight*0.125 : screenHeight*0.155,
+  height: isIphoneX() ? screenHeight*0.125 : isAndroid() ? screenHeight*0.175 : screenHeight*0.155,
   backgroundColor:'#fff',
   borderBottomColor:'#d5d5d5',
   borderBottomWidth:1,

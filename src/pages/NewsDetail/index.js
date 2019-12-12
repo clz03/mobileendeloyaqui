@@ -55,7 +55,6 @@ export default function NewsDetail({ navigation }) {
           
         )}            
       />
-
     </View>
   );
 }
@@ -84,7 +83,6 @@ var styles = StyleSheet.create({
   },
 
   ItemImg: {
-    height:110,
     backgroundColor:'#fff',
     paddingTop: 10,
     paddingLeft: 10,

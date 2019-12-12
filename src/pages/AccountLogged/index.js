@@ -12,12 +12,19 @@ export function isIphoneX() {
   );
 }
 
+export function isAndroid() {
+  return (
+    Platform.OS !== 'ios'
+  );
+}
+
 export default function AccountLogged({ navigation }) {
 
   const [nome, setNome] = useState("");
   const [evento, setEvento] = useState([]);  
   const [cupom, setCupom] = useState([]);  
   const [loading, setLoading] = useState(false);
+  const [msginativo, setMsginativo] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
   async function handleLogout(){
@@ -77,13 +84,24 @@ export default function AccountLogged({ navigation }) {
   async function refreshList() {
     setRefreshing(true);
     await loadEventos();
+    if (msginativo) checkUserAtivo();
     setRefreshing(false);
   }
 
   async function refreshList2() {
     setRefreshing(true);
     await loadCupons();
+    if (msginativo) checkUserAtivo();
     setRefreshing(false);
+  }
+  
+  async function checkUserAtivo(){
+    const iduser = await AsyncStorage.getItem('eloyuserid');
+    const response = await fetch(
+      'https://backendeloyaqui.herokuapp.com/usuarios/' + iduser
+    );
+    const data = await response.json();
+    data[0].validado === false ? setMsginativo(true) : setMsginativo(false);
   }
 
   useEffect(() => {
@@ -91,6 +109,7 @@ export default function AccountLogged({ navigation }) {
     getStorageValue();
     loadEventos();
     loadCupons();
+    checkUserAtivo();
   }, []);
 
   return (
@@ -102,6 +121,12 @@ export default function AccountLogged({ navigation }) {
             <TouchableHighlight style={styles.btnEntrar} onPress={handleLogout}>
               <Text style={styles.textoEntrar}>Sair</Text>
             </TouchableHighlight>
+
+            { msginativo &&
+              <View style={styles.msguserinativo}>
+                <Text style={styles.txtMsguserinativo}>Sua conta ainda não está ativa, verifique seu e-mail e ative seu cadastro para realizar agendamentos e utilizar cupons</Text>
+              </View>
+            }
 
             <Container>
                 <Tabs initialPage={0} locked={true}>
@@ -119,7 +144,7 @@ export default function AccountLogged({ navigation }) {
                       }
                       onRefresh={refreshList}
                       refreshing={refreshing}
-                      ListEmptyComponent={<Text style={styles.tabTitle}>Você não possuí agendamentos.</Text>}
+                      ListEmptyComponent={<Text style={styles.tabTitle}>Você não possuí agendamentos. Arraste para atualizar !</Text>}
                       renderItem={({ item }) => (                
                         <View style={styles.Item}>
                         <Text style={styles.textDescPrinc}>{item.data.substring(8,10) + "/" + item.data.substring(5,7) + "/" + item.data.substring(0,4)}</Text>
@@ -154,8 +179,9 @@ export default function AccountLogged({ navigation }) {
                       }
                       onRefresh={refreshList2}
                       refreshing={refreshing}
-                      ListEmptyComponent={<Text style={styles.tabTitle}>Você não possuí cupons válidos.</Text>}
-                      renderItem={({ item }) => (                
+                      ListEmptyComponent={<Text style={styles.tabTitle}>Você não possuí cupons válidos. Arraste para atualizar !</Text>}
+                      renderItem={({ item }) => (  
+                       (item.idcupom != null &&              
                         <View style={styles.Item}>
                         <Text style={styles.textDescPrinc}>{item.idcupom.premio}</Text>
                           <View style={styles.containerGeral}>
@@ -167,7 +193,7 @@ export default function AccountLogged({ navigation }) {
                               <Text style={styles.dadosTextRegras}>*Apresentar esse cupom no estabelecimento*</Text>
                             </View>
                           </View>
-                        </View>
+                       </View> )
                         )}            
                       />
                     </View>
@@ -229,7 +255,7 @@ var styles = StyleSheet.create({
   },
 
   Item: {
-    height: isIphoneX() ? screenHeight * 0.14 : screenHeight * 0.175,
+    height: isIphoneX() ? screenHeight*0.14 : isAndroid() ? screenHeight*0.21 : screenHeight*0.175,
     backgroundColor:'#fff',
     borderBottomColor:'#d5d5d5',
     borderBottomWidth:1,
@@ -248,8 +274,8 @@ var styles = StyleSheet.create({
     width: screenWidth * 0.50,
     backgroundColor:'#471a88',
     height: isIphoneX() ? screenHeight * 0.04 : screenHeight * 0.05,
-    marginTop: screenHeight*0.03,
-    marginBottom: screenHeight*0.03,
+    marginTop: screenHeight*0.02,
+    marginBottom: screenHeight*0.02,
     borderRadius:6,
     alignSelf:'center'
   },
@@ -287,5 +313,17 @@ var styles = StyleSheet.create({
     paddingTop:10,
     color:'#707070'
   },
+
+  msguserinativo: {
+    marginBottom:screenHeight*0.01,
+    marginLeft: screenWidth*0.025,
+    marginRight: screenWidth*0.02,
+    backgroundColor: "#fff7dc",
+    borderRadius: 5
+  },
+
+  txtMsguserinativo: {
+    textAlign:'center'
+  }
 
 });

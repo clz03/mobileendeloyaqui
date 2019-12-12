@@ -229,7 +229,7 @@ export default function Detail({ navigation }) {
                               </TouchableOpacity>
 
                             }
-                            {estab.facebook.length > 0 &&
+                            {/* {estab.facebook.length > 0 &&
 
                               <TouchableOpacity onPress={() => Linking.openURL(`fb://page/${estab.facebook}`)}>
                                 <View style={styles.menuItem}>
@@ -239,7 +239,7 @@ export default function Detail({ navigation }) {
                                 </View>
                               </TouchableOpacity>
                               
-                            }
+                            } */}
                             </View>
                           </>
                         }
@@ -269,9 +269,9 @@ export default function Detail({ navigation }) {
                             <View style={styles.barraLateralVerde}></View>
                             <View style={styles.ticket}>
                               <Text style={styles.ticketText}>{cupom.premio}</Text>
-                              <Text style={styles.dadosTextRegras}>*Apresentar o cupom no estabelecimento*</Text>
-                              <Text style={styles.dadosTextRegras}>*Válido até {cupom.validade}*</Text>
-                            </View>   
+                              <Text style={styles.dadosTextRegras}>*Obtenha esse cupom no menu Cupons.</Text>
+                              <Text style={styles.dadosTextRegras}>*Válido até {cupom.validade.substring(8,10) + "/" + cupom.validade.substring(5,7) + "/" + cupom.validade.substring(0,4)}*</Text>
+                            </View>
                           </View>
                         ) : <Text style={styles.txtNoData}>Em breve novos Cupons. Fique de olho !</Text>
                       }
@@ -617,9 +617,7 @@ var styles = StyleSheet.create({
     color:'#5d5d5d',
     marginTop:5,
     marginLeft:10,
-    fontWeight:'bold',
-    borderBottomWidth:2,
-    borderColor:'#000'
+    fontWeight:'bold'
   },
 
   dadosTextRegras:{

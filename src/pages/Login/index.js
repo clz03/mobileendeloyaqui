@@ -1,9 +1,27 @@
 import React, { useState } from 'react';
-import {View, Text, StyleSheet, Dimensions, TextInput, TouchableHighlight, TouchableOpacity, ActivityIndicator } from 'react-native';
+import {
+  View, 
+  Text, 
+  StyleSheet, 
+  Dimensions, 
+  TextInput, 
+  TouchableHighlight, 
+  TouchableOpacity, 
+  ActivityIndicator, 
+  ScrollView, 
+  KeyboardAvoidingView,
+  Platform
+ } from 'react-native';
 import {AsyncStorage} from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
+
+export function isAndroid() {
+  return (
+    Platform.OS !== 'ios'
+  );
+}
 
 export default function Login({ navigation }) {
 
@@ -85,7 +103,8 @@ export default function Login({ navigation }) {
     
         <View style={styles.backContainer}>
           
-          <View style={styles.container}>
+          <ScrollView style={styles.container}>
+          <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={50}>
             <Text style={styles.txtTitle}>Login</Text>
             <Text style={styles.txtTitleDesc}>Em breve teremos novidades para os inscritos no Eloy Aqui</Text>
 
@@ -118,23 +137,22 @@ export default function Login({ navigation }) {
               <TouchableOpacity style={styles.labelLogin} onPress={handleForgotPwd}>
                 <Text>Esqueci minha senha</Text>
               </TouchableOpacity>
+              <View style={styles.containerBotoes}>
+                
+                <TouchableHighlight style={styles.btnEntrar} onPress={handleRegistered}>
+                  <Text style={styles.textoEntrar}>Cadastre-se</Text>
+                </TouchableHighlight>
 
-              <TouchableHighlight style={styles.btnEntrar} onPress={handleSubmit}>
-                <Text style={styles.textoEntrar}>Entrar</Text>
-              </TouchableHighlight>
-
-              <TouchableHighlight style={styles.btnEntrar} onPress={handleRegistered}>
-                <Text style={styles.textoEntrar}>Não tenho cadastro</Text>
-              </TouchableHighlight>
-
+                <TouchableHighlight style={styles.btnEntrar} onPress={handleSubmit}>
+                  <Text style={styles.textoEntrar}>Entrar</Text>
+                </TouchableHighlight>
+              </View>
               {
                 loading && <ActivityIndicator size="large" style={styles.LoadingIndicator} />
               }
-
-
             </View>
-
-          </View>
+            </KeyboardAvoidingView>
+          </ScrollView>
           
         </View>
   );
@@ -145,6 +163,12 @@ var styles = StyleSheet.create({
   backContainer: {
     flex: 1,
     paddingHorizontal: 0,
+  },
+
+  containerBotoes: {
+    flexDirection: 'row',
+    flex: 1,
+    backgroundColor:'#fff'
   },
   
   LoadingIndicator:{
@@ -165,17 +189,10 @@ var styles = StyleSheet.create({
     backgroundColor:'#fff'
   },
 
-  textMenuTitleHeader: {
-    fontSize:17,
-    color: '#fff',
-    paddingTop:10,
-    textAlign:'center'
-  },
-
   txtTitle:{
     color:'#000',
     fontSize:25,
-    marginTop:10,
+    marginTop:screenHeight*0.008,
     textAlign:'center',
     fontWeight:'bold'
   },
@@ -183,7 +200,7 @@ var styles = StyleSheet.create({
   txtTitleDesc:{
     color:'#000',
     fontSize:20,
-    marginTop:10,
+    marginTop:screenHeight*0.008,
     marginLeft:5,
     marginRight:5,
     textAlign:'center',
@@ -192,7 +209,7 @@ var styles = StyleSheet.create({
   labelLogin:{
     color:'#471a88',
     marginLeft: screenWidth * 0.05,
-    marginTop:5,
+    marginTop:screenHeight*0.005,
   },
 
   labelError:{
@@ -201,46 +218,29 @@ var styles = StyleSheet.create({
   },
 
   inputLogin:{
-    height: 40, 
+    height: screenHeight*0.06,
     width:screenWidth * 0.90,
     marginLeft: screenWidth * 0.05,
-    marginTop:2,
     borderColor: '#471a88', 
     borderWidth: 1,
-    borderRadius:5
-  },
-
-  labelSenha:{
-    color:'#471a88',
-    marginLeft: screenWidth * 0.05,
-    marginTop:10,
-  },
-
-  inputSenha:{
-    height: 40, 
-    width:screenWidth * 0.90,
-    marginLeft: screenWidth * 0.05,
-    marginTop:2,
-    borderColor: '#471a88', 
-    borderWidth: 1,
-    borderRadius:5
+    borderRadius:5,
+    paddingLeft:3
   },
 
   btnEntrar:{
-    width: screenWidth * 0.90,
+    width: screenWidth * 0.42,
     backgroundColor:'#471a88',
-    height:35,
+    height: screenHeight*0.05,
     marginLeft: screenWidth * 0.05,
     marginTop: 15,
     borderRadius:6,
-
   },
 
   textoEntrar:{
     color:'#fff',
     textAlign:'center',
-    fontSize:18,
-    marginTop:5
+    fontSize:16,
+    marginTop: isAndroid() ? screenHeight * 0.002 : screenHeight * 0.012,
   }
   
 

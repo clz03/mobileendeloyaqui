@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {View, Text, StyleSheet, Dimensions, TextInput, TouchableHighlight, KeyboardAvoidingView,ActivityIndicator } from 'react-native';
+import {View, Text, StyleSheet, Dimensions, TextInput, TouchableHighlight, ScrollView, KeyboardAvoidingView ,ActivityIndicator } from 'react-native';
 import {AsyncStorage} from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
@@ -10,9 +10,11 @@ export default function Register({ navigation }) {
   const [email, setEmail] = useState("");
   const [nome, setNome] = useState("");
   const [senha, setSenha] = useState("");
+  const [telefone, setTelefone] = useState("");
   const [erroValidador, setErroValidador] = useState("");
   const [erroValidador2, setErroValidador2] = useState("");
   const [erroValidador3, setErroValidador3] = useState("");
+  const [erroValidador4, setErroValidador4] = useState("");
   const [loading, setLoading] = useState(false);
 
   async function CheckRedirect(){
@@ -93,7 +95,8 @@ useEffect(() => {
   return (
     
         <View style={styles.backContainer}>
-          <KeyboardAvoidingView style={styles.container} behavior="position">
+          <ScrollView style={styles.container}>
+            <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={150}>
           <Text style={styles.txtTitle}>Cadastre-se</Text>
             <Text style={styles.txtTitleDesc}>Em breve teremos novidades para os inscritos no Eloy Aqui</Text>
             <View>
@@ -106,6 +109,16 @@ useEffect(() => {
                 onChangeText={(text) => setNome(text)}
               />
               <Text style={styles.labelError}>{erroValidador2}</Text>
+
+              <Text style={styles.labelLogin}>Celular</Text>
+              <TextInput 
+                style={ styles.inputLogin } 
+                maxLength={40}
+                autoCorrect={true} 
+                value={telefone}
+                onChangeText={(text) => setTelefone(text)}
+              />
+              <Text style={styles.labelError}>{erroValidador4}</Text>
 
               <Text style={styles.labelLogin}>E-mail</Text>
               <TextInput 
@@ -143,8 +156,8 @@ useEffect(() => {
                 loading && <ActivityIndicator size="large" style={styles.LoadingIndicator} />
               }
             </View>
-
-          </KeyboardAvoidingView>
+            </KeyboardAvoidingView>
+          </ScrollView>
         </View>
   );
 }
@@ -169,7 +182,7 @@ var styles = StyleSheet.create({
   txtTitle:{
     color:'#000',
     fontSize:25,
-    marginTop:10,
+    marginTop:screenHeight*0.008,
     textAlign:'center',
     fontWeight:'bold'
   },
@@ -177,7 +190,7 @@ var styles = StyleSheet.create({
   txtTitleDesc:{
     color:'#000',
     fontSize:20,
-    marginTop:10,
+    marginTop:screenHeight*0.008,
     marginLeft:5,
     marginRight:5,
     textAlign:'center',
@@ -186,7 +199,6 @@ var styles = StyleSheet.create({
   labelLogin:{
     color:'#471a88',
     marginLeft: screenWidth * 0.05,
-    marginTop:5,
   },
 
   labelError:{
@@ -201,7 +213,8 @@ var styles = StyleSheet.create({
     marginTop:0,
     borderColor: '#471a88', 
     borderWidth: 1,
-    borderRadius:5
+    borderRadius:5,
+    paddingLeft:3
   },
 
   btnEntrar:{

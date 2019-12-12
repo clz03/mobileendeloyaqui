@@ -10,6 +10,12 @@ export function isIphoneX() {
   );
 }
 
+export function isAndroid() {
+  return (
+    Platform.OS !== 'ios'
+  );
+}
+
 export default function Agenda({ navigation }) {
   
   const [estab, setEstab] = useState([]);   
@@ -109,7 +115,7 @@ var styles = StyleSheet.create({
   },
 
   ItemImg: {
-    height: isIphoneX() ? screenHeight*0.125 : screenHeight*0.155,
+    height: isIphoneX() ? screenHeight*0.125 : isAndroid() ? screenHeight*0.175 : screenHeight*0.155,
     backgroundColor:'#fff',
     borderBottomColor:'#d5d5d5',
     borderBottomWidth:1,

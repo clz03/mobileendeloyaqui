@@ -19,7 +19,13 @@ export function isIphoneX() {
   return (
     Platform.OS === 'ios' && screenHeight >= 812
   );
-}
+};
+
+export function isAndroid() {
+  return (
+    Platform.OS !== 'ios'
+  );
+};
 
 export default function Reward({navigation}) {
 
@@ -97,7 +103,7 @@ export default function Reward({navigation}) {
     }
 
     const responseApi = await fetch(
-      'https://backendeloyaqui.herokuapp.com/usercupons', {
+       'https://backendeloyaqui.herokuapp.com/usercupons', {
         method: 'POST',
         headers: {
           Accept: 'application/json',
@@ -115,6 +121,11 @@ export default function Reward({navigation}) {
       Alert.alert(
         'Confirmação',
         'Parabéns, seu cupom está disponível no seu Perfil para ser utilizado.'
+      );
+    }  else {
+      Alert.alert(
+        '=(',
+        'Algum problema impediu a solicitação. Por favor tente novamente.'
       );
     }
 }
@@ -197,7 +208,7 @@ var styles = StyleSheet.create({
   menuItem:{
     flexDirection: 'row',
     width: screenWidth *0.93,
-    height: isIphoneX() ? screenHeight*0.22 : screenHeight*0.26,
+    height: isIphoneX() ? screenHeight*0.22 : isAndroid() ? screenHeight*0.3 : screenHeight*0.26,
     backgroundColor: '#fff',
     borderRadius:10,
     borderWidth:1,
