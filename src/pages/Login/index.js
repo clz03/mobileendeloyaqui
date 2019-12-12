@@ -117,6 +117,7 @@ export default function Login({ navigation }) {
                   autoCorrect={false} 
                   keyboardType="email-address"
                   maxLength={40}
+                  placeholder="seu e-mail cadastrado"
                   value={email}
                   onChangeText={(text) => setEmail(text)}
                 />
@@ -128,6 +129,7 @@ export default function Login({ navigation }) {
                   autoCapitalize='none' 
                   autoCorrect={false}
                   maxLength={20}
+                  placeholder="sua senha"
                   secureTextEntry={true}
                   value={senha}
                   onChangeText={(text) => setSenha(text)}

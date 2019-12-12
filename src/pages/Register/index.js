@@ -45,6 +45,13 @@ export default function Register({ navigation }) {
       setErroValidador2('');
     }
 
+    if(telefone == '') {
+      setErroValidador4('celular não pode ser vazio');
+      cError = true;
+    } else {
+      setErroValidador4('');
+    }
+
     if(senha == '') {
       setErroValidador3('senha não pode ser vazio');
       cError = true;
@@ -66,7 +73,8 @@ export default function Register({ navigation }) {
           email: email,
           pwd: senha,
           validado: false,
-          nome: nome
+          nome: nome,
+          telefone: telefone
         }),
     });
 
@@ -105,6 +113,7 @@ useEffect(() => {
                 style={ styles.inputLogin } 
                 maxLength={40}
                 autoCorrect={true} 
+                placeholder="seu nome"
                 value={nome}
                 onChangeText={(text) => setNome(text)}
               />
@@ -113,9 +122,10 @@ useEffect(() => {
               <Text style={styles.labelLogin}>Celular</Text>
               <TextInput 
                 style={ styles.inputLogin } 
-                maxLength={40}
-                autoCorrect={true} 
+                maxLength={30}
+                placeholder="(11) 9999-9999"
                 value={telefone}
+                keyboardType="numeric"
                 onChangeText={(text) => setTelefone(text)}
               />
               <Text style={styles.labelError}>{erroValidador4}</Text>
@@ -126,6 +136,7 @@ useEffect(() => {
                 maxLength={40}
                 autoCapitalize='none' 
                 autoCorrect={false} 
+                placeholder="seu e-mail"
                 keyboardType="email-address"
                 value={email}
                 onChangeText={(text) => setEmail(text)}
@@ -138,6 +149,7 @@ useEffect(() => {
                 maxLength={20}
                 autoCapitalize='none'
                 secureTextEntry={true}
+                placeholder="sua senha"
                 autoCorrect={false} 
                 value={senha}
                 onChangeText={(text) => setSenha(text)}
