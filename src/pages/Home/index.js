@@ -37,9 +37,24 @@ export default function Home({ navigation }) {
       setCat(data);
       setLoading(false);
     }
+
+    async function checkMensagemHome() {
+      const response = await fetch(
+        'https://backendeloyaqui.herokuapp.com/homealert' 
+      );
+      const data = await response.json();
+
+      if (typeof data[0] === 'object'){
+        Alert.alert(
+          data[0].titulo,
+          data[0].mensagem
+        );
+      }
+    }
     
     setLoading(true);
     loadCat();
+    checkMensagemHome();
     
   }, []);
 

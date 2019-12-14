@@ -76,6 +76,7 @@ export default function Forgot({ navigation }) {
                   style={ styles.inputLogin } 
                   autoCapitalize='none' 
                   autoCorrect={false} 
+                  placeholder="seu e-mail cadastrado"
                   keyboardType="email-address"
                   value={email}
                   onChangeText={(text) => setEmail(text)}
@@ -171,7 +172,8 @@ var styles = StyleSheet.create({
     marginTop:2,
     borderColor: '#471a88', 
     borderWidth: 1,
-    borderRadius:5
+    borderRadius:5,
+    paddingLeft:3
   },
 
   labelSenha:{

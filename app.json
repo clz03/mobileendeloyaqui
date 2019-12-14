@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "EloyAqui",
-    "slug": "mobileeloyaqui",
+    "name": "Eloy Aqui",
+    "slug": "eloy-aqui",
     "privacy": "public",
     "sdkVersion": "35.0.0",
     "platforms": [
@@ -17,6 +17,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#471a88"
     },
+    "android": {
+      "package": "com.c2t.eloyaqui"
+    },
     "updates": {
       "fallbackToCacheTimeout": 0
     },
@@ -24,7 +27,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.c2t.eloyaqui",
+      "supportsTablet": false
     },
     "description": ""
   }

@@ -584,7 +584,7 @@ var styles = StyleSheet.create({
     width: screenWidth *0.93,
     height: screenHeight*0.15,
     backgroundColor: '#fff',
-    borderRadius:10,
+    borderRadius:12,
     borderWidth:1,
     borderColor:'#a5a5a5',
     marginTop:10,

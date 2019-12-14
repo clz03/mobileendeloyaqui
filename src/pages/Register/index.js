@@ -1,9 +1,32 @@
 import React, { useState, useEffect } from 'react';
-import {View, Text, StyleSheet, Dimensions, TextInput, TouchableHighlight, ScrollView, KeyboardAvoidingView ,ActivityIndicator } from 'react-native';
+import {
+  View, 
+  Text, 
+  StyleSheet, 
+  Dimensions, 
+  TextInput, 
+  TouchableHighlight, 
+  ScrollView, 
+  KeyboardAvoidingView ,
+  ActivityIndicator,
+  Platform,
+  Modal } from 'react-native';
 import {AsyncStorage} from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
+
+export function isIphoneX() {
+  return (
+    Platform.OS === 'ios' && screenHeight >= 736
+  );
+}
+
+export function isAndroid() {
+  return (
+    Platform.OS !== 'ios'
+  );
+}
 
 export default function Register({ navigation }) {
 
@@ -15,7 +38,7 @@ export default function Register({ navigation }) {
   const [erroValidador2, setErroValidador2] = useState("");
   const [erroValidador3, setErroValidador3] = useState("");
   const [erroValidador4, setErroValidador4] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); 
 
   async function CheckRedirect(){
     if (await AsyncStorage.getItem('eloyuseremail') != null)
@@ -160,12 +183,23 @@ useEffect(() => {
                 <Text style={styles.textoEntrar}>Cadastrar</Text>
               </TouchableHighlight>
 
-              <TouchableHighlight style={styles.btnEntrar} onPress={handleRegistered}>
+              <TouchableHighlight style={styles.btnEntrar2} onPress={handleRegistered}>
                 <Text style={styles.textoEntrar}>Já tenho cadastro</Text>
               </TouchableHighlight>
 
               {
-                loading && <ActivityIndicator size="large" style={styles.LoadingIndicator} />
+                loading && <Modal
+                transparent={true}
+                animationType={'none'}
+                visible={loading}>
+                <View style={styles.modalBackground}>
+                  <View style={styles.activityIndicatorWrapper}>
+                    <ActivityIndicator
+                      animating={loading} />
+                      <Text style={styles.textMenuSmall}>processando</Text>
+                  </View>
+                </View>
+              </Modal>
               }
             </View>
             </KeyboardAvoidingView>
@@ -191,6 +225,36 @@ var styles = StyleSheet.create({
     marginTop:25
   },
 
+  modalBackground: {
+    flex: 1,
+    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    backgroundColor: '#00000040'
+  },
+
+  activityIndicatorWrapper: {
+    backgroundColor: '#FFFFFF',
+    height: 100,
+    width: 100,
+    borderRadius: 10,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-around'
+  },
+
+  textMenuSmall: {
+    fontSize:10,
+    color: '#000',
+    alignItems: 'center',
+  },
+
+  container: {
+    flexDirection: 'column',
+    flex: 1,
+    backgroundColor:'#fff'
+  },
+
   txtTitle:{
     color:'#000',
     fontSize:25,
@@ -211,6 +275,7 @@ var styles = StyleSheet.create({
   labelLogin:{
     color:'#471a88',
     marginLeft: screenWidth * 0.05,
+    marginTop:screenHeight*0.005,
   },
 
   labelError:{
@@ -219,10 +284,9 @@ var styles = StyleSheet.create({
   },
 
   inputLogin:{
-    height: 40, 
+    height: screenHeight*0.06,
     width:screenWidth * 0.90,
     marginLeft: screenWidth * 0.05,
-    marginTop:0,
     borderColor: '#471a88', 
     borderWidth: 1,
     borderRadius:5,
@@ -234,9 +298,8 @@ var styles = StyleSheet.create({
     backgroundColor:'#471a88',
     height:35,
     marginLeft: screenWidth * 0.05,
-    marginTop: 10,
+    marginTop: 15,
     borderRadius:6,
-
   },
 
   textoEntrar:{
@@ -244,7 +307,18 @@ var styles = StyleSheet.create({
     textAlign:'center',
     fontSize:18,
     marginTop:5
-  }
+  },
+
+  btnEntrar2:{
+    width: screenWidth * 0.90,
+    backgroundColor:'#471a88',
+    height:35,
+    marginLeft: screenWidth * 0.05,
+    marginTop: 15,
+    borderRadius:6,
+    marginBottom: 25
+  },
+
   
 
 });

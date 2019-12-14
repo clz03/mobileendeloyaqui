@@ -10,7 +10,8 @@ import {
   Image, 
   TouchableHighlight, 
   Alert, 
-  AsyncStorage} from 'react-native';
+  AsyncStorage,
+  Modal} from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
@@ -31,6 +32,7 @@ export default function Reward({navigation}) {
 
   const [cupom, setCupom] = useState([]);  
   const [loading, setLoading] = useState(false);
+  const [loading2, setLoading2] = useState(false);
   const [page, setPage] = useState(1);   
   const [totalCount, setTotalCount] = useState(0);   
   const [refreshing, setRefreshing] = useState(false);
@@ -87,7 +89,7 @@ export default function Reward({navigation}) {
   };
 
   async function confirmCupom(idcupom, iduser, idestabelecimento) {
-
+    
     const response = await fetch(
       'https://backendeloyaqui.herokuapp.com/usuarios/'+ iduser
     );
@@ -101,6 +103,8 @@ export default function Reward({navigation}) {
       );
       return;
     }
+
+    setLoading2(true);
 
     const responseApi = await fetch(
        'https://backendeloyaqui.herokuapp.com/usercupons', {
@@ -117,17 +121,14 @@ export default function Reward({navigation}) {
         }),
     });
 
+    setLoading2(false);
+
     if(responseApi.ok){
-      Alert.alert(
-        'Confirmação',
-        'Parabéns, seu cupom está disponível no seu Perfil para ser utilizado.'
-      );
+      setTimeout(() => Alert.alert('Confirmação', 'Parabéns, seu cupom está disponível no seu Perfil para ser utilizado.'), 800);
     }  else {
-      Alert.alert(
-        '=(',
-        'Algum problema impediu a solicitação. Por favor tente novamente.'
-      );
+      setTimeout(() => Alert.alert('=(', 'Algum problema impediu a solicitação. Por favor tente novamente.'), 800);
     }
+
 }
 
 
@@ -162,7 +163,7 @@ export default function Reward({navigation}) {
                       <Image style={styles.imagem} source={{uri: item.idestabelecimento.imagem }}></Image>
                     </View>
                     <View style={styles.txtContainer}>
-                      <Text numberOfLines={1} style={styles.dadosText}>{item.idestabelecimento.nome} - {screenWidth}</Text>
+                      <Text numberOfLines={1} style={styles.dadosText}>{item.idestabelecimento.nome}</Text>
                       <Text numberOfLines={1} style={styles.dadosText}>{item.idestabelecimento.tipo}/{item.idestabelecimento.subtipo}</Text>
                       <Text numberOfLines={1} style={styles.dadosTextRegras}>{item.idestabelecimento.rua}, {item.idestabelecimento.numero}</Text>
                       <Text style={styles.dadosTextRegras}>*{item.regra}</Text>
@@ -181,7 +182,20 @@ export default function Reward({navigation}) {
             )}  
           />
           </View>
-
+          {
+                loading2 && <Modal
+                transparent={true}
+                animationType={'none'}
+                visible={loading2}>
+                <View style={styles.modalBackground}>
+                  <View style={styles.activityIndicatorWrapper}>
+                    <ActivityIndicator
+                      animating={loading2} />
+                      <Text style={styles.textMenuSmall}>processando</Text>
+                  </View>
+                </View>
+              </Modal>
+          }
         </View>
   );
 }
@@ -203,6 +217,30 @@ var styles = StyleSheet.create({
     flex:1,
     justifyContent:"center",
     marginTop:15
+  },
+
+  modalBackground: {
+    flex: 1,
+    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    backgroundColor: '#00000040'
+  },
+
+  activityIndicatorWrapper: {
+    backgroundColor: '#FFFFFF',
+    height: 100,
+    width: 100,
+    borderRadius: 10,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-around'
+  },
+
+  textMenuSmall: {
+    fontSize:10,
+    color: '#000',
+    alignItems: 'center',
   },
 
   menuItem:{

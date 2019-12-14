@@ -10,7 +10,8 @@ import {
   ActivityIndicator, 
   ScrollView, 
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  Modal
  } from 'react-native';
 import {AsyncStorage} from 'react-native';
 
@@ -104,7 +105,7 @@ export default function Login({ navigation }) {
         <View style={styles.backContainer}>
           
           <ScrollView style={styles.container}>
-          <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={50}>
+          <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={70}>
             <Text style={styles.txtTitle}>Login</Text>
             <Text style={styles.txtTitleDesc}>Em breve teremos novidades para os inscritos no Eloy Aqui</Text>
 
@@ -139,18 +140,28 @@ export default function Login({ navigation }) {
               <TouchableOpacity style={styles.labelLogin} onPress={handleForgotPwd}>
                 <Text>Esqueci minha senha</Text>
               </TouchableOpacity>
-              <View style={styles.containerBotoes}>
-                
-                <TouchableHighlight style={styles.btnEntrar} onPress={handleRegistered}>
-                  <Text style={styles.textoEntrar}>Cadastre-se</Text>
-                </TouchableHighlight>
 
-                <TouchableHighlight style={styles.btnEntrar} onPress={handleSubmit}>
-                  <Text style={styles.textoEntrar}>Entrar</Text>
-                </TouchableHighlight>
-              </View>
+              <TouchableHighlight style={styles.btnEntrar} onPress={handleSubmit}>
+                <Text style={styles.textoEntrar}>Entrar</Text>
+              </TouchableHighlight>
+
+              <TouchableHighlight style={styles.btnEntrar2} onPress={handleRegistered}>
+                <Text style={styles.textoEntrar}>Cadastre-se</Text>
+              </TouchableHighlight>
+
               {
-                loading && <ActivityIndicator size="large" style={styles.LoadingIndicator} />
+                loading && <Modal
+                transparent={true}
+                animationType={'none'}
+                visible={loading}>
+                <View style={styles.modalBackground}>
+                  <View style={styles.activityIndicatorWrapper}>
+                    <ActivityIndicator
+                      animating={loading} />
+                      <Text style={styles.textMenuSmall}>processando</Text>
+                  </View>
+                </View>
+              </Modal>
               }
             </View>
             </KeyboardAvoidingView>
@@ -183,7 +194,31 @@ var styles = StyleSheet.create({
     alignContent:'center',
     alignItems:'center',
     backgroundColor:'#471a88',
-    },
+  },
+
+  modalBackground: {
+    flex: 1,
+    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    backgroundColor: '#00000040'
+  },
+
+  activityIndicatorWrapper: {
+    backgroundColor: '#FFFFFF',
+    height: 100,
+    width: 100,
+    borderRadius: 10,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-around'
+  },
+
+  textMenuSmall: {
+    fontSize:10,
+    color: '#000',
+    alignItems: 'center',
+  },
 
   container: {
     flexDirection: 'column',
@@ -230,9 +265,9 @@ var styles = StyleSheet.create({
   },
 
   btnEntrar:{
-    width: screenWidth * 0.42,
+    width: screenWidth * 0.90,
     backgroundColor:'#471a88',
-    height: screenHeight*0.05,
+    height:35,
     marginLeft: screenWidth * 0.05,
     marginTop: 15,
     borderRadius:6,
@@ -241,9 +276,19 @@ var styles = StyleSheet.create({
   textoEntrar:{
     color:'#fff',
     textAlign:'center',
-    fontSize:16,
-    marginTop: isAndroid() ? screenHeight * 0.002 : screenHeight * 0.012,
-  }
+    fontSize:18,
+    marginTop:5
+  },
+
+  btnEntrar2:{
+    width: screenWidth * 0.90,
+    backgroundColor:'#471a88',
+    height:35,
+    marginLeft: screenWidth * 0.05,
+    marginTop: 15,
+    borderRadius:6,
+    marginBottom: 25
+  },
   
 
 });

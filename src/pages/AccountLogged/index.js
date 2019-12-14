@@ -100,8 +100,12 @@ export default function AccountLogged({ navigation }) {
     const response = await fetch(
       'https://backendeloyaqui.herokuapp.com/usuarios/' + iduser
     );
-    const data = await response.json();
-    data[0].validado === false ? setMsginativo(true) : setMsginativo(false);
+    const data = await response.json()
+    if (typeof data[0] === 'object'){
+      data[0].validado === false ? setMsginativo(true) : setMsginativo(false);
+    } else {
+      handleLogout();
+    }
   }
 
   useEffect(() => {
@@ -255,7 +259,7 @@ var styles = StyleSheet.create({
   },
 
   Item: {
-    height: isIphoneX() ? screenHeight*0.14 : isAndroid() ? screenHeight*0.21 : screenHeight*0.175,
+    height: isIphoneX() ? screenHeight*0.13 : isAndroid() ? screenHeight*0.21 : screenHeight*0.175,
     backgroundColor:'#fff',
     borderBottomColor:'#d5d5d5',
     borderBottomWidth:1,
@@ -283,9 +287,10 @@ var styles = StyleSheet.create({
   textoEntrar:{
     color:'#fff',
     textAlign:'center',
-    fontSize:18,
-    marginTop:screenHeight*0.005
+    fontSize:16,
+    marginTop: isAndroid() ? screenHeight * 0.004 : screenHeight * 0.01,
   },
+
 
   dadosTextRegras:{
     color:'#5d5d5d',
@@ -297,7 +302,7 @@ var styles = StyleSheet.create({
     color:'#fff',
     textAlign:'center',
     fontSize:16,
-    marginTop:screenHeight*0.003
+    marginTop: isAndroid() ? screenHeight * 0 : screenHeight * 0.003,
   },
 
   btnRemover:{
