@@ -1,7 +1,17 @@
 import React, { useState, useEffect} from 'react';
-import {View, Text, StyleSheet, Dimensions, TouchableHighlight, FlatList, ActivityIndicator, Alert, Platform } from 'react-native';
+import {
+    View, 
+    Text, 
+    StyleSheet, 
+    Dimensions, 
+    TouchableHighlight, 
+    FlatList, 
+    ActivityIndicator, 
+    Alert, 
+    Platform, 
+    AsyncStorage 
+} from 'react-native';
 import {Container, Tab, Tabs, TabHeading } from 'native-base';
-import {AsyncStorage} from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
@@ -39,7 +49,6 @@ export default function AccountLogged({ navigation }) {
   }
 
   function handleCancel(idevento) {
-
     Alert.alert(
       'Confirmação',
       'Deseja remover o agendamento ?',
@@ -204,8 +213,6 @@ export default function AccountLogged({ navigation }) {
                   </Tab>
                 </Tabs>
               </Container>
-            
-
           </View>
         </View>
   );
@@ -329,6 +336,20 @@ var styles = StyleSheet.create({
 
   txtMsguserinativo: {
     textAlign:'center'
-  }
+  },
+  
+  badge: {
+    borderRadius: 9,
+    height: 18,
+    minWidth: 0,
+    width: 18,
+  },
+  badgeContainer: {
+    position: 'absolute',
+  },
+  badgeText: {
+    fontSize: 10,
+    paddingHorizontal: 0,
+  },
 
 });

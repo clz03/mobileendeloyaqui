@@ -50,7 +50,6 @@ export default function Detail({ navigation }) {
   };
 
   async function loadEstab() {
-
       const response = await fetch(
         'https://backendeloyaqui.herokuapp.com/estabelecimentos/' + idestab
       );
@@ -65,7 +64,6 @@ export default function Detail({ navigation }) {
       const response2 = await fetch(
         'https://backendeloyaqui.herokuapp.com/produtos/estabelecimento/' + idestab
       );
- 
       const data2 = await response2.json();
       setProd(data2);
     };
@@ -80,12 +78,10 @@ export default function Detail({ navigation }) {
    };
 
   useEffect(() => {
-  
     loadEstab();
     loadProd();
     loadCupom();
     loadEvento(moment().format("YYYY-MM-DD"));
-
   }, []);
 
   async function handleAgendamento(data, hora, status) {
@@ -131,7 +127,6 @@ export default function Detail({ navigation }) {
       const datareturn = await response.json();
       
       if(!datareturn[0].validado){
-        
         Alert.alert(
           'Seu cadastro ainda não está validado',
           'Por favor ative seu cadastro, verifique o e-mail recebido para ativar sua conta.'
@@ -151,7 +146,7 @@ export default function Detail({ navigation }) {
           body: JSON.stringify({
             data: data,
             hora: hora,
-            comentario: useremail,
+            comentario: datareturn[0].telefone,
             idestabelecimento: idestab,
             idusuario: iduser
           }),
@@ -162,7 +157,7 @@ export default function Detail({ navigation }) {
 
       setLoading(false);
 
-      setTimeout(() => Alert.alert('Agendamento realizado!', 'Gerencie seus agendamentos no seu perfil'), 800);
+      setTimeout(() => Alert.alert('Agendamento realizado!', 'Gerencie seus agendamentos na aba Meu Perfil'), 800);
   }
 
 
@@ -186,7 +181,7 @@ export default function Detail({ navigation }) {
 
               <Container>
                 <Tabs initialPage={0} locked={true}>
-                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Informações</Text></TabHeading>}>
+                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Sobre</Text></TabHeading>}>
 
                     {estab.map(estab => 
                       <ScrollView key={estab._id} style={[ styles.container2 ]}>
@@ -248,8 +243,8 @@ export default function Detail({ navigation }) {
                     )}
                 </Tab>
       
-                {plano > 0 && pedonline == 1 &&
-                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Destaques/Cupons</Text></TabHeading>}>
+                {plano > 0 &&
+                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Destaque/Cupom</Text></TabHeading>}>
                                        
                     <ScrollView>
 
@@ -281,7 +276,7 @@ export default function Detail({ navigation }) {
                   </Tab>
                 }
              
-               {plano > 0 && pedonline ==  0 &&
+               {/* {plano > 0 && pedonline ==  0 &&
                   <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Destaques</Text></TabHeading>}>
                                        
                     <ScrollView>
@@ -300,10 +295,10 @@ export default function Detail({ navigation }) {
                     </ScrollView>
                     
                   </Tab>
-                }
+                } */}
 
                 {plano > 0 && pedonline == 0 &&
-                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Descontos</Text></TabHeading>}>
+                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Cardápio</Text></TabHeading>}>
                     <ScrollView style={[ styles.container ]}>
                       
                       {cupom.length > 0 ? cupom.map(cupom => 

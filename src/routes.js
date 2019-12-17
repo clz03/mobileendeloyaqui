@@ -14,7 +14,7 @@ import News from './pages/News';
 import NewsDetail from './pages/NewsDetail';
 import Search from './pages/Search'; 
 import Detail from './pages/Detail';
-import Agenda from './pages/Agenda';
+import TelUteis from './pages/TelUteis';
 
 const PagesNavigator = createStackNavigator({
   Search:{
@@ -80,24 +80,18 @@ const Newsnavigator = createStackNavigator({
   initialRouteName:'News'
 });
 
-const Agendanavigator = createStackNavigator({
-  Agenda:{
-    screen: Agenda,
+const TelUteisnavigator = createStackNavigator({
+  TelUteis:{
+    screen: TelUteis,
     navigationOptions: {
       headerStyle: {backgroundColor:'#471a88'},
-      headerTitle:'Disponíveis para Agendar',
+      headerTitle:'Telefones Úteis',
       headerTitleStyle: {color:'#fff'},
       headerTintColor: '#fff'
     },
-  },
-  Detail:{
-    screen: Detail,
-    navigationOptions: {
-      header: null,
-    },
-  },
+  }
 },{
-  initialRouteName:'Agenda'
+  initialRouteName:'TelUteis'
 });
 
 const Accountnavigator = createSwitchNavigator({
@@ -141,11 +135,11 @@ const Routes = createAppContainer(
           },
         },
         Agenda:{
-          screen: Agendanavigator,
+          screen: TelUteisnavigator,
           navigationOptions: {
-            title: 'Agendar',
+            title: 'Tel Úteis',
             tabBarIcon: ({ focused, tintColor }) => {
-              return <Icon name='insert-invitation' size={24} color={tintColor} />;
+              return <Icon name='call' size={24} color={tintColor} />;
             },
           },
         },

@@ -1,5 +1,14 @@
 import React, { useState, useEffect }  from 'react';
-import { View, Text, StyleSheet, TouchableHighlight, Image, Dimensions, FlatList, ActivityIndicator, Platform } from 'react-native';
+import { 
+        View, 
+        Text, 
+        StyleSheet, 
+        TouchableHighlight, 
+        Image, 
+        Dimensions, 
+        FlatList, 
+        ActivityIndicator, 
+        Platform } from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
@@ -36,7 +45,7 @@ export default function Agenda({ navigation }) {
     const data = await response.json();
     setEstab(shouldRefresh ? data.result : [...estab, ...data.result]);
     setTotalCount(Math.ceil(data.totalRecords / 10));
-    setPage(pageNumber + 1)
+    setPage(pageNumber + 1);
     setLoading(false);
   };
 
