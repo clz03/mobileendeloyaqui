@@ -134,10 +134,10 @@ const Routes = createAppContainer(
             },
           },
         },
-        Agenda:{
+        TelUteis:{
           screen: TelUteisnavigator,
           navigationOptions: {
-            title: 'Tel Úteis',
+            title: 'Serv. Úteis',
             tabBarIcon: ({ focused, tintColor }) => {
               return <Icon name='call' size={24} color={tintColor} />;
             },
