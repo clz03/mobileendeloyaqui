@@ -143,6 +143,7 @@ export default function Reward({navigation}) {
             onEndReached={() => loadPage()}
             onEndReachedThreshold={0.1}
             onRefresh={refreshList}
+            ListEmptyComponent={<Text style={styles.tabTitle}>Em breve novos cupons disponíveis.</Text>}
             refreshing={refreshing}
             ListHeaderComponent={
               loading ? (
@@ -225,6 +226,13 @@ var styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'space-around',
     backgroundColor: '#00000040'
+  },
+
+  tabTitle: {
+    paddingLeft: 10,
+    paddingTop:10,
+    color:'#707070',
+    textAlign:'center'
   },
 
   activityIndicatorWrapper: {
