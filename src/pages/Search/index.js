@@ -1,5 +1,14 @@
 import React, { useState, useEffect }  from 'react';
-import { View, Text, StyleSheet, TouchableHighlight, Image, Dimensions, FlatList, ActivityIndicator, Platform } from 'react-native';
+import { 
+  View, 
+  Text, 
+  StyleSheet, 
+  TouchableHighlight, 
+  Image, 
+  Dimensions, 
+  FlatList, 
+  ActivityIndicator, 
+  Platform } from 'react-native';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
@@ -78,7 +87,33 @@ export default function Search({ navigation }) {
         renderItem={({ item }) => (
           <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('Detail', { idestab: item._id }) }}>
             <View style={styles.ItemImg}>
-            <Text numberOfLines={1} style={styles.textTitle}>{item.nome}</Text>
+            
+            {item.cardapio &&
+              <View style={styles.containerBadge}>
+                <View style={styles.viewBadge}>
+                  <Text numberOfLines={1} style={styles.textTitle}>{item.nome}</Text>
+                </View>
+                <View style={styles.viewBadge2}>
+                  <Text numberOfLines={1} style={styles.textDescBadge}>Cardápio Online</Text>
+                </View>
+              </View>
+            }
+
+            {item.pedonline &&
+              <View style={styles.containerBadge}>
+                <View style={styles.viewBadge}>
+                  <Text numberOfLines={1} style={styles.textTitle}>{item.nome}</Text>
+                </View>
+                <View style={styles.viewBadge2}>
+                  <Text numberOfLines={1} style={styles.textDescBadge}>Agendamento Online</Text>
+                </View>
+              </View>
+            }
+
+            {!item.cardapio && !item.pedonline &&
+                <Text numberOfLines={1} style={styles.textTitle}>{item.nome}</Text>
+            }
+            
               <View style={styles.containerGeral}>
                 <View style={styles.imgContainer}>
                   <Image style={styles.imagem} source={{uri: item.imagem }}></Image>
@@ -113,6 +148,11 @@ var styles = StyleSheet.create({
     backgroundColor:'#fff'
   },
 
+  containerBadge: {
+    width:screenWidth,
+    flexDirection: "row"
+  },
+
   LoadingIndicator:{
     flex:1,
     justifyContent:"center",
@@ -128,10 +168,29 @@ var styles = StyleSheet.create({
     marginLeft:10,
   },
 
+  viewBadge: {
+      width: screenWidth *0.6,
+  },
+
+  viewBadge2: {
+    width: screenWidth *0.3,
+    alignItems:"center",
+    backgroundColor:"#fff",
+    borderColor:'#004c00',
+    borderWidth:1,
+    borderRadius:8
+  },
+
+  textDescBadge: {
+    fontSize: 10,
+    paddingTop:1,
+    color:'#004c00'
+  },
+
   textTitle: {
     fontSize:14,
     fontWeight:'bold',
-    color:'#12299B'
+    color:'#12299B',
   },
 
   textDesc: {
@@ -144,6 +203,8 @@ var styles = StyleSheet.create({
     paddingTop:5,
     color:'green'
   },
+
+
 
   containerGeral:{
     flexDirection:'row',

@@ -14,7 +14,8 @@ import {
   ActivityIndicator,
   Alert,
   AsyncStorage,
-  Modal } 
+  Modal,
+  Platform } 
 from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -26,11 +27,25 @@ import 'moment/locale/pt-br';
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
 
+export function isIphoneX() {
+  return (
+    Platform.OS === 'ios' && screenHeight >= 812
+  );
+};
+
+export function isAndroid() {
+  return (
+    Platform.OS !== 'ios'
+  );
+};
+
 export default function Detail({ navigation }) {
   
   const [estab, setEstab] = useState([]);
   const [plano, setPlano] = useState([]);
   const [pedonline, setPedonline] = useState([]);
+  const [cardapio, setCardapio] = useState("");
+  const [cardapioonline, setCardapioonline] = useState(false);
   const [prod, setProd] = useState([]);
   const [cupom, setCupom] = useState([]);
   const [evento, setEvento] = useState([]);
@@ -55,9 +70,19 @@ export default function Detail({ navigation }) {
       );
 
       const data = await response.json();
+      const plano = data[0].plano;
+      const agendaonline = data[0].pedonline;
+      const cardapionline = data[0].cardapio;
       setEstab(data);
-      setPlano(data[0].plano);
-      setPedonline(data[0].pedonline);
+      setPlano(plano);
+      setPedonline(agendaonline);
+      setCardapioonline(cardapionline);
+      if (plano > 0) {
+        loadProd();
+        loadCupom();
+        if (agendaonline) loadEvento(moment().format("YYYY-MM-DD"));
+        if (cardapionline) loadCardapio();
+      }
     };
 
     async function loadProd() {
@@ -77,11 +102,18 @@ export default function Detail({ navigation }) {
      setCupom(data3);
    };
 
+    async function loadCardapio() {
+    const response5 = await fetch(
+      'https://backendeloyaqui.herokuapp.com/cardapios/estabelecimento/' + idestab
+    );
+
+    const data5 = await response5.json();
+    setCardapio(data5);
+  };
+
+
   useEffect(() => {
     loadEstab();
-    loadProd();
-    loadCupom();
-    loadEvento(moment().format("YYYY-MM-DD"));
   }, []);
 
   async function handleAgendamento(data, hora, status) {
@@ -100,7 +132,7 @@ export default function Detail({ navigation }) {
           'Agendar para ' + data.substring(8,10) + "/" + data.substring(5,7) + "/" + data.substring(0,4) + ' - ' + hora + ':00 ?',
           [
             {text: 'Não'},
-            {text: 'Sim', onPress: () => confirmAgendamento(data, hora, useremail)}
+            {text: 'Sim', onPress: () => confirmAgendamento(data, hora)}
           ]
         );
       }
@@ -116,7 +148,7 @@ export default function Detail({ navigation }) {
     }
   }
 
-  async function confirmAgendamento(data, hora, useremail) {
+  async function confirmAgendamento(data, hora) {
 
       const iduser = await AsyncStorage.getItem('eloyuserid');
 
@@ -297,27 +329,33 @@ export default function Detail({ navigation }) {
                   </Tab>
                 } */}
 
-                {plano > 0 && pedonline == 0 &&
+                {plano > 0 && cardapioonline == 1 &&
                   <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Cardápio</Text></TabHeading>}>
-                    <ScrollView style={[ styles.container ]}>
+                    <ScrollView style={styles.container}>
                       
-                      {cupom.length > 0 ? cupom.map(cupom => 
-                        <View style={styles.cupomItem} key={cupom._id}>
-                          <View style={styles.barraLateralVerde}></View>
-                          <View style={styles.ticket}>
-                            <Text style={styles.ticketText}>{cupom.premio}</Text>
-                            <Text style={styles.dadosTextRegras}>*Apresentar o cupom no estabelecimento*</Text>
-                            <Text style={styles.dadosTextRegras}>*Válido até {cupom.validade}*</Text>
-                          </View>   
+                      {/* {catcardapio.length > 0 && catcardapio.map(catcardapio => 
+                        <Text style={styles.textDestaques} key={catcardapio}>{catcardapio}</Text>
+                       
+                       
+       
+                      )} */}
+
+                      {cardapio.length > 0 && cardapio.map(cardapio => 
+                        <View style={styles.ItemImg} key={cardapio._id}>
+                          <View style={styles.containerGeral}>
+                            <View style={styles.txtContainer}>
+                            <Text style={styles.textDestaques}>{cardapio.categoria}</Text>
+                              <Text style={styles.textCardapio}>{cardapio.item} - R${cardapio.valor}</Text>
+                            </View>
+                          </View>
                         </View>
-                      ) : <Text style={styles.txtNoData}>Em breve novos Cupons. Fique de olho !</Text>
-                    }
-                      
+                      )}
+
                     </ScrollView>
                   </Tab>
                 }
 
-                {pedonline == 1 && 
+                {plano > 0 && pedonline == 1 && 
 
                   <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Agendar</Text></TabHeading>}>
 
@@ -400,6 +438,13 @@ var styles = StyleSheet.create({
     height:screenHeight * 0.30,
   },
 
+  ItemImg: {
+    width: screenWidth,
+    borderBottomColor:'#d5d5d5',
+    borderBottomWidth:1,
+    marginTop:10
+  },
+
   modalBackground: {
     flex: 1,
     alignItems: 'center',
@@ -466,6 +511,13 @@ var styles = StyleSheet.create({
     color:'#fff',
     fontSize:13,
     paddingLeft:15,
+  },
+
+  textCardapio: {
+    color:'#000',
+    fontSize:13,
+    marginLeft:10,
+    marginBottom:5
   },
 
   textDestaq: {
@@ -569,8 +621,9 @@ var styles = StyleSheet.create({
 
   textDestaques:{
     color:'#000',
-    padding:10,
+    marginLeft:10,
     fontSize:13,
+    fontWeight:'bold',
     width: screenWidth * 0.95
   },
 
