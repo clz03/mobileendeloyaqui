@@ -14,7 +14,10 @@ import News from './pages/News';
 import NewsDetail from './pages/NewsDetail';
 import Search from './pages/Search'; 
 import Detail from './pages/Detail';
-import TelUteis from './pages/TelUteis';
+// import TelUteis from './pages/TelUteis';
+import Delivery from './pages/Delivery';
+import Pedido from './pages/Delivery/pedido';
+import ItemPedido from './pages/Delivery/itemPedido';
 
 const PagesNavigator = createStackNavigator({
   Search:{
@@ -41,6 +44,38 @@ const PagesNavigator = createStackNavigator({
   },
 },{
   initialRouteName:'Home'
+});
+
+const DeliveryNavigator = createStackNavigator({
+  Delivery:{
+    screen: Delivery,
+    navigationOptions: {
+      headerStyle: {backgroundColor:'#471a88'},
+      headerTitle:'Pedido Delivery',
+      headerTitleStyle: {color:'#fff'},
+      headerTintColor: '#fff'
+    },
+  },
+  Pedido:{
+    screen: Pedido,
+    navigationOptions: {
+      headerStyle: {backgroundColor:'#471a88'},
+      headerTitle:'Cardápio Online - Pedido',
+      headerTitleStyle: {color:'#fff'},
+      headerTintColor: '#fff'
+    },
+  },
+  itemPedido:{
+    screen: ItemPedido,
+    navigationOptions: {
+      headerStyle: {backgroundColor:'#471a88'},
+      headerTitle:'Item Pedido',
+      headerTitleStyle: {color:'#fff'},
+      headerTintColor: '#fff'
+    },
+  },
+},{
+  initialRouteName:'Delivery'
 });
 
 const Cupomnavigator = createStackNavigator({
@@ -80,19 +115,19 @@ const Newsnavigator = createStackNavigator({
   initialRouteName:'News'
 });
 
-const TelUteisnavigator = createStackNavigator({
-  TelUteis:{
-    screen: TelUteis,
-    navigationOptions: {
-      headerStyle: {backgroundColor:'#471a88'},
-      headerTitle:'Telefones Úteis',
-      headerTitleStyle: {color:'#fff'},
-      headerTintColor: '#fff'
-    },
-  }
-},{
-  initialRouteName:'TelUteis'
-});
+// const TelUteisnavigator = createStackNavigator({
+//   TelUteis:{
+//     screen: TelUteis,
+//     navigationOptions: {
+//       headerStyle: {backgroundColor:'#471a88'},
+//       headerTitle:'Telefones Úteis',
+//       headerTitleStyle: {color:'#fff'},
+//       headerTintColor: '#fff'
+//     },
+//   }
+// },{
+//   initialRouteName:'TelUteis'
+// });
 
 const Accountnavigator = createSwitchNavigator({
   Register:{
@@ -134,12 +169,12 @@ const Routes = createAppContainer(
             },
           },
         },
-        TelUteis:{
-          screen: TelUteisnavigator,
+        Delivery:{
+          screen: DeliveryNavigator,
           navigationOptions: {
-            title: 'Serv. Úteis',
+            title: 'Delivery',
             tabBarIcon: ({ focused, tintColor }) => {
-              return <Icon name='call' size={24} color={tintColor} />;
+              return <Icon name='motorcycle' size={24} color={tintColor} />;
             },
           },
         },
@@ -152,6 +187,15 @@ const Routes = createAppContainer(
             },
           },
         },
+        // TelUteis:{
+        //   screen: TelUteisnavigator,
+        //   navigationOptions: {
+        //     title: 'Serv. Úteis',
+        //     tabBarIcon: ({ focused, tintColor }) => {
+        //       return <Icon name='call' size={24} color={tintColor} />;
+        //     },
+        //   },
+        // },
         News:{
           screen: Newsnavigator,
           navigationOptions: {
