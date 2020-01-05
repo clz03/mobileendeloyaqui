@@ -1,5 +1,6 @@
 import React, { useState, useEffect }  from 'react';
 import { View, Text, StyleSheet, TouchableHighlight, Dimensions, FlatList, ActivityIndicator } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 //const screenHeight = Math.round(Dimensions.get('window').height);
@@ -10,14 +11,17 @@ export default function Pedido({ navigation }) {
   const nomeestab = navigation.getParam('nomeestab');
 
   const [cardapio, setCardapio] = useState([]);  
+  const [categorias, setCategorias] = useState([]);  
   const [loading, setLoading] = useState(false);
 
   async function loadCardapio() {
     const response = await fetch(
       'https://backendeloyaqui.herokuapp.com/cardapios/estabelecimento/' + idestab
     );
-
     const data = await response.json();
+    const categorias = data.map(data => data.categoria);
+    let unique = [...new Set(categorias)]; 
+    setCategorias(unique);
     setCardapio(data);
     setLoading(false)
 };
@@ -33,9 +37,20 @@ export default function Pedido({ navigation }) {
   return (
 
     <View style={styles.container}>
+
+      <View style={styles.tempoentrega}>
+        <Icon style={styles.iconeMoto} name='motorcycle' size={24} color='#484848' />
+        <Text style={styles.textoPreto}>Tempo médio de entrega: 50-60 minutos</Text>
+      </View>
+
+      <View style={styles.pedminimo}>
+        <Text style={styles.textoCinza}>* Pedido mínimo R$15,00</Text>
+        <Text></Text>
+      </View>
+
       <FlatList
-        data={cardapio}
-        keyExtractor={cardapio => String(cardapio._id)}
+        data={categorias}
+        keyExtractor={categorias => categorias}
         ListHeaderComponent={
           loading ? (
             <ActivityIndicator size="large" style={styles.LoadingIndicator} />
@@ -45,19 +60,33 @@ export default function Pedido({ navigation }) {
         }
         renderItem={({ item }) => (
 
-            <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('itemPedido', { idcardapio: item._id }) }}>
-                <View style={styles.ItemImg} key={item._id}>
-                    <View style={styles.containerGeral}>
-                    <View style={styles.txtContainer}>
-                    <Text style={styles.textDestaques}>{item.categoria}</Text>
-                        <Text style={styles.textCardapio}>{item.item} - R${item.valor}</Text>
-                    </View>
-                    </View>
-                </View>
-            </TouchableHighlight>
-          
+          <View style={styles.viewCardapio}>
+            <Text style={styles.textDestaques}>{item}</Text>
+
+            {cardapio.map(cardapio => 
+              <View key={cardapio._id}>
+
+              {item === cardapio.categoria &&
+                <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('itemPedido', { idcardapio: cardapio._id }) }}>
+                  <View style={styles.ItemImg2}>
+                      <Text style={styles.textItem}>{cardapio.item}</Text>
+                      <Text style={styles.textItemDesc}>Arroz, Feijão, Farofa, Batata</Text>
+                      <Text style={styles.textItemValor}>R${cardapio.valor}</Text> 
+                  </View>
+                </TouchableHighlight>
+              }
+
+              </View>
+            )}
+
+          </View>
         )}            
       />
+
+      <View>
+        <Text>Ver Pedido</Text>
+      </View>
+
     </View>
   );
 }
@@ -74,7 +103,7 @@ var styles = StyleSheet.create({
   
   container: {
     flex: 1,
-    backgroundColor:'#e5e5e5'
+    backgroundColor:'#fff'
   },
 
   LoadingIndicator:{
@@ -83,19 +112,80 @@ var styles = StyleSheet.create({
     marginTop:15
   },
 
-  Item: {
-    height:65,
-    backgroundColor:'#fff',
-    borderBottomColor:'#d5d5d5',
-    borderBottomWidth:1,
-    paddingTop: 10,
-    paddingLeft: 10,
-
+  viewCardapio:{
+    marginTop:5
   },
 
-  ItemImg: {
-    backgroundColor:'#fff',
-    marginLeft: 8,
+  ItemImg2: {
+    borderWidth:1,
+    borderColor: '#d3d3d3',
+    width: screenWidth * 0.95,
+    marginLeft: screenWidth * 0.025,
+    marginBottom:8
+  },
+
+  tempoentrega:{
+    width: screenWidth*0.95,
+    marginLeft: screenWidth*0.025,
+    marginTop:5,
+    borderWidth:1,
+    borderColor:'#c3c3c3',
+    borderRadius:5,
+    alignItems:'center',
+    flexDirection:'row',
+    height:40
+  },
+
+  pedminimo:{
+    marginLeft:screenWidth*0.025,
+    marginRight:screenWidth*0.025,
+    marginTop:5,
+  },
+
+  textoCinza:{
+    fontSize:12,
+    color:'gray',
+  },
+
+  textoPreto:{
+    fontSize:12,
+    color:'#484848',
+    marginLeft: screenWidth * 0.025
+  },
+
+  iconeMoto:{
+    marginLeft: screenWidth * 0.025
+  },
+
+  textItem:{
+    marginLeft:screenWidth*0.025,
+    marginTop:4
+  },
+
+  textItemDesc:{
+    marginLeft:screenWidth*0.025,
+    fontSize:11,
+    color:'#595959'
+  },
+
+  textItemValor:{
+    marginLeft:screenWidth*0.025,
+    fontSize:13,
+    fontWeight:'bold',
+    marginBottom:5,
+    marginTop:5,
+    color:'#595959',
+    borderColor: '#c3c3c3',
+    borderBottomWidth: 1,
+  },
+
+  textDestaques:{
+    fontSize:16,
+    fontWeight:'bold',
+    color:'#484848',
+    marginLeft:screenWidth*0.025,
+    marginBottom:10,
+    marginTop: 5
   },
 
   textTitle: {

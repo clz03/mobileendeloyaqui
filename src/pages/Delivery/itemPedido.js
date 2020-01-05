@@ -1,5 +1,6 @@
 import React, { useState, useEffect }  from 'react';
-import { View, Text, StyleSheet, TouchableHighlight, Dimensions, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Dimensions, ScrollView, ActivityIndicator, TouchableOpacity, AsyncStorage } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 //const screenHeight = Math.round(Dimensions.get('window').height);
@@ -11,6 +12,11 @@ export default function ItemPedido({ navigation }) {
 
   const [cardapio, setCardapio] = useState([]);  
   const [loading, setLoading] = useState(false);
+  const [pedido, setPedido] = useState(false);
+  const [obs, setObs] = useState('');
+  const [qtdy, setQtdy] = useState(1);
+  const [valorun, setValorun] = useState(0);
+  const [valortotal, setValortotal] = useState(0);
 
   async function loadCardapio() {
     const response = await fetch(
@@ -18,49 +24,136 @@ export default function ItemPedido({ navigation }) {
     );
 
     const data = await response.json();
+    const valor = parseFloat((data[0].valor.replace(',','.')));
     setCardapio(data);
+    setValorun(valor);
+    setValortotal((valor).toFixed(2));
     setLoading(false)
 };
+
+function aumentaqtdy(){
+  if(qtdy < 10) setQtdy(qtdy + 1);
+};
+
+function diminuiqtdy(){
+  if(qtdy > 1) setQtdy(qtdy - 1);
+};
+
+async function Limpapedido(){
+  for (i = 1; i <= 20; i++) {
+    if (await AsyncStorage.getItem('eloyitem'+i) !== null){
+      AsyncStorage.removeItem('eloypedido');
+      AsyncStorage.removeItem('eloyitem'+i);
+      AsyncStorage.removeItem('eloyqtdy'+i);
+      AsyncStorage.removeItem('eloyvalorun'+i);
+      AsyncStorage.removeItem('eloyvalortotal'+i);
+    }
+ }
+}
+
+async function adicionaItem(itemcardapio){
+  var i;
+  for (i = 1; i <= 20; i++) {
+    if (await AsyncStorage.getItem('eloyitem'+i) === null){
+      break;
+    }
+  }  
+
+  await AsyncStorage.setItem('eloypedido', JSON.stringify(i));
+  await AsyncStorage.setItem('eloyitem'+i, JSON.stringify(itemcardapio));
+  await AsyncStorage.setItem('eloyqtdy'+i, JSON.stringify(qtdy));
+  await AsyncStorage.setItem('eloyvalorun'+i, JSON.stringify(valorun));
+  await AsyncStorage.setItem('eloyvalortotal'+i, JSON.stringify(valortotal));
+  setPedido(true);
+  navigation.navigate('Sacola');
+};
+
+async function CheckPedido(){
+  if (await AsyncStorage.getItem('eloyitem1') !== null)
+    setPedido(true);
+  else
+    setPedido(false);
+  }
 
   useEffect(() => {
     navigation.setParams({ 
       nomeestab: nomeestab
     }); 
-    setLoading(true)
+    setLoading(true);
+    //Limpapedido();
+    CheckPedido();
     loadCardapio();
   }, []);
+
+  useEffect(() => {
+    setValortotal((valorun * qtdy).toFixed(2));
+  }, [qtdy]);
 
   return (
 
     <View style={styles.container}>
-      <FlatList
-        data={cardapio}
-        keyExtractor={cardapio => String(cardapio._id)}
-        ListHeaderComponent={
-          loading ? (
-            <ActivityIndicator size="large" style={styles.LoadingIndicator} />
-          ) : (
-            ""
-          )
-        }
-        renderItem={({ item }) => (
 
-            <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('itemPedido', { idestab: item._id }) }}>
-                <View style={styles.ItemImg} key={item._id}>
-                    <View style={styles.containerGeral}>
-                    <View style={styles.txtContainer}>
-                    <Text style={styles.textDestaques}>{item.categoria}</Text>
-                        <Text style={styles.textCardapio}>{item.item} - R${item.valor}</Text>
-                    </View>
-                    </View>
-                </View>
-            </TouchableHighlight>
-          
-        )}            
-      />
+      {cardapio.map(cardapio => 
+        <ScrollView key={cardapio._id}>
+
+          <View style={styles.viewCardapio}>
+            {/* <Text style={styles.textDestaques}>{cardapio.categoria}</Text> */}
+
+            <View style={styles.ItemImg2}>
+              <Text style={styles.textItem}>{cardapio.item}</Text>
+              <Text style={styles.textItemDesc}>Arroz, Feijão, Farofa, Batata</Text>
+              <Text style={styles.textItemValor}>R${cardapio.valor}</Text> 
+            </View>
+
+            <Text style={styles.labelLogin}>Alguma observação ?</Text>
+            <TextInput 
+              style={ styles.inputLogin } 
+              autoCorrect={true}
+              maxLength={50}
+              placeholder="ex: sem cebola"
+              value={obs}
+              onChangeText={(text) => setObs(text)}
+            />
+            <View style={styles.containerGeral}>
+              <View style={styles.containerMaisMenos}>
+
+                <TouchableOpacity onPress ={() => diminuiqtdy()} style={styles.botaomenos}>
+                  <Icon style={styles.iconeMoto} name='remove' size={24} color='#817E9F' />
+                </TouchableOpacity>
+
+                <Text style={styles.textDesc}>{qtdy}</Text>
+
+                <TouchableOpacity onPress ={() => aumentaqtdy()} style={styles.botaomais}>
+                  <Icon style={styles.iconeMoto} name='add' size={24} color='#817E9F' />
+                </TouchableOpacity>
+            
+              </View>
+
+              <View style={styles.containerAdicionar}>
+
+                <TouchableOpacity style={styles.botaoadicionar} onPress={() => adicionaItem(cardapio.item)}>
+                  <Icon style={styles.iconeMoto} name='add-shopping-cart' size={24} color='#fff' />
+                  <Text style={styles.textAdicionar}>Adicionar - R${valortotal}</Text>
+                </TouchableOpacity>
+              </View>
+
+              </View>
+
+          </View>
+        </ScrollView>
+      )}
+    
+    {pedido &&
+      <TouchableOpacity style={styles.pedidoBottom} onPress={() => { navigation.navigate('Sacola', { idestab: "item" }) }}>
+        <Icon style={styles.pedidoBottomContentIcon} name='shopping-basket' size={24} color='#fff' />
+        <Text style={styles.pedidoBottomContent}>Ver Pedido</Text>
+        <Text style={styles.pedidoBottomContent}>R${valortotal}</Text>
+      </TouchableOpacity>
+    }
     </View>
   );
 }
+
 
 ItemPedido.navigationOptions = ({ navigation }) => {
   return {
@@ -74,13 +167,35 @@ var styles = StyleSheet.create({
   
   container: {
     flex: 1,
-    backgroundColor:'#e5e5e5'
+    backgroundColor:'#fff'
   },
 
   LoadingIndicator:{
     flex:1,
     justifyContent:"center",
     marginTop:15
+  },
+
+  pedidoBottom:{
+    flexDirection:'row',
+    width: screenWidth,
+    height: 45,
+    backgroundColor:'#700353',
+    position: 'absolute',
+    bottom:0
+  },
+
+  pedidoBottomContentIcon:{
+    width: (screenWidth - 0.1) /3,
+    marginLeft: screenWidth * 0.05,
+    marginTop:10,
+    color:'#fff'
+  },
+
+  pedidoBottomContent:{
+    width: (screenWidth - 0.1) /3,
+    marginTop:13,
+    color:'#fff'
   },
 
   Item: {
@@ -90,6 +205,9 @@ var styles = StyleSheet.create({
     borderBottomWidth:1,
     paddingTop: 10,
     paddingLeft: 10,
+  },
+
+  viewCardapio:{
 
   },
 
@@ -98,15 +216,40 @@ var styles = StyleSheet.create({
     marginLeft: 8,
   },
 
+  inputLogin:{
+    height: 40,
+    width:screenWidth * 0.90,
+    marginLeft: screenWidth * 0.05,
+    borderColor: '#471a88', 
+    borderWidth: 1,
+    borderRadius:5,
+    paddingLeft:3
+  },
+
+  labelLogin:{
+    color:'#471a88',
+    marginLeft: screenWidth * 0.05,
+    marginBottom:3,
+  },
+
   textTitle: {
-    fontSize:14,
+    fontSize:16,
+    marginTop:10,
     fontWeight:'bold',
     color:'#12299B'
   },
 
   textDesc: {
-    fontSize: 12,
-    paddingTop:5
+    fontSize: 15,
+    marginTop:10,
+    marginLeft:8,
+    marginRight:8
+  },
+
+  textAdicionar: {
+    fontSize: 16,
+    marginLeft:8,
+    color:'#fff',
   },
 
   textDescNoticia: {
@@ -122,8 +265,49 @@ var styles = StyleSheet.create({
     color:'red'
   },
 
+  containerMaisMenos:{
+    flexDirection:'row',
+    borderWidth:1,
+    borderColor:'#471a88',
+    borderRadius:5,
+    width:screenWidth*0.3,
+    height:40,
+    marginLeft: screenWidth * 0.05,
+    marginTop:15
+  },
+
+  containerAdicionar:{
+    backgroundColor:'#700353',
+    flexDirection:'row',
+    borderWidth:1,
+    borderColor:'#fff',
+    borderRadius:5,
+    width:screenWidth*0.575,
+    height:40,
+    marginLeft: screenWidth * 0.025,
+    marginTop:15
+  },
+
   containerGeral:{
     flexDirection:'row',
+  },
+
+  botaomais:{
+    marginLeft:10,
+    marginTop:8,
+  },
+
+  botaomenos:{
+    marginLeft:10,
+    marginRight:8,
+    marginTop:8,
+  },
+
+  botaoadicionar:{
+    marginLeft:10,
+    marginTop:8,
+    flexDirection:'row',
+    width:'100%'
   },
 
   imgContainer:{
@@ -160,5 +344,38 @@ var styles = StyleSheet.create({
     color:'#fff',
     fontSize:10,
     fontWeight:'bold'
+  },
+
+  textItem:{
+    fontSize:18,
+    marginLeft:screenWidth*0.05,
+    marginTop:10,
+    marginBottom:5
+  },
+
+  textItemDesc:{
+    fontSize:12,
+    marginLeft:screenWidth*0.055,
+    color:'#595959'
+  },
+
+  textItemValor:{
+    marginLeft:screenWidth*0.05,
+    fontSize:16,
+    fontWeight:'bold',
+    marginBottom:20,
+    marginTop:15,
+    color:'#595959',
+    borderColor: '#c3c3c3',
+    borderBottomWidth: 1,
+  },
+
+  textDestaques:{
+    fontSize:18,
+    fontWeight:'bold',
+    color:'#484848',
+    marginLeft:screenWidth*0.05,
+    marginBottom:15,
+    marginTop: 10
   },
 })

@@ -3,12 +3,16 @@ import {
   View, 
   Text, 
   StyleSheet, 
-  TouchableHighlight, 
+  TouchableHighlight,
+  TouchableOpacity,
   Image, 
   Dimensions, 
   FlatList, 
   ActivityIndicator, 
+  TextInput,
   Platform } from 'react-native';
+
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
@@ -32,6 +36,7 @@ export default function Delivery({ navigation }) {
   const [totalCount, setTotalCount] = useState(0);   
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [busca, setBusca] = useState('');   
 
   async function loadPage(pageNumber = page, shouldRefresh = false) {
     
@@ -63,6 +68,21 @@ export default function Delivery({ navigation }) {
   return (
 
     <View style={styles.container}>
+      <View style={styles.containerBusca}>
+        <TextInput 
+          style={ styles.inputLogin } 
+          autoCapitalize='none' 
+          autoCorrect={false} 
+          keyboardType="web-search"
+          maxLength={40}
+          placeholder="Busca"
+          value={busca}
+          onChangeText={(text) => setBusca(text)}
+        />
+        <TouchableOpacity onPress={() => navigation.goBack(null)} style={styles.buttonBusca}>
+          <Icon name='search' size={24} color='gray' />
+        </TouchableOpacity>
+      </View>
       <FlatList
         data={estab}
         keyExtractor={estab => String(estab._id)}
@@ -120,9 +140,9 @@ var styles = StyleSheet.create({
   },
 
   ItemImg: {
-    height: isIphoneX() ? screenHeight*0.125 : isAndroid() ? screenHeight*0.175 : screenHeight*0.155,
+    height: isIphoneX() ? screenHeight*0.115 : isAndroid() ? screenHeight*0.175 : screenHeight*0.145,
     backgroundColor:'#fff',
-    borderRadius:10,
+    borderRadius:5,
     marginTop:8,
     marginLeft:8,
     marginRight:8
@@ -170,14 +190,23 @@ var styles = StyleSheet.create({
 
   imgContainer:{
     width:screenWidth *0.2,
-    borderTopLeftRadius:10,
+    borderTopLeftRadius:5,
     borderBottomLeftRadius:10,
     overflow: "hidden"
   },
 
+  containerBusca:{
+    flexDirection: 'row',
+  },
+
+  buttonBusca:{
+    marginTop:8,
+    marginLeft:8,
+  },
+
   imagem:{
     width:screenWidth *0.19,
-    height: isIphoneX() ? screenHeight*0.125 : isAndroid() ? screenHeight*0.175 : screenHeight*0.155,
+    height: isIphoneX() ? screenHeight*0.115 : isAndroid() ? screenHeight*0.175 : screenHeight*0.145,
   },
 
   txtContainer:{
@@ -191,5 +220,17 @@ var styles = StyleSheet.create({
     fontWeight:'600',
     color:'#fff',
     marginHorizontal:16
+  },
+
+  inputLogin:{
+    height: screenHeight*0.04,
+    width:screenWidth * 0.85,
+    marginLeft: 8,
+    marginTop:5,
+    backgroundColor:'#fff',
+    borderColor: '#fff', 
+    borderWidth: 1,
+    borderRadius:5,
+    paddingLeft:3
   },
 })

@@ -18,6 +18,7 @@ import Detail from './pages/Detail';
 import Delivery from './pages/Delivery';
 import Pedido from './pages/Delivery/pedido';
 import ItemPedido from './pages/Delivery/itemPedido';
+import Sacola from './pages/Delivery/sacola';
 
 const PagesNavigator = createStackNavigator({
   Search:{
@@ -70,6 +71,15 @@ const DeliveryNavigator = createStackNavigator({
     navigationOptions: {
       headerStyle: {backgroundColor:'#471a88'},
       headerTitle:'Item Pedido',
+      headerTitleStyle: {color:'#fff'},
+      headerTintColor: '#fff'
+    },
+  },
+  Sacola:{
+    screen: Sacola,
+    navigationOptions: {
+      headerStyle: {backgroundColor:'#471a88'},
+      headerTitle:'Sacola Pedido',
       headerTitleStyle: {color:'#fff'},
       headerTintColor: '#fff'
     },

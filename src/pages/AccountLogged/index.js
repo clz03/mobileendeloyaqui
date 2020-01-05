@@ -31,6 +31,7 @@ export function isAndroid() {
 export default function AccountLogged({ navigation }) {
 
   const [nome, setNome] = useState("");
+  const [usuario, setUsuario] = useState("");
   const [evento, setEvento] = useState([]);  
   const [cupom, setCupom] = useState([]);  
   const [loading, setLoading] = useState(false);
@@ -109,7 +110,8 @@ export default function AccountLogged({ navigation }) {
     const response = await fetch(
       'https://backendeloyaqui.herokuapp.com/usuarios/' + iduser
     );
-    const data = await response.json()
+    const data = await response.json();
+    setUsuario(data);
     if (typeof data[0] === 'object'){
       data[0].validado === false ? setMsginativo(true) : setMsginativo(false);
     } else {
@@ -143,7 +145,7 @@ export default function AccountLogged({ navigation }) {
 
             <Container>
                 <Tabs initialPage={0} locked={true}>
-                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Meus Agendamentos</Text></TabHeading>}>
+                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Agendamentos</Text></TabHeading>}>
                     <View style={styles.container}>
                       <FlatList
                       data={evento}
@@ -178,7 +180,7 @@ export default function AccountLogged({ navigation }) {
                   </Tab>
 
 
-                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Meus Cupons</Text></TabHeading>}>
+                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Cupons</Text></TabHeading>}>
                     <View style={styles.container}>
                     <FlatList
                       data={cupom}
@@ -211,12 +213,45 @@ export default function AccountLogged({ navigation }) {
                       />
                     </View>
                   </Tab>
+
+                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Meu Perfil</Text></TabHeading>}>
+                    <View style={styles.container}>
+                    <FlatList
+                      data={usuario}
+                      keyExtractor={usuario => String(usuario._id)}
+                      ListHeaderComponent={
+                        loading ? (
+                          <ActivityIndicator size="large" style={styles.LoadingIndicator}/>
+                        ) : (
+                          ""
+                        )
+                      }
+                      renderItem={({ item }) => (                
+                        <View style={styles.Item}>
+                        <Text style={styles.textDescPrinc}>{item.nome}</Text>
+                          <View style={styles.containerGeral}>
+                            <View style={styles.txtContainer}>
+                              <Text style={styles.textDesc}>{item.telefone}</Text>
+                              <Text style={styles.textDesc}>{item.email}</Text>
+                            </View>
+                          </View>
+                          <Text style={styles.textDescPrinc}>Endereço:</Text>
+                          <Text style={styles.textDesc}>Atmosphera</Text>
+                          <Text style={styles.textDesc}>Rua Chiara Lubich, 371</Text>
+                          <Text style={styles.textDesc}>Torre Figueira - AP74</Text>
+                        </View>
+                        )}            
+                      />
+                    </View>
+                  </Tab>
                 </Tabs>
               </Container>
           </View>
         </View>
   );
 }
+
+
 
 var styles = StyleSheet.create({
   
@@ -266,7 +301,7 @@ var styles = StyleSheet.create({
   },
 
   Item: {
-    height: isIphoneX() ? screenHeight*0.13 : isAndroid() ? screenHeight*0.21 : screenHeight*0.175,
+    // height: isIphoneX() ? screenHeight*0.13 : isAndroid() ? screenHeight*0.21 : screenHeight*0.175,
     backgroundColor:'#fff',
     borderBottomColor:'#d5d5d5',
     borderBottomWidth:1,
