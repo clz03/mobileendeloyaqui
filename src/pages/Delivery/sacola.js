@@ -9,6 +9,8 @@ export default function Sacola({ navigation }) {
  
   const [cardapio, setCardapio] = useState([]);  
   const [loading, setLoading] = useState(false);
+  const [tipoEntrega, setTipoEntrega] = useState("E");
+  const [tipoPag, setTipoPag] = useState("D"); // D=Debito - C=Credito - E=Especie
 
   function aumentaqtdy(){
     if(qtdy < 10) setQtdy(qtdy + 1);
@@ -29,43 +31,134 @@ export default function Sacola({ navigation }) {
 
       <ScrollView>
 
-        <View>
-          <Text>Entrega em:</Text>
-          <Icon style={styles.iconeMoto} name='near-me' size={24} color='#817E9F' />
-          <Text>Rua Chiara Lubich, 371</Text>
-          <Text>Torre Figueira, AP 74 - Residencial Atmosphera</Text>
+        <View style={styles.secao}>
+          <Text style={styles.textDestaques}>Entrega ou Retirada</Text>
+          
+          <View style={styles.buttonContainer}>
+            <View style={styles.containerColumn}>
+              <Text style={styles.textDesc}>Entrega</Text>
+              <Text style={styles.textDesc}>50-60 minutos</Text>
+              <Text style={styles.textItemDesc}>R$3,00</Text>
+            </View>
+            <TouchableOpacity
+                style={styles.circle}
+                onPress={() => setTipoEntrega("E")}
+            >
+              { tipoEntrega === "E" && (<View style={styles.checkedCircle} />) }
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.buttonContainer}>
+            <View style={styles.containerColumn}>
+              <Text style={styles.textDesc}>Retirada</Text>
+              <Text style={styles.textDesc}>20-30 minutos</Text>
+              <Text numberOfLines={1} style={styles.textItemDesc}>Av. Benedito Castilho de Andrade, 368</Text>
+            </View>
+            <TouchableOpacity
+                style={styles.circle}
+                onPress={() => setTipoEntrega("R")}
+            >
+              { tipoEntrega === "R" && (<View style={styles.checkedCircle} />) }
+            </TouchableOpacity>
+          </View>
+
         </View>
 
-        <View>
-          <Text>Entrega Padrão</Text>
-          <Text>50-60 minutos - R$3,00</Text>
-          <TouchableOpacity><Text>Trocar</Text></TouchableOpacity>
+        { tipoEntrega === "E" && (
+
+        <View style={styles.secao}>
+          <Text style={styles.textDestaques}>Entregar em</Text>
+          <View style={styles.containerGeral}>
+            <Icon style={styles.icone} name='near-me' size={24} color='#817E9F' />
+            <View style={styles.containerColumnComplemento}>
+              <Text numberOfLines={1} style={styles.textDesc}>Rua Chiara Lubich, 371</Text>
+              <Text numberOfLines={1} style={styles.textItemDesc}>Torre Figueira, AP 74 - Residencial Atmospheraasd</Text>
+            </View>
+          </View>
         </View>
 
-        <View>
-          <Text>Danilo Picanha</Text>
+        )}
+
+        <View style={styles.secao}>
+          <Text style={styles.textDestaquesValores}>O que será preparado</Text>
+
           <View>
-            <Text>Parmegiana de Frango</Text>
-            <Text>R$39.90</Text>
-            <Text>Mais ou Menos Botao</Text>
-            <TouchableOpacity><Text>Adicionar mais itens</Text></TouchableOpacity>
+            <Text style={styles.textDestaquesCardapio}>Parmegiana de Frango</Text>
+            <Text style={styles.textDesc}>R$39.90</Text>
+            <Text style={styles.textItemDesc}>Obs: Sem cebola</Text>
           </View>
 
           <View>
-            <Text>Subtotal: R$39.90</Text>
-            <Text>Taxa entrega: R$3.00</Text>
-            <Text>Total: R$42.90</Text>
+            <Text style={styles.textDestaquesCardapio}>Parmegiana de Carne</Text>
+            <Text style={styles.textDesc}>R$39.90</Text>
           </View>
+
+          <View>
+          <TouchableOpacity style={styles.btnAdicionar} onPress={() => { navigation.goBack(null) }}>
+            <Text style={styles.textoAdicionar}>Adicionar mais itens</Text>
+          </TouchableOpacity>
+          </View>
+
+
+
+          <View style={styles.buttonContainerPag}>
+            <View style={styles.containerColumn}>
+              <Text style={styles.textDesc}>SubTotal:</Text>
+            </View>
+            <Text>R$39,90</Text>
+          </View>
+
+          <View style={styles.buttonContainerPag}>
+            <View style={styles.containerColumn}>
+              <Text style={styles.textDesc}>Taxa Entrega:</Text>
+            </View>
+            <Text>R$3,00</Text>
+          </View>
+
+          <View style={styles.buttonContainerPag}>
+            <View style={styles.containerColumn}>
+              <Text style={styles.textDescBold}>Total:</Text>
+            </View>
+            <Text style={styles.valorDireita}>R$42,90</Text>
+          </View>
+
+
+          
 
         </View>
 
-        <View>
-          <Text>Pague ao receber</Text>
-          <Text>Dinheiro</Text>
-          <Text>Cartão Débito/Crédito</Text>
+        <View style={styles.secaoLast}>
+          <Text style={styles.textDestaques}>Pagamento</Text>
+          {/* <Text style={styles.textItemDesc}>*Pague no recebimento</Text> */}
 
-          <TouchableOpacity><Text>Fazer Pedido</Text></TouchableOpacity>
-          {/* Redirecionar para Status Pedidos */}
+          <View style={styles.buttonContainer}>
+            <View style={styles.containerColumn}>
+              <Text style={styles.textDesc}>Cartão Débito/Crédito</Text>
+            </View>
+            <TouchableOpacity
+                style={styles.circle}
+                onPress={() => setTipoPag("D")}
+            >
+              { tipoPag === "D" && (<View style={styles.checkedCircle} />) }
+            </TouchableOpacity>
+          </View>
+
+          <View style={styles.buttonContainer}>
+            <View style={styles.containerColumn}>
+              <Text style={styles.textDesc}>Dinheiro</Text>
+            </View>
+            <TouchableOpacity
+                style={styles.circle}
+                onPress={() => setTipoPag("E")}
+            >
+              { tipoPag === "E" && (<View style={styles.checkedCircle} />) }
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity style={styles.btnEntrar}>
+            <Text style={styles.textoEntrar}>Fazer Pedido</Text>
+          </TouchableOpacity>
+          
         </View>
 
       </ScrollView>
@@ -87,7 +180,7 @@ var styles = StyleSheet.create({
   
   container: {
     flex: 1,
-    backgroundColor:'#fff'
+    backgroundColor:'#ededed'
   },
 
   LoadingIndicator:{
@@ -127,8 +220,38 @@ var styles = StyleSheet.create({
     paddingLeft: 10,
   },
 
-  viewCardapio:{
+  icone:{
+    marginLeft: screenWidth * 0.025,
+    marginBottom:20
+  },
 
+  secao:{
+    backgroundColor:'#fff',
+    width: screenWidth * 0.95,
+    marginTop:5,
+    marginLeft: screenWidth * 0.025,
+    borderWidth:1,
+    borderColor:'#d3d3d3',
+    borderRadius:5
+  },
+
+  secaoLast:{
+    backgroundColor:'#fff',
+    width: screenWidth * 0.95,
+    marginTop:5,
+    marginBottom:20,
+    marginLeft: screenWidth * 0.025,
+    borderWidth:1,
+    borderColor:'#d3d3d3',
+    borderRadius:5
+  },
+
+  valores:{
+    flexDirection:'column',
+    backgroundColor:'#d3d3d3',
+    marginTop:10,
+    marginLeft: screenWidth * 0.025,
+    marginBottom:10
   },
 
   ItemImg: {
@@ -161,10 +284,15 @@ var styles = StyleSheet.create({
 
   textDesc: {
     fontSize: 15,
-    marginTop:10,
-    marginLeft:8,
-    marginRight:8
+    marginLeft: screenWidth * 0.025
   },
+
+  textDescBold: {
+    fontSize: 15,
+    marginLeft: screenWidth * 0.025,
+    fontWeight:'bold'
+  },
+
 
   textAdicionar: {
     fontSize: 16,
@@ -210,6 +338,17 @@ var styles = StyleSheet.create({
 
   containerGeral:{
     flexDirection:'row',
+  },
+
+  containerColumn:{
+    flexDirection:'column',
+    marginLeft: screenWidth * 0.025,
+  },
+  
+  containerColumnComplemento:{
+    flexDirection:'column',
+    marginLeft: screenWidth * 0.025,
+    marginRight:35
   },
 
   botaomais:{
@@ -275,27 +414,135 @@ var styles = StyleSheet.create({
 
   textItemDesc:{
     fontSize:12,
-    marginLeft:screenWidth*0.055,
+    marginLeft:screenWidth*0.025,
     color:'#595959'
   },
 
+  textItemSubValor:{
+    fontSize:15,
+    color:'#808080',
+    marginBottom:3
+  },
+
+  textItemSubValorRight:{
+    fontSize:15,
+    color:'#808080',
+    marginBottom:3,
+    textAlign: 'right'
+  },
+
+  viewDireita:{
+    flexDirection:'row',
+    width:'50%',
+    alignItems:'flex-end',
+  },
+
+  viewEsquerda:{
+    flexDirection:'row',
+    width:'50%',
+    alignItems:'flex-start',
+  },
+
   textItemValor:{
-    marginLeft:screenWidth*0.05,
     fontSize:16,
     fontWeight:'bold',
-    marginBottom:20,
-    marginTop:15,
     color:'#595959',
-    borderColor: '#c3c3c3',
-    borderBottomWidth: 1,
   },
 
   textDestaques:{
-    fontSize:18,
+    fontSize:16,
     fontWeight:'bold',
     color:'#484848',
-    marginLeft:screenWidth*0.05,
-    marginBottom:15,
+    marginLeft:screenWidth*0.025,
+    marginBottom:10,
     marginTop: 10
   },
+
+  textDestaquesValores:{
+    fontSize:16,
+    fontWeight:'bold',
+    color:'#484848',
+    marginLeft:screenWidth*0.025,
+    marginTop: 10
+  },
+
+  textDestaquesCardapio:{
+    fontSize:15,
+    color:'#484848',
+    marginLeft:screenWidth*0.025,
+    marginTop: 10,
+  },
+
+  buttonContainerPag: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 5,
+    marginRight:15
+  },
+
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 10,
+    marginRight:30
+  },
+
+  circle: {
+      height: 20,
+      width: 20,
+      borderRadius: 10,
+      borderWidth: 1,
+      borderColor: '#ACACAC',
+      alignItems: 'center',
+      justifyContent: 'center',
+  },
+
+  checkedCircle: {
+      width: 14,
+      height: 14,
+      borderRadius: 7,
+      backgroundColor: '#794F9B',
+  },
+
+  valorDireita: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    fontWeight:'bold'
+},
+
+  btnAdicionar:{
+    width: screenWidth * 0.80,
+    height:35,
+    marginLeft: screenWidth * 0.08,
+    marginTop: 15,
+    marginBottom:10,
+    borderRadius:6,
+  },
+
+  textoAdicionar:{
+    color:'#471a88',
+    textAlign:'center',
+    fontSize:16,
+    marginTop:5
+  },
+
+  btnEntrar:{
+    width: screenWidth * 0.80,
+    backgroundColor:'#471a88',
+    height:35,
+    marginLeft: screenWidth * 0.08,
+    marginTop: 15,
+    marginBottom:10,
+    borderRadius:6,
+  },
+
+  textoEntrar:{
+    color:'#fff',
+    textAlign:'center',
+    fontSize:18,
+    marginTop:5
+  },
+
 })

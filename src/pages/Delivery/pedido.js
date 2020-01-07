@@ -1,5 +1,5 @@
 import React, { useState, useEffect }  from 'react';
-import { View, Text, StyleSheet, TouchableHighlight, Dimensions, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, TouchableHighlight, TouchableOpacity, Dimensions, FlatList, ActivityIndicator, AsyncStorage } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
@@ -13,6 +13,8 @@ export default function Pedido({ navigation }) {
   const [cardapio, setCardapio] = useState([]);  
   const [categorias, setCategorias] = useState([]);  
   const [loading, setLoading] = useState(false);
+  const [pedido, setPedido] = useState(false);
+  const [valortotal, setValortotal] = useState(0);
 
   async function loadCardapio() {
     const response = await fetch(
@@ -24,15 +26,48 @@ export default function Pedido({ navigation }) {
     setCategorias(unique);
     setCardapio(data);
     setLoading(false)
-};
+  };
+
+  async function CheckPedido(){
+    if (await AsyncStorage.getItem('eloyitem1') !== null){
+      setPedido(true);
+      CarregaPedido();
+    }
+    else
+      setPedido(false);
+    };
+
+    async function CarregaPedido(){
+      var vlTotal = 0;
+      var vlAcumulado = 0;
+
+      for (i = 1; i <= 20; i++) {
+        vlTotal = await AsyncStorage.getItem('eloyvalortotal'+i);
+
+        if(vlTotal != null){
+          vlTotal = vlTotal.replace('"','');
+          vlTotal = vlTotal.replace('"','');
+          console.log (vlTotal);
+          vlAcumulado = parseFloat(vlTotal) + parseFloat(vlAcumulado);
+        };
+      }
+      setValortotal(vlAcumulado.toFixed(2));
+    };
+
+    handleOnNavigateBack = () => {
+      CheckPedido();
+    }
 
   useEffect(() => {
     navigation.setParams({ 
       nomeestab: nomeestab
     }); 
-    setLoading(true)
+    setLoading(true);
     loadCardapio();
+    CheckPedido();
   }, []);
+
+
 
   return (
 
@@ -67,7 +102,7 @@ export default function Pedido({ navigation }) {
               <View key={cardapio._id}>
 
               {item === cardapio.categoria &&
-                <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('itemPedido', { idcardapio: cardapio._id }) }}>
+                <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('itemPedido', { idcardapio: cardapio._id, onNavigateBack: handleOnNavigateBack }) }}>
                   <View style={styles.ItemImg2}>
                       <Text style={styles.textItem}>{cardapio.item}</Text>
                       <Text style={styles.textItemDesc}>Arroz, Feijão, Farofa, Batata</Text>
@@ -78,14 +113,20 @@ export default function Pedido({ navigation }) {
 
               </View>
             )}
-
+               
           </View>
         )}            
       />
 
-      <View>
-        <Text>Ver Pedido</Text>
-      </View>
+    {pedido &&
+      <TouchableOpacity style={styles.pedidoBottom} onPress={() => { navigation.navigate('Sacola', { idestab: "item" }) }}>
+        <Icon style={styles.pedidoBottomContentIcon} name='shopping-basket' size={24} color='#fff' />
+        <Text style={styles.pedidoBottomContent}>Ver Pedido</Text>
+        <Text style={styles.pedidoBottomContent}>R${valortotal}</Text>
+      </TouchableOpacity>
+    }
+
+  
 
     </View>
   );
@@ -122,6 +163,28 @@ var styles = StyleSheet.create({
     width: screenWidth * 0.95,
     marginLeft: screenWidth * 0.025,
     marginBottom:8
+  },
+
+  pedidoBottom:{
+    flexDirection:'row',
+    width: screenWidth,
+    height: 45,
+    backgroundColor:'#794F9B',
+    position: 'absolute',
+    bottom:0
+  },
+
+  pedidoBottomContentIcon:{
+    width: (screenWidth - 0.1) /3,
+    marginLeft: screenWidth * 0.05,
+    marginTop:10,
+    color:'#fff'
+  },
+
+  pedidoBottomContent:{
+    width: (screenWidth - 0.1) /3,
+    marginTop:13,
+    color:'#fff'
   },
 
   tempoentrega:{

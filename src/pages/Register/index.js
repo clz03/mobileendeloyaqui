@@ -295,7 +295,9 @@ var styles = StyleSheet.create({
 
   btnEntrar:{
     width: screenWidth * 0.90,
+    borderWidth:1,
     backgroundColor:'#471a88',
+    borderColor:'#fff',
     height:35,
     marginLeft: screenWidth * 0.05,
     marginTop: 15,
@@ -311,10 +313,12 @@ var styles = StyleSheet.create({
 
   btnEntrar2:{
     width: screenWidth * 0.90,
-    backgroundColor:'#471a88',
+    borderWidth:1,
+    backgroundColor:'#794F9B',
+    borderColor:'#fff',
     height:35,
     marginLeft: screenWidth * 0.05,
-    marginTop: 15,
+    marginTop: 10,
     borderRadius:6,
     marginBottom: 25
   },

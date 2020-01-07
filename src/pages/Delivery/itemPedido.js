@@ -29,48 +29,51 @@ export default function ItemPedido({ navigation }) {
     setValorun(valor);
     setValortotal((valor).toFixed(2));
     setLoading(false)
-};
+  };
 
-function aumentaqtdy(){
-  if(qtdy < 10) setQtdy(qtdy + 1);
-};
+  function aumentaqtdy(){
+    if(qtdy < 10) setQtdy(qtdy + 1);
+  };
 
-function diminuiqtdy(){
-  if(qtdy > 1) setQtdy(qtdy - 1);
-};
+  function diminuiqtdy(){
+    if(qtdy > 1) setQtdy(qtdy - 1);
+  };
 
-async function Limpapedido(){
-  for (i = 1; i <= 20; i++) {
-    if (await AsyncStorage.getItem('eloyitem'+i) !== null){
-      AsyncStorage.removeItem('eloypedido');
-      AsyncStorage.removeItem('eloyitem'+i);
-      AsyncStorage.removeItem('eloyqtdy'+i);
-      AsyncStorage.removeItem('eloyvalorun'+i);
-      AsyncStorage.removeItem('eloyvalortotal'+i);
-    }
- }
-}
+  async function Limpapedido(){
+    for (i = 1; i <= 20; i++) {
+      await AsyncStorage.removeItem('eloypedido');
+      await AsyncStorage.removeItem('eloyitem'+i);
+      await AsyncStorage.removeItem('eloyqtdy'+i);
+      await AsyncStorage.removeItem('eloyvalorun'+i);
+      await AsyncStorage.removeItem('eloyvalortotal'+i);
+  }
+  navigation.state.params.onNavigateBack();
+  navigation.goBack(null);
+  }
 
-async function adicionaItem(itemcardapio){
-  var i;
-  for (i = 1; i <= 20; i++) {
-    if (await AsyncStorage.getItem('eloyitem'+i) === null){
-      break;
-    }
-  }  
+  async function adicionaItem(itemcardapio){
+    var i;
+    for (i = 1; i <= 20; i++) {
+      if (await AsyncStorage.getItem('eloyitem'+i) == null){
+        await AsyncStorage.setItem('eloyitem'+i, JSON.stringify(itemcardapio));
+        await AsyncStorage.setItem('eloyqtdy'+i, JSON.stringify(qtdy));
+        await AsyncStorage.setItem('eloyvalorun'+i, JSON.stringify(valorun));
+        await AsyncStorage.setItem('eloyvalortotal'+i, JSON.stringify(valortotal));
+        break;
+      }
+    }  
 
-  await AsyncStorage.setItem('eloypedido', JSON.stringify(i));
-  await AsyncStorage.setItem('eloyitem'+i, JSON.stringify(itemcardapio));
-  await AsyncStorage.setItem('eloyqtdy'+i, JSON.stringify(qtdy));
-  await AsyncStorage.setItem('eloyvalorun'+i, JSON.stringify(valorun));
-  await AsyncStorage.setItem('eloyvalortotal'+i, JSON.stringify(valortotal));
-  setPedido(true);
-  navigation.navigate('Sacola');
-};
+    await AsyncStorage.setItem('eloypedido', JSON.stringify(i));
+    setPedido(true);
+    navigation.state.params.onNavigateBack();
+    navigation.goBack(null)
+  };
 
 async function CheckPedido(){
-  if (await AsyncStorage.getItem('eloyitem1') !== null)
+  if (await AsyncStorage.getItem('eloyitem1') != null){
     setPedido(true);
+    //CarregaPedido();
+  }
   else
     setPedido(false);
   }
@@ -80,7 +83,6 @@ async function CheckPedido(){
       nomeestab: nomeestab
     }); 
     setLoading(true);
-    //Limpapedido();
     CheckPedido();
     loadCardapio();
   }, []);
@@ -132,13 +134,15 @@ async function CheckPedido(){
               <View style={styles.containerAdicionar}>
 
                 <TouchableOpacity style={styles.botaoadicionar} onPress={() => adicionaItem(cardapio.item)}>
-                  <Icon style={styles.iconeMoto} name='add-shopping-cart' size={24} color='#fff' />
+                  <Icon style={styles.iconeMoto} name='shopping-basket' size={24} color='#fff' />
                   <Text style={styles.textAdicionar}>Adicionar - R${valortotal}</Text>
                 </TouchableOpacity>
               </View>
 
               </View>
-
+              <TouchableOpacity style={styles.botaoadicionar} onPress={() => Limpapedido()}>
+                  <Text>Limpar</Text>
+                </TouchableOpacity>
           </View>
         </ScrollView>
       )}
@@ -180,7 +184,7 @@ var styles = StyleSheet.create({
     flexDirection:'row',
     width: screenWidth,
     height: 45,
-    backgroundColor:'#700353',
+    backgroundColor:'#794F9B',
     position: 'absolute',
     bottom:0
   },
@@ -247,8 +251,9 @@ var styles = StyleSheet.create({
   },
 
   textAdicionar: {
-    fontSize: 16,
+    fontSize: 14,   
     marginLeft:8,
+    marginTop:2,
     color:'#fff',
   },
 
@@ -277,7 +282,7 @@ var styles = StyleSheet.create({
   },
 
   containerAdicionar:{
-    backgroundColor:'#700353',
+    backgroundColor:'#794F9B',
     flexDirection:'row',
     borderWidth:1,
     borderColor:'#fff',
