@@ -94,7 +94,7 @@ export default function Search({ navigation }) {
                   <Text numberOfLines={1} style={styles.textTitle}>{item.nome}</Text>
                 </View>
                 <View style={styles.viewBadge2}>
-                  <Text numberOfLines={1} style={styles.textDescBadge}>Cardápio Online</Text>
+                  <Text numberOfLines={1} style={styles.textDescBadge}>Pedido Online</Text>
                 </View>
               </View>
             }

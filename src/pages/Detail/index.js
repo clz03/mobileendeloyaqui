@@ -46,6 +46,7 @@ export default function Detail({ navigation }) {
   const [pedonline, setPedonline] = useState([]);
   const [cardapio, setCardapio] = useState("");
   const [cardapioonline, setCardapioonline] = useState(false);
+  const [categorias, setCategorias] = useState([]);  
   const [prod, setProd] = useState([]);
   const [cupom, setCupom] = useState([]);
   const [evento, setEvento] = useState([]);
@@ -102,13 +103,17 @@ export default function Detail({ navigation }) {
      setCupom(data3);
    };
 
-    async function loadCardapio() {
+
+  async function loadCardapio() {
     const response5 = await fetch(
       'https://backendeloyaqui.herokuapp.com/cardapios/estabelecimento/' + idestab
     );
-
     const data5 = await response5.json();
+    const categorias = data5.map(data5 => data5.categoria);
+    let unique = [...new Set(categorias)]; 
+    setCategorias(unique);
     setCardapio(data5);
+    setLoading(false)
   };
 
 
@@ -256,17 +261,17 @@ export default function Detail({ navigation }) {
                               </TouchableOpacity>
 
                             }
-                            {/* {estab.facebook.length > 0 &&
-
-                              <TouchableOpacity onPress={() => Linking.openURL(`fb://page/${estab.facebook}`)}>
+                            {cardapioonline &&
+                             
+                             <TouchableOpacity onPress={() => { navigation.navigate('Pedido', { idestab: idestab, nomeestab: estab.nome }) }}>
                                 <View style={styles.menuItem}>
-                                  <Image style={styles.imginstagram} source={require('./assets/facebook-logo.png')} />
-                                  <Text style={styles.tabSubRS}>Acompanhar</Text>
-                                  <Text style={styles.tabSubRS}>{estab.facebook}</Text>
+                                  <Icon name='restaurant' size={24} color='#794F9B' />
+                                  <Text style={styles.tabSubRS}>Fazer pedido</Text>
+                                  <Text style={styles.tabSubRS}>Online</Text>
                                 </View>
                               </TouchableOpacity>
-                              
-                            } */}
+
+                            }
                             </View>
                           </>
                         }
@@ -340,7 +345,13 @@ export default function Detail({ navigation }) {
        
                       )} */}
 
-                      {cardapio.length > 0 && cardapio.map(cardapio => 
+                      
+                        <TouchableHighlight style={styles.pedidoOnline} onPress={() => { navigation.navigate('Pedido', { idestab: idestab, nomeestab: estab.nome }) }}>
+                          <Text style={styles.textoEntrar}>Peça Online Aqui</Text>
+                        </TouchableHighlight>
+                   
+
+                      {/* {cardapio.length > 0 && cardapio.map(cardapio => 
                         <View style={styles.ItemImg} key={cardapio._id}>
                           <View style={styles.containerGeral}>
                             <View style={styles.txtContainer}>
@@ -349,7 +360,40 @@ export default function Detail({ navigation }) {
                             </View>
                           </View>
                         </View>
-                      )}
+                      )} */}
+
+                      <FlatList
+                        data={categorias}
+                        keyExtractor={categorias => categorias}
+                        ListHeaderComponent={
+                          loading ? (
+                            <ActivityIndicator size="large" style={styles.LoadingIndicator} />
+                          ) : (
+                            ""
+                          )
+                        }
+                        renderItem={({ item }) => (
+
+                          <View style={styles.viewCardapio}>
+                            <Text style={styles.textDestaques}>{item}</Text>
+
+                            {cardapio.map(cardapio => 
+                              <View key={cardapio._id}>
+
+                              {item === cardapio.categoria &&
+                                  <View style={styles.ItemImg2}>
+                                      <Text style={styles.textItem}>{cardapio.item}</Text>
+                                      <Text style={styles.textItemDesc}>Arroz, Feijão, Farofa, Batata</Text>
+                                      <Text style={styles.textItemValor}>R${cardapio.valor}</Text> 
+                                  </View>
+                              }
+
+                              </View>
+                            )}
+                              
+                          </View>
+                        )}            
+                      />
 
                     </ScrollView>
                   </Tab>
@@ -438,11 +482,34 @@ var styles = StyleSheet.create({
     height:screenHeight * 0.30,
   },
 
+  viewCardapio:{
+    marginTop:5
+  },
+
+  pedidoOnline:{
+    marginTop:10,
+    marginBottom:5,
+    marginLeft:screenWidth* 0.025,
+    backgroundColor:'#fff',
+    borderWidth: 1,
+    borderColor:'#794F9B',
+    borderRadius:5,
+    alignItems:'center'
+  },
+
   ItemImg: {
     width: screenWidth,
     borderBottomColor:'#d5d5d5',
     borderBottomWidth:1,
     marginTop:10
+  },
+
+  ItemImg2: {
+    borderWidth:1,
+    borderColor: '#d3d3d3',
+    width: screenWidth * 0.95,
+    marginLeft: screenWidth * 0.025,
+    marginBottom:8
   },
 
   modalBackground: {
@@ -452,6 +519,7 @@ var styles = StyleSheet.create({
     justifyContent: 'space-around',
     backgroundColor: '#00000040'
   },
+
   activityIndicatorWrapper: {
     backgroundColor: '#FFFFFF',
     height: 100,
@@ -488,6 +556,34 @@ var styles = StyleSheet.create({
   textMenuRed: {
     fontSize:13,
     color: 'red'
+  },
+
+  textItem:{
+    marginLeft:screenWidth*0.025,
+    marginTop:4
+  },
+
+  textItemDesc:{
+    marginLeft:screenWidth*0.025,
+    fontSize:11,
+    color:'#595959'
+  },
+
+  textItemValor:{
+    marginLeft:screenWidth*0.025,
+    fontSize:13,
+    fontWeight:'bold',
+    marginBottom:5,
+    marginTop:5,
+    color:'#595959',
+    borderColor: '#c3c3c3',
+    borderBottomWidth: 1,
+  },
+
+  textoEntrar:{
+    marginLeft:5,
+    marginTop:3,
+    marginBottom:3
   },
 
   tabTitle: {

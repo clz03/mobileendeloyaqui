@@ -52,7 +52,7 @@ const DeliveryNavigator = createStackNavigator({
     screen: Delivery,
     navigationOptions: {
       headerStyle: {backgroundColor:'#471a88'},
-      headerTitle:'Pedido Delivery',
+      headerTitle:'Delivery',
       headerTitleStyle: {color:'#fff'},
       headerTintColor: '#fff'
     },
@@ -61,7 +61,7 @@ const DeliveryNavigator = createStackNavigator({
     screen: Pedido,
     navigationOptions: {
       headerStyle: {backgroundColor:'#471a88'},
-      headerTitle:'Cardápio Online - Pedido',
+      //headerTitle:'Cardápio Online - Pedido',
       headerTitleStyle: {color:'#fff'},
       headerTintColor: '#fff'
     },
@@ -70,7 +70,7 @@ const DeliveryNavigator = createStackNavigator({
     screen: ItemPedido,
     navigationOptions: {
       headerStyle: {backgroundColor:'#471a88'},
-      headerTitle:'Item Pedido',
+      //headerTitle:'Item Pedido',
       headerTitleStyle: {color:'#fff'},
       headerTintColor: '#fff'
     },
@@ -79,7 +79,7 @@ const DeliveryNavigator = createStackNavigator({
     screen: Sacola,
     navigationOptions: {
       headerStyle: {backgroundColor:'#471a88'},
-      headerTitle:'Sacola Pedido',
+      //headerTitle:'Sacola Pedido',
       headerTitleStyle: {color:'#fff'},
       headerTintColor: '#fff'
     },

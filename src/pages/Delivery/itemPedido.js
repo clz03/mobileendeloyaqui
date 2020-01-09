@@ -8,6 +8,7 @@ const screenWidth = Math.round(Dimensions.get('window').width);
 export default function ItemPedido({ navigation }) {
  
   const idcardapio = navigation.getParam('idcardapio');
+  const idestab = navigation.getParam('idestab');
   const nomeestab = navigation.getParam('nomeestab');
 
   const [cardapio, setCardapio] = useState([]);  
@@ -17,6 +18,7 @@ export default function ItemPedido({ navigation }) {
   const [qtdy, setQtdy] = useState(1);
   const [valorun, setValorun] = useState(0);
   const [valortotal, setValortotal] = useState(0);
+  const [valorPedido, setValorPedido] = useState(0);
 
   async function loadCardapio() {
     const response = await fetch(
@@ -53,26 +55,46 @@ export default function ItemPedido({ navigation }) {
 
   async function adicionaItem(itemcardapio){
     var i;
+    var item;
+
     for (i = 1; i <= 20; i++) {
-      if (await AsyncStorage.getItem('eloyitem'+i) == null){
+      item = await AsyncStorage.getItem('eloyitem'+i);
+      if (item === null){
         await AsyncStorage.setItem('eloyitem'+i, JSON.stringify(itemcardapio));
         await AsyncStorage.setItem('eloyqtdy'+i, JSON.stringify(qtdy));
-        await AsyncStorage.setItem('eloyvalorun'+i, JSON.stringify(valorun));
+        await AsyncStorage.setItem('eloyitemobs'+i, JSON.stringify(obs));
         await AsyncStorage.setItem('eloyvalortotal'+i, JSON.stringify(valortotal));
         break;
       }
     }  
-
     await AsyncStorage.setItem('eloypedido', JSON.stringify(i));
+
     setPedido(true);
     navigation.state.params.onNavigateBack();
-    navigation.goBack(null)
+    navigation.goBack(null);
   };
+
+  async function CarregaPedido(){
+    var vlTotal = 0;
+    var vlAcumulado = 0;
+
+    for (i = 1; i <= 20; i++) {
+      vlTotal = await AsyncStorage.getItem('eloyvalortotal'+i);
+
+      if(vlTotal != null){
+        vlTotal = vlTotal.replace('"','');
+        vlTotal = vlTotal.replace('"','');
+        vlAcumulado = parseFloat(vlTotal) + parseFloat(vlAcumulado);
+      };
+    }
+    setValorPedido(vlAcumulado.toFixed(2));
+  };
+
 
 async function CheckPedido(){
   if (await AsyncStorage.getItem('eloyitem1') != null){
     setPedido(true);
-    //CarregaPedido();
+    CarregaPedido();
   }
   else
     setPedido(false);
@@ -80,7 +102,7 @@ async function CheckPedido(){
 
   useEffect(() => {
     navigation.setParams({ 
-      nomeestab: nomeestab
+      categoria: nomeestab
     }); 
     setLoading(true);
     CheckPedido();
@@ -148,21 +170,20 @@ async function CheckPedido(){
       )}
     
     {pedido &&
-      <TouchableOpacity style={styles.pedidoBottom} onPress={() => { navigation.navigate('Sacola', { idestab: "item" }) }}>
+      <TouchableOpacity style={styles.pedidoBottom} onPress={() => { navigation.navigate('Sacola', { idestab: idestab, nomeestab: nomeestab }) }}>
         <Icon style={styles.pedidoBottomContentIcon} name='shopping-basket' size={24} color='#fff' />
-        <Text style={styles.pedidoBottomContent}>Ver Pedido</Text>
-        <Text style={styles.pedidoBottomContent}>R${valortotal}</Text>
+        <Text style={styles.pedidoBottomContent}>Finalizar Pedido</Text>
+        <Text style={styles.pedidoBottomContentRight}>R${valorPedido}</Text>
       </TouchableOpacity>
     }
     </View>
   );
 }
 
-
 ItemPedido.navigationOptions = ({ navigation }) => {
   return {
     headerTitle: () => (
-      <Text style={styles.txtPedido}>{navigation.getParam('nomeestab')}</Text>
+      <Text style={styles.txtPedido}>{navigation.getParam('categoria')}</Text>
     ),
   }
 }
@@ -190,15 +211,24 @@ var styles = StyleSheet.create({
   },
 
   pedidoBottomContentIcon:{
-    width: (screenWidth - 0.1) /3,
+    width: (screenWidth) /4,
     marginLeft: screenWidth * 0.05,
     marginTop:10,
     color:'#fff'
   },
 
   pedidoBottomContent:{
-    width: (screenWidth - 0.1) /3,
+    width: (screenWidth) /3,
     marginTop:13,
+    textAlign:'center',
+    color:'#fff'
+  },
+
+  pedidoBottomContentRight:{
+    width: (screenWidth) /3,
+    marginTop:13,
+    marginRight:10,
+    textAlign:'right',
     color:'#fff'
   },
 
@@ -382,5 +412,12 @@ var styles = StyleSheet.create({
     marginLeft:screenWidth*0.05,
     marginBottom:15,
     marginTop: 10
+  },
+
+  txtPedido:{
+    fontSize:17,
+    fontWeight:'600',
+    color:'#fff',
+    marginHorizontal:16
   },
 })

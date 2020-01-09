@@ -1,5 +1,5 @@
 import React, { useState, useEffect }  from 'react';
-import { View, Text, StyleSheet, TextInput, Dimensions, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Dimensions, ScrollView, ActivityIndicator, TouchableOpacity, AsyncStorage } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
@@ -7,9 +7,17 @@ const screenWidth = Math.round(Dimensions.get('window').width);
 
 export default function Sacola({ navigation }) {
  
-  const [cardapio, setCardapio] = useState([]);  
+  const idestab = navigation.getParam('idestab');
+  const nomeestab = navigation.getParam('nomeestab');
+
+  const [estab, setEstab] = useState([]);
+  const [endereco, setEndereco] = useState([]);  
+  const [itens, setItens] = useState([]);  
   const [loading, setLoading] = useState(false);
   const [tipoEntrega, setTipoEntrega] = useState("E");
+  const [valortotal, setValortotal] = useState(0);
+  const [valortaxaE, setValortaxaE] = useState(0);
+  const [valorGrandTotal, setValorGrandTotal] = useState(0);
   const [tipoPag, setTipoPag] = useState("D"); // D=Debito - C=Credito - E=Especie
 
   function aumentaqtdy(){
@@ -20,10 +28,103 @@ export default function Sacola({ navigation }) {
     if(qtdy > 1) setQtdy(qtdy - 1);
   };
 
-  useEffect(() => {
+  async function loadEstab() {
+    const response = await fetch(
+      'https://backendeloyaqui.herokuapp.com/estabelecimentos/' + idestab
+    );
+    const data = await response.json();
+    setEstab(data);
+  };
 
+  async function loadEndereco() {
+    const iduser = await AsyncStorage.getItem('eloyuserid');
+    const response = await fetch(
+      'https://backendeloyaqui.herokuapp.com/enderecos/usuario/' + iduser
+    );
+    const data = await response.json();
+    setEndereco(data);
+  };
+
+  async function CarregaItensPedido(){
+    var itensPed = [];
+    var nome;
+    var vlTotal = 0;
+    var vlAcumulado = 0;
+    var quantidade = 1;
+    var observacao;
+    //var count = parseInt(await AsyncStorage.getItem('eloypedido'));
+    
+    for (i = 1; i <= 15; i++) {
+      vlTotal = await AsyncStorage.getItem('eloyvalortotal'+i);
+      if(vlTotal !== null)
+        vlTotal = vlTotal.replace(/"/g,'');
+
+      quantidade = await AsyncStorage.getItem('eloyqtdy'+i);
+      if(quantidade !== null)
+        quantidade = quantidade.replace(/"/g,'');
+
+      observacao = await AsyncStorage.getItem('eloyitemobs'+i);
+
+      nome = await AsyncStorage.getItem('eloyitem'+i);
+      if(nome !== null){
+        nome = nome.replace(/"/g,'');
+        itensPed.push({
+          id: i,
+          item: nome,
+          qtdy: quantidade,
+          valortotal: vlTotal,
+          obs: observacao
+        })
+        vlAcumulado = parseFloat(vlTotal) + parseFloat(vlAcumulado);
+      };
+      vlTotal = 0;
+      quantidade = 1;
+    };
+  
+    if (vlAcumulado === 0){
+      navigation.goBack(null);
+      return;
+    }
+
+    setItens(itensPed);
+    setValortotal(vlAcumulado);
+    if(tipoEntrega == 'E'){
+      setValortaxaE(3);
+      setValorGrandTotal(vlAcumulado + 3);
+    }else{
+      setValortaxaE(0);
+      setValorGrandTotal(vlAcumulado);
+    }
+
+    setLoading(false);
+  };  
+
+  async function RemoveItemPedido(i){
+    const qtdyItens = parseInt(await AsyncStorage.getItem('eloypedido'));
+    await AsyncStorage.setItem('eloypedido',JSON.stringify(qtdyItens - 1));
+    await AsyncStorage.removeItem('eloyitem'+i);
+    await AsyncStorage.removeItem('eloyqtdy'+i);
+    await AsyncStorage.removeItem('eloyvalorun'+i);
+    await AsyncStorage.removeItem('eloyvalortotal'+i);
+    setTimeout(() => {CarregaItensPedido();}, 500);
+    navigation.state.params.onNavigateBack();
+  };
+
+  useEffect(() => {
+    setLoading(true);
+    navigation.setParams({ 
+      categoria: nomeestab
+    }); 
+    loadEstab();
+    loadEndereco();
+    setTimeout(() => {CarregaItensPedido();}, 2000);
   }, []);
 
+  useEffect(() => {
+    CarregaItensPedido();
+  }, [tipoEntrega]);
+
+  
 
   return (
 
@@ -52,7 +153,7 @@ export default function Sacola({ navigation }) {
             <View style={styles.containerColumn}>
               <Text style={styles.textDesc}>Retirada</Text>
               <Text style={styles.textDesc}>20-30 minutos</Text>
-              <Text numberOfLines={1} style={styles.textItemDesc}>Av. Benedito Castilho de Andrade, 368</Text>
+              <Text numberOfLines={1} style={styles.textItemDesc}>{estab.rua}</Text>
             </View>
             <TouchableOpacity
                 style={styles.circle}
@@ -82,44 +183,50 @@ export default function Sacola({ navigation }) {
         <View style={styles.secao}>
           <Text style={styles.textDestaquesValores}>O que será preparado</Text>
 
-          <View>
-            <Text style={styles.textDestaquesCardapio}>Parmegiana de Frango</Text>
-            <Text style={styles.textDesc}>R$39.90</Text>
-            <Text style={styles.textItemDesc}>Obs: Sem cebola</Text>
+          {itens.map(item => 
+              <View key={item.id}>
+
+                <View>
+                  <Text style={styles.textDestaquesCardapio}>{item.qtdy}x {item.item}</Text>
+                  <Text style={styles.textDesc}>R${item.valortotal}</Text>
+                  {item.obs.length > 2 &&
+                  <Text style={styles.textItemDesc}>Obs: {item.obs}</Text>
+                  }
+                  <TouchableOpacity onPress={() => RemoveItemPedido(item.id)}><Text>Remover</Text></TouchableOpacity>
+                </View>
+
+              </View>
+            )}
+
+          <View style={styles.bordas}>
+            <TouchableOpacity style={styles.btnAdicionar} onPress={() => { navigation.goBack(null) }}>
+              <Text style={styles.textoAdicionar}>Adicionar mais itens</Text>
+            </TouchableOpacity>
           </View>
+          
+          { tipoEntrega == "E" &&
+            <>
+              <View style={styles.buttonContainerPag}>
+                <View style={styles.containerColumn}>
+                  <Text style={styles.textDesc}>SubTotal:</Text>
+                </View>
+                <Text>R${valortotal.toFixed(2)}</Text>
+              </View>
 
-          <View>
-            <Text style={styles.textDestaquesCardapio}>Parmegiana de Carne</Text>
-            <Text style={styles.textDesc}>R$39.90</Text>
-          </View>
-
-          <View>
-          <TouchableOpacity style={styles.btnAdicionar} onPress={() => { navigation.goBack(null) }}>
-            <Text style={styles.textoAdicionar}>Adicionar mais itens</Text>
-          </TouchableOpacity>
-          </View>
-
-
-
-          <View style={styles.buttonContainerPag}>
-            <View style={styles.containerColumn}>
-              <Text style={styles.textDesc}>SubTotal:</Text>
-            </View>
-            <Text>R$39,90</Text>
-          </View>
-
-          <View style={styles.buttonContainerPag}>
-            <View style={styles.containerColumn}>
-              <Text style={styles.textDesc}>Taxa Entrega:</Text>
-            </View>
-            <Text>R$3,00</Text>
-          </View>
+              <View style={styles.buttonContainerPag}>
+                <View style={styles.containerColumn}>
+                  <Text style={styles.textDesc}>Taxa Entrega:</Text>
+                </View>
+                <Text>R${valortaxaE.toFixed(2)}</Text>
+              </View>
+            </>
+          }
 
           <View style={styles.buttonContainerPag}>
             <View style={styles.containerColumn}>
               <Text style={styles.textDescBold}>Total:</Text>
             </View>
-            <Text style={styles.valorDireita}>R$42,90</Text>
+            <Text style={styles.valorDireita}>R${valorGrandTotal.toFixed(2)}</Text>
           </View>
 
 
@@ -171,7 +278,7 @@ export default function Sacola({ navigation }) {
 Sacola.navigationOptions = ({ navigation }) => {
   return {
     headerTitle: () => (
-      <Text style={styles.txtPedido}>{navigation.getParam('nomeestab')}</Text>
+      <Text style={styles.txtPedido}>{navigation.getParam('categoria')}</Text>
     ),
   }
 }
@@ -218,6 +325,16 @@ var styles = StyleSheet.create({
     borderBottomWidth:1,
     paddingTop: 10,
     paddingLeft: 10,
+  },
+
+  bordas:{
+    borderBottomWidth:1,
+    borderTopWidth:1,
+    borderColor:'#d3d3d3',
+    marginTop:10,
+    marginBottom:10,
+    marginLeft:15,
+    marginRight:15
   },
 
   icone:{
@@ -514,10 +631,9 @@ var styles = StyleSheet.create({
 
   btnAdicionar:{
     width: screenWidth * 0.80,
-    height:35,
     marginLeft: screenWidth * 0.08,
-    marginTop: 15,
-    marginBottom:10,
+    marginTop: 5,
+    marginBottom:5,
     borderRadius:6,
   },
 
@@ -525,7 +641,6 @@ var styles = StyleSheet.create({
     color:'#471a88',
     textAlign:'center',
     fontSize:16,
-    marginTop:5
   },
 
   btnEntrar:{
@@ -543,6 +658,13 @@ var styles = StyleSheet.create({
     textAlign:'center',
     fontSize:18,
     marginTop:5
+  },
+
+  txtPedido:{
+    fontSize:17,
+    fontWeight:'600',
+    color:'#fff',
+    marginHorizontal:16
   },
 
 })
