@@ -91,6 +91,7 @@ export default function AccountLogged({ navigation }) {
     setLoading(false);
   }
 
+
   async function refreshList() {
     setRefreshing(true);
     await loadEventos();

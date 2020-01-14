@@ -48,9 +48,9 @@ export default function ItemPedido({ navigation }) {
       await AsyncStorage.removeItem('eloyqtdy'+i);
       await AsyncStorage.removeItem('eloyvalorun'+i);
       await AsyncStorage.removeItem('eloyvalortotal'+i);
-  }
-  navigation.state.params.onNavigateBack();
-  navigation.goBack(null);
+    }
+    navigation.state.params.onNavigateBack();
+    navigation.goBack(null);
   }
 
   async function adicionaItem(itemcardapio){

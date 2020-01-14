@@ -10,7 +10,8 @@ import {
   FlatList, 
   ActivityIndicator, 
   TextInput,
-  Platform } from 'react-native';
+  Platform,
+  AsyncStorage } from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
@@ -29,7 +30,7 @@ export function isAndroid() {
   );
 }
 
-export default function Delivery({ navigation }) {
+export default function MeusPedidos({ navigation }) {
    
   const [estab, setEstab] = useState([]);   
   const [page, setPage] = useState(1);   
@@ -38,11 +39,13 @@ export default function Delivery({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [busca, setBusca] = useState('');   
 
+
   async function loadPage(pageNumber = page, shouldRefresh = false) {
-    
+
+    const iduser = await AsyncStorage.getItem('eloyuserid');
     if(totalCount && pageNumber > totalCount) return;
 
-    const query = 'https://backendeloyaqui.herokuapp.com/estabelecimentos/com/delivery/' + `?page=${pageNumber}`;
+    const query = 'https://backendeloyaqui.herokuapp.com/pedidos/usuario/' + iduser + `?page=${pageNumber}`;
     const response = await fetch(
       query
     );
@@ -69,36 +72,6 @@ export default function Delivery({ navigation }) {
 
     <View style={styles.container}>
 
-      <View style={styles.containerPedidos}>
-
-        <TouchableOpacity onPress={() => navigation.navigate("MeusPedidos")} style={styles.buttonBack}>
-          <Icon name='restore' size={24} color='#fff' />
-          <Text style={styles.textbutton}>Meus Pedidos</Text>
-        </TouchableOpacity>
-
-        
-        {/* <TouchableOpacity style={styles.buttonBackRight}>
-          <Icon name='reorder' size={24} color='#12299B' />
-          <Text style={styles.textbuttonRight}>Filtrar</Text>
-        </TouchableOpacity> */}
-      </View>
-
-      <View style={styles.containerBusca}>
-        {/* <TextInput 
-          style={ styles.inputLogin } 
-          autoCapitalize='none' 
-          autoCorrect={false} 
-          keyboardType="web-search"
-          maxLength={40}
-          placeholder="Busca"
-          value={busca}
-          onChangeText={(text) => setBusca(text)}
-        />
-        <TouchableOpacity onPress={() => navigation.goBack(null)} style={styles.buttonBusca}>
-          <Icon name='search' size={24} color='gray' />
-        </TouchableOpacity> */}
-      </View>
-
       <FlatList
         data={estab}
         keyExtractor={estab => String(estab._id)}
@@ -114,18 +87,15 @@ export default function Delivery({ navigation }) {
           )
         }
         renderItem={({ item }) => (
-          <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('Pedido', { idestab: item._id, nomeestab: item.nome }) }}>
+          <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('PedidoDetalhe', { idestab: item._id, nomeestab: item.nome }) }}>
             <View style={styles.ItemImg}>
         
               <View style={styles.containerGeral}>
-                <View style={styles.imgContainer}>
-                  <Image style={styles.imagem} source={{uri: item.imagem }}></Image>
-                </View>
                 <View style={styles.txtContainer}>
-                <Text numberOfLines={1} style={styles.textTitle}>{item.nome}</Text>
-                  <Text numberOfLines={1} style={styles.textDesc}>{item.tipo} / {item.subtipo}</Text>
-                  <Text numberOfLines={1} style={styles.textDesc}>{item.rua}, {item.numero}</Text>
-                  <Text numberOfLines={1} style={styles.textDescAberto}>{item.descr}</Text>
+                  <Text numberOfLines={1} style={styles.textTitle}>{item.idestabelecimento.nome}</Text>
+                  <Text numberOfLines={1} style={styles.textDesc}>Data: {item.data.substring(8,10) + "/" + item.data.substring(5,7) + "/" + item.data.substring(0,4)}</Text>
+                  <Text numberOfLines={1} style={styles.textDesc}>Status: {item.status}</Text>
+                  <Text numberOfLines={1} style={styles.textDesc}>Valor: {item.total.toFixed(2)}</Text>
                 </View>
               </View>
             </View>
@@ -189,43 +159,22 @@ var styles = StyleSheet.create({
 
   textbutton: {
     fontSize:14,
-    color:'#fff',
-    marginTop:4,
-    marginLeft:3,
-    fontWeight:'500',
-  },
-  
-  textbuttonBack: {
-    fontSize:16,
-    color:'#fff',
-  },
-
-  buttonBack: {
-    width:screenWidth*0.95,
-    flexDirection: 'row',
-    marginRight:10,
-    borderWidth:1,
-    borderColor:'#d3d3d3',
-    backgroundColor:'#794F9B',
-    borderRadius:5,
-    justifyContent: 'center',
-    paddingBottom:5,
-    paddingTop:5
-  },
-
-  textbuttonRight: {
-    fontSize:14,
     color:'#12299B',
     marginTop:4,
     marginLeft:3,
     fontWeight:'500',
   },
 
-  buttonBackRight: {
-    flexDirection: 'row',
-    width:screenWidth*0.42,
-    justifyContent: 'flex-end',
+  textbuttonBack: {
+    fontSize:16,
+    color:'#fff'
   },
+
+  buttonBack: {
+    flexDirection: 'row',
+    marginRight:10
+  },
+
 
   textDescBadge: {
     fontSize: 10,
@@ -268,8 +217,7 @@ var styles = StyleSheet.create({
   containerPedidos:{
     flexDirection: 'row',
     marginTop:5,
-    marginLeft: screenWidth * 0.025,
-    width:screenWidth,
+    marginLeft: screenWidth * 0.025
   },
 
   buttonBusca:{
@@ -284,6 +232,7 @@ var styles = StyleSheet.create({
 
   txtContainer:{
     width:screenWidth *0.7,
+    marginLeft: screenWidth*0.025,
     marginTop:5
   },
 
@@ -298,10 +247,10 @@ var styles = StyleSheet.create({
   inputLogin:{
     height: screenHeight*0.04,
     width:screenWidth * 0.85,
-    marginLeft: screenWidth * 0.025,
+    marginLeft: 8,
     marginTop:5,
     backgroundColor:'#fff',
-    borderColor: 'green', 
+    borderColor: '#fff', 
     borderWidth: 1,
     borderRadius:5,
     paddingLeft:3

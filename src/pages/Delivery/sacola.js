@@ -20,14 +20,6 @@ export default function Sacola({ navigation }) {
   const [valorGrandTotal, setValorGrandTotal] = useState(0);
   const [tipoPag, setTipoPag] = useState("D"); // D=Debito - C=Credito - E=Especie
 
-  function aumentaqtdy(){
-    if(qtdy < 10) setQtdy(qtdy + 1);
-  };
-
-  function diminuiqtdy(){
-    if(qtdy > 1) setQtdy(qtdy - 1);
-  };
-
   async function loadEstab() {
     const response = await fetch(
       'https://backendeloyaqui.herokuapp.com/estabelecimentos/' + idestab
@@ -43,6 +35,22 @@ export default function Sacola({ navigation }) {
     );
     const data = await response.json();
     setEndereco(data);
+  };
+
+  async function Limpapedido(){
+    for (i = 1; i <= 15; i++) {
+      await AsyncStorage.removeItem('eloypedido');
+      await AsyncStorage.removeItem('eloyitem'+i);
+      await AsyncStorage.removeItem('eloyqtdy'+i);
+      await AsyncStorage.removeItem('eloyvalorun'+i);
+      await AsyncStorage.removeItem('eloyvalortotal'+i);
+    }
+  };
+
+  async function handlePedido(){
+    //grava Pedido
+    //Limpapedido();
+    navigation.navigate('Status', { idestab: idestab });
   };
 
   async function CarregaItensPedido(){
@@ -262,7 +270,7 @@ export default function Sacola({ navigation }) {
             </TouchableOpacity>
           </View>
 
-          <TouchableOpacity style={styles.btnEntrar}>
+          <TouchableOpacity style={styles.btnEntrar} onPress={() => { handlePedido() }}>
             <Text style={styles.textoEntrar}>Fazer Pedido</Text>
           </TouchableOpacity>
           
