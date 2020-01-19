@@ -49,7 +49,32 @@ export default function Sacola({ navigation }) {
 
   async function handlePedido(){
     //grava Pedido
-    //Limpapedido();
+    setLoading(true);
+
+    const apireturn = await fetch(
+       'https://backendeloyaqui.herokuapp.com/pedidos', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+         //model
+        }),
+    });
+
+    const responseJson = await apireturn.json();
+    
+    if (!apireturn.ok) {
+      setErroValidador(responseJson.error);
+      setLoading(false);
+      return;
+    } else {
+      setErroValidador('');
+    }
+
+    //LimpapedidoStorage;
+    //Navega para Status
     navigation.navigate('Status', { idestab: idestab });
   };
 
@@ -176,12 +201,19 @@ export default function Sacola({ navigation }) {
         { tipoEntrega === "E" && (
 
         <View style={styles.secao}>
-          <Text style={styles.textDestaques}>Entregar em</Text>
+          <View style={styles.containerGeral}>
+            <Text style={styles.textDestaques}>Entregar em </Text>
+            <TouchableOpacity><Text style={styles.textDestaquesLink}>( Alterar Endereço )</Text></TouchableOpacity>
+          </View>
           <View style={styles.containerGeral}>
             <Icon style={styles.icone} name='near-me' size={24} color='#817E9F' />
             <View style={styles.containerColumnComplemento}>
-              <Text numberOfLines={1} style={styles.textDesc}>Rua Chiara Lubich, 371</Text>
-              <Text numberOfLines={1} style={styles.textItemDesc}>Torre Figueira, AP 74 - Residencial Atmospheraasd</Text>
+              {endereco.length > 0 && (
+              <>
+                <Text numberOfLines={1} style={styles.textDesc}>{endereco[0].rua}, {endereco[0].numero}</Text>
+                <Text numberOfLines={1} style={styles.textItemDesc}>{endereco[0].bairro} - {endereco[0].complemento}</Text>
+              </>
+              )}
             </View>
           </View>
         </View>
@@ -194,14 +226,17 @@ export default function Sacola({ navigation }) {
           {itens.map(item => 
               <View key={item.id}>
 
-                <View>
-                  <Text style={styles.textDestaquesCardapio}>{item.qtdy}x {item.item}</Text>
-                  <Text style={styles.textDesc}>R${item.valortotal}</Text>
-                  {item.obs.length > 2 &&
-                  <Text style={styles.textItemDesc}>Obs: {item.obs}</Text>
-                  }
-                  <TouchableOpacity onPress={() => RemoveItemPedido(item.id)}><Text>Remover</Text></TouchableOpacity>
+                <View style={styles.buttonContainer}>
+                  <View style={styles.containerColumn}>
+                    <Text style={styles.textDestaquesCardapio}>{item.qtdy}x {item.item}</Text>
+                    <Text style={styles.textDesc}>R${item.valortotal}</Text>
+                    {item.obs.length > 2 &&
+                      <Text style={styles.textItemDesc}>Obs: {item.obs}</Text>
+                    }
+                  </View>
+                  <TouchableOpacity onPress={() => RemoveItemPedido(item.id)}><Icon name='remove-circle' size={24} color='red' /></TouchableOpacity>
                 </View>
+
 
               </View>
             )}
@@ -236,9 +271,6 @@ export default function Sacola({ navigation }) {
             </View>
             <Text style={styles.valorDireita}>R${valorGrandTotal.toFixed(2)}</Text>
           </View>
-
-
-          
 
         </View>
 
@@ -583,6 +615,15 @@ var styles = StyleSheet.create({
     marginTop: 10
   },
 
+  textDestaquesLink:{
+    fontSize:12,
+    fontWeight:'bold',
+    color:'#794F9B',
+    marginLeft:screenWidth*0.01,
+    marginBottom:10,
+    marginTop: 12
+  },
+
   textDestaquesValores:{
     fontSize:16,
     fontWeight:'bold',
@@ -639,7 +680,7 @@ var styles = StyleSheet.create({
 
   btnAdicionar:{
     width: screenWidth * 0.80,
-    marginLeft: screenWidth * 0.08,
+    marginLeft: screenWidth * 0.05,
     marginTop: 5,
     marginBottom:5,
     borderRadius:6,

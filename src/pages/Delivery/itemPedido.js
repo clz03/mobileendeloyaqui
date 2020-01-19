@@ -162,9 +162,7 @@ async function CheckPedido(){
               </View>
 
               </View>
-              <TouchableOpacity style={styles.botaoadicionar} onPress={() => Limpapedido()}>
-                  <Text>Limpar</Text>
-                </TouchableOpacity>
+             
           </View>
         </ScrollView>
       )}
@@ -276,13 +274,13 @@ var styles = StyleSheet.create({
   textDesc: {
     fontSize: 15,
     marginTop:10,
-    marginLeft:8,
+    marginLeft:screenWidth*0.025,
     marginRight:8
   },
 
   textAdicionar: {
     fontSize: 14,   
-    marginLeft:8,
+    marginLeft:screenWidth*0.025,
     marginTop:2,
     color:'#fff',
   },
@@ -328,18 +326,18 @@ var styles = StyleSheet.create({
   },
 
   botaomais:{
-    marginLeft:10,
+    marginLeft:screenWidth*0.025,
     marginTop:8,
   },
 
   botaomenos:{
-    marginLeft:10,
+    marginLeft:screenWidth*0.025,
     marginRight:8,
     marginTop:8,
   },
 
   botaoadicionar:{
-    marginLeft:10,
+    marginLeft:screenWidth*0.025,
     marginTop:8,
     flexDirection:'row',
     width:'100%'
@@ -401,8 +399,6 @@ var styles = StyleSheet.create({
     marginBottom:20,
     marginTop:15,
     color:'#595959',
-    borderColor: '#c3c3c3',
-    borderBottomWidth: 1,
   },
 
   textDestaques:{

@@ -246,8 +246,6 @@ var styles = StyleSheet.create({
     marginBottom:5,
     marginTop:5,
     color:'#595959',
-    borderColor: '#c3c3c3',
-    borderBottomWidth: 1,
   },
 
   textDestaques:{
