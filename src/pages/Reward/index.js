@@ -287,7 +287,7 @@ var styles = StyleSheet.create({
     marginLeft:screenWidth*0.01,
     fontWeight:'bold',
     textAlign:"center",
-    fontSize:screenWidth*0.04,
+    fontSize:15,
   },
 
   dados:{
@@ -296,7 +296,7 @@ var styles = StyleSheet.create({
 
   dadosText:{
     color:'#5d5d5d',
-    fontSize:screenWidth*0.04,
+    fontSize:14,
     marginLeft:screenWidth*0.01,
   },
 
@@ -310,7 +310,7 @@ var styles = StyleSheet.create({
   dadosTextRegras:{
     color:'#5d5d5d',
     marginLeft:screenWidth*0.01,
-    fontSize:screenWidth*0.035,
+    fontSize:13,
   },
 
   containerGeral:{
@@ -338,9 +338,9 @@ var styles = StyleSheet.create({
   btnEntrar:{
     width: screenWidth * 0.68,
     backgroundColor:'green',
-    height: isIphoneX() ? screenHeight*0.04 : screenHeight*0.045,
     marginTop:screenHeight*0.015,
     marginRight:screenWidth*0.01,
+    padding:6,
     borderRadius:6,
 
   },
@@ -348,8 +348,7 @@ var styles = StyleSheet.create({
   textoEntrar:{
     color:'#fff',
     textAlign:'center',
-    fontSize:screenWidth*0.045,
-    marginTop:screenHeight*0.004
+    fontSize:16,
   }
 
 });

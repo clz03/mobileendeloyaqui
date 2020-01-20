@@ -166,29 +166,29 @@ export default function AccountLogged({ navigation }) {
   }
 
   function handleEndereco(){
-      setShowEnd(true);
+    setShowEnd(true);
   };
 
   function handleNome(){
     setCadNome(true);
-};
+  };
 
-function handleTelefone(){
-  setCadTel(true);
-};
+  function handleTelefone(){
+    setCadTel(true);
+  };
 
-function handleEmail(){
-  setCadEmail(true);
-};
+  function handleEmail(){
+    setCadEmail(true);
+  };
 
-async function SubmitNome(){
-}
+  async function SubmitNome(){
+  }
 
-async function SubmitTelefone(){
-}
+  async function SubmitTelefone(){
+  }
 
-async function SubmitEmail(){
-}
+  async function SubmitEmail(){
+  }
 
   async function SubmitEndereco(){
 
@@ -256,7 +256,7 @@ async function SubmitEmail(){
     loadEndereco();
 };
 
-  async function handleSubmit() {
+  async function handleSubmitUser() {
     const iduser = await AsyncStorage.getItem('eloyuserid');
 
     setLoading(true);
@@ -270,7 +270,8 @@ async function SubmitEmail(){
         },
         body: JSON.stringify({
           nome: nome,
-          telefone: telefone
+          telefone: telefone,
+          email: email
         }),
     });
 
@@ -302,10 +303,6 @@ async function SubmitEmail(){
           <View style={styles.container}>
           <Icon style={styles.Iconcenter} name='account-circle' size={48} color='#585858' />
             <Text style={styles.txtTitle} numberOfLines={1}>Seja Bem Vindo, {nome}</Text>
-
-            {/* <TouchableHighlight style={styles.btnEntrar} onPress={handleLogout}>
-              <Text style={styles.textoEntrar}>Sair</Text>
-            </TouchableHighlight> */}
 
             { msginativo &&
               <View style={styles.msguserinativo}>
@@ -445,6 +442,10 @@ async function SubmitEmail(){
                           </View>
                           </TouchableHighlight> */}
 
+                         <TouchableHighlight style={styles.btnEntrar} onPress={handleLogout}>
+                          <Text style={styles.textoEntrar}>Sair</Text>
+                        </TouchableHighlight>
+
                          
                           
                           
@@ -489,7 +490,7 @@ async function SubmitEmail(){
                     />
 
                      <Text style={styles.labelError}>{erroValidador2}</Text>
-                     <TouchableHighlight style={styles.btnEntrarModal} onPress={SubmitNome}>
+                     <TouchableHighlight style={styles.btnEntrarModal} onPress={handleSubmitUser}>
                       <Text style={styles.textoEntrar}>Alterar Nome</Text>
                      </TouchableHighlight>
                      
@@ -520,8 +521,8 @@ async function SubmitEmail(){
                     />
 
                      <Text style={styles.labelError}>{erroValidador2}</Text>
-                     <TouchableHighlight style={styles.btnEntrarModal} onPress={SubmitTelefone}>
-                      <Text style={styles.textoEntrar}>Alterar Nome</Text>
+                     <TouchableHighlight style={styles.btnEntrarModal} onPress={handleSubmitUser}>
+                      <Text style={styles.textoEntrar}>Alterar Telefone</Text>
                      </TouchableHighlight>
                      
                      <TouchableHighlight style={styles.btnEntrarModal2} onPress={() => setCadTel(false)}>
@@ -551,8 +552,8 @@ async function SubmitEmail(){
                     />
 
                      <Text style={styles.labelError}>{erroValidador2}</Text>
-                     <TouchableHighlight style={styles.btnEntrarModal} onPress={SubmitEmail}>
-                      <Text style={styles.textoEntrar}>Alterar Nome</Text>
+                     <TouchableHighlight style={styles.btnEntrarModal} onPress={handleSubmitUser}>
+                      <Text style={styles.textoEntrar}>Alterar E-mail</Text>
                      </TouchableHighlight>
                      
                      <TouchableHighlight style={styles.btnEntrarModal2} onPress={() => setCadEmail(false)}>
@@ -585,7 +586,7 @@ async function SubmitEmail(){
                    
 
                      <Text style={styles.labelError}>{erroValidador2}</Text>
-                     <TouchableHighlight style={styles.btnEntrarModal} onPress={SubmitEmail}>
+                     <TouchableHighlight style={styles.btnEntrarModal} onPress={() => setCadEnd(true)}>
                       <Text style={styles.textoEntrar}>Cadastrar Novo</Text>
                      </TouchableHighlight>
                      
@@ -809,13 +810,13 @@ var styles = StyleSheet.create({
   },
 
   btnEntrar:{
-    width: screenWidth * 0.50,
-    backgroundColor:'#471a88',
-    height: isIphoneX() ? screenHeight * 0.04 : screenHeight * 0.05,
-    marginTop: screenHeight*0.02,
-    marginBottom: screenHeight*0.02,
+    width: screenWidth * 0.9,
+    backgroundColor:'#794F9B',
+    padding:4,
+    marginTop:10,
     borderRadius:6,
-    alignSelf:'center'
+    alignSelf:'center',
+    alignItems:'center'
   },
 
   btnEntrar2:{
@@ -855,7 +856,6 @@ var styles = StyleSheet.create({
     color:'#fff',
     textAlign:'center',
     fontSize:16,
-    marginTop: isAndroid() ? screenHeight * 0.004 : screenHeight * 0.01,
   },
 
 

@@ -298,7 +298,7 @@ var styles = StyleSheet.create({
     borderWidth:1,
     backgroundColor:'#471a88',
     borderColor:'#fff',
-    height:35,
+    padding:6,
     marginLeft: screenWidth * 0.05,
     marginTop: 15,
     borderRadius:6,
@@ -308,7 +308,6 @@ var styles = StyleSheet.create({
     color:'#fff',
     textAlign:'center',
     fontSize:18,
-    marginTop:5
   },
 
   btnEntrar2:{
@@ -316,7 +315,7 @@ var styles = StyleSheet.create({
     borderWidth:1,
     backgroundColor:'#794F9B',
     borderColor:'#fff',
-    height:35,
+    padding:6,
     marginLeft: screenWidth * 0.05,
     marginTop: 10,
     borderRadius:6,

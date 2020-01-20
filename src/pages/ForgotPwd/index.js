@@ -88,7 +88,7 @@ export default function Forgot({ navigation }) {
                 <Text style={styles.textoEntrar}>Enviar nova senha</Text>
               </TouchableHighlight>
 
-              <TouchableHighlight style={styles.btnEntrar} onPress={handleRegistered}>
+              <TouchableHighlight style={styles.btnEntrar2} onPress={handleRegistered}>
                 <Text style={styles.textoEntrar}>Voltar</Text>
               </TouchableHighlight>
 
@@ -195,18 +195,29 @@ var styles = StyleSheet.create({
   btnEntrar:{
     width: screenWidth * 0.90,
     backgroundColor:'#471a88',
-    height:35,
+    padding:6,
     marginLeft: screenWidth * 0.05,
     marginTop: 15,
     borderRadius:6,
 
   },
 
+  btnEntrar2:{
+    width: screenWidth * 0.90,
+    borderWidth:1,
+    backgroundColor:'#794F9B',
+    borderColor:'#fff',
+    padding:6,
+    marginLeft: screenWidth * 0.05,
+    marginTop: 10,
+    borderRadius:6,
+    marginBottom: 25
+  },
+
   textoEntrar:{
     color:'#fff',
     textAlign:'center',
     fontSize:18,
-    marginTop:5
   }
   
 
