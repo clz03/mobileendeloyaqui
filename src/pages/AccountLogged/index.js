@@ -76,10 +76,20 @@ export default function AccountLogged({ navigation }) {
       'Deseja remover esse endereço ?',
       [
         {text: 'Não'},
-        {text: 'Sim', onPress: () => confirmCancel(idend)}
+        {text: 'Sim', onPress: () => confirmDeleteEnd(idend)}
       ]
     );
   };
+
+  async function confirmDeleteEnd(idend) {
+    await fetch(
+      'https://backendeloyaqui.herokuapp.com/enderecos/' + idend, {
+        method: 'DELETE'
+    });
+
+    setLoading(true);
+    loadEndereco();
+  }
 
   function handleCancel(idevento) {
     Alert.alert(
@@ -243,17 +253,16 @@ export default function AccountLogged({ navigation }) {
 
     const responseJson = await apireturn.json();
     
-    if (!apireturn.ok) {
+    if (apireturn.ok) {
+      setErroValidador2('');
+      setLoading(false);
+      setCadEnd(false);
+      loadEndereco();
+    } else {
       setErroValidador2(responseJson.error);
       setLoading(false);
-      return;
-    } else {
-      setErroValidador('');
     }
 
-    setLoading(false);
-    setCadEnd(false);
-    loadEndereco();
 };
 
   async function handleSubmitUser() {
@@ -280,12 +289,15 @@ export default function AccountLogged({ navigation }) {
     if (responseApi.ok) {
       setLoading(false);
       await AsyncStorage.setItem('eloyusernome', nome);
+      await AsyncStorage.setItem('eloyuseremail', email);
       checkUserAtivo();
+      setCadNome(false);
+      setCadEmail(false);
+      setCadTel(false);
     } else {
-      setErroValidador(data.error);
+      setErroValidador2(data.error);
       setLoading(false);
     }
-
 }
 
   useEffect(() => {
@@ -442,13 +454,21 @@ export default function AccountLogged({ navigation }) {
                           </View>
                           </TouchableHighlight> */}
 
-                         <TouchableHighlight style={styles.btnEntrar} onPress={handleLogout}>
-                          <Text style={styles.textoEntrar}>Sair</Text>
-                        </TouchableHighlight>
+                          <TouchableHighlight underlayColor={"#fff"} onPress={handleLogout}>
+                          <View style={styles.containerGeralForm}>
+                          <View style={styles.buttonContainer}>
+                              <View style={styles.containerColumn}>
+                                <Text style={styles.textDesc}>Logout</Text>
+                              </View>
+                              <Text style={styles.textGray}>aperte para sair <Icon name='chevron-right' size={16} color='#585858' /></Text>
+                              </View>
+                          </View>
+                          </TouchableHighlight>
 
-                         
-                          
-                          
+                         {/* <TouchableHighlight style={styles.btnEntrar} onPress={handleLogout}>
+                          <Text style={styles.textoSair}>Sair</Text>
+                        </TouchableHighlight> */}
+
                         </ScrollView>
                     
                     </View>
@@ -456,6 +476,14 @@ export default function AccountLogged({ navigation }) {
                 </Tabs>
               </Container>
           </View>
+
+          {/* *
+          *
+          *
+          AREA Modal
+          *
+          *
+          * */}
 
           {
                 loading && <Modal
@@ -491,7 +519,7 @@ export default function AccountLogged({ navigation }) {
 
                      <Text style={styles.labelError}>{erroValidador2}</Text>
                      <TouchableHighlight style={styles.btnEntrarModal} onPress={handleSubmitUser}>
-                      <Text style={styles.textoEntrar}>Alterar Nome</Text>
+                       <Text style={styles.textoEntrar}>Alterar Nome</Text>
                      </TouchableHighlight>
                      
                      <TouchableHighlight style={styles.btnEntrarModal2} onPress={() => setCadNome(false)}>
@@ -580,13 +608,16 @@ export default function AccountLogged({ navigation }) {
                         <Text style={styles.textDescPrinc2}>Bairro: <Text style={styles.textDesc}>{endereco.bairro}</Text></Text>
                         <Text style={styles.textDescPrinc2}>Complemento: <Text style={styles.textDesc}>{endereco.complemento}</Text></Text>
                         <Text style={styles.textDescPrinc2}>CEP: <Text style={styles.textDesc}>{endereco.cep}</Text></Text>
+                        <TouchableHighlight onPress={() => handleDeleteEnd(endereco._id)}>
+                          <Text style={styles.textoRemoverEnd}>( Remover )</Text>
+                        </TouchableHighlight>
                         <Text></Text>
                       </View>
                     )}
                    
 
                      <Text style={styles.labelError}>{erroValidador2}</Text>
-                     <TouchableHighlight style={styles.btnEntrarModal} onPress={() => setCadEnd(true)}>
+                     <TouchableHighlight style={styles.btnEntrarModal} onPress={() => { setShowEnd(false);setCadEnd(true) }}>
                       <Text style={styles.textoEntrar}>Cadastrar Novo</Text>
                      </TouchableHighlight>
                      
@@ -671,6 +702,7 @@ export default function AccountLogged({ navigation }) {
                      <TouchableHighlight style={styles.btnEntrarModal2} onPress={() => setCadEnd(false)}>
                       <Text style={styles.textoEntrar}>Cancelar</Text>
                      </TouchableHighlight>
+                     <Text></Text>
                   </View>
                 </View>
               </Modal>
@@ -798,7 +830,9 @@ var styles = StyleSheet.create({
     backgroundColor:'#fff',
     borderBottomColor:'#d5d5d5',
     borderBottomWidth:1,
-    marginLeft: screenWidth*0.025
+    marginLeft: screenWidth*0.025,
+    paddingBottom:5,
+    paddingTop:5
   },
 
   txtContainer:{
@@ -810,12 +844,15 @@ var styles = StyleSheet.create({
   },
 
   btnEntrar:{
-    width: screenWidth * 0.9,
-    backgroundColor:'#794F9B',
-    padding:4,
-    marginTop:10,
+    width: screenWidth * 0.95,
+    backgroundColor:'#e5e5e5',
+    borderWidth:1,
+    borderColor:'#585858',
+    borderRadius:5,
+    padding:5,
+    marginTop:15,
     borderRadius:6,
-    alignSelf:'center',
+    alignSelf:'flex-start',
     alignItems:'center'
   },
 
@@ -835,7 +872,7 @@ var styles = StyleSheet.create({
     borderWidth:1,
     backgroundColor:'#471a88',
     borderColor:'#fff',
-    height:35,
+    padding:6,
     marginTop: 10,
     borderRadius:6,
     marginBottom: 5
@@ -846,7 +883,7 @@ var styles = StyleSheet.create({
     borderWidth:1,
     backgroundColor:'#794F9B',
     borderColor:'#fff',
-    height:35,
+    padding:6,
     marginTop: 2,
     borderRadius:6,
     marginBottom: 5
@@ -858,6 +895,13 @@ var styles = StyleSheet.create({
     fontSize:16,
   },
 
+  textoSair:{
+    color:'#585858',
+    textAlign:'center',
+    fontSize:16,
+  },
+
+
 
   dadosTextRegras:{
     color:'#5d5d5d',
@@ -868,22 +912,19 @@ var styles = StyleSheet.create({
   textoRemover:{
     color:'#fff',
     textAlign:'center',
-    fontSize:16,
-    marginTop: isAndroid() ? screenHeight * 0 : screenHeight * 0.003,
+    fontSize:16
   },
 
   textoRemoverEnd:{
-    color:'#000',
-    textAlign:'center',
-    fontSize:12,
-    fontWeight:'bold'
+    color:'red',
+    fontSize:13,
   },
 
   btnRemover:{
     width: screenWidth * 0.30,
     backgroundColor:'red',
-    height: isIphoneX() ? screenHeight * 0.03 : screenHeight * 0.04,
-    marginTop: screenHeight*0.008,
+    padding:4,
+    marginTop: 5,
     borderRadius:4
   },
 

@@ -155,8 +155,6 @@ export default function Reward({navigation}) {
             renderItem={({ item }) => (
           
               <View style={styles.menuItem}>
-                <View style={styles.barraLateralVerde}></View>
-
                 <View style={styles.dados}>
                   <Text style={styles.ticketText}>{item.premio}</Text>
                   <View style={styles.containerGeral}>
@@ -253,22 +251,21 @@ var styles = StyleSheet.create({
 
   menuItem:{
     flexDirection: 'row',
-    width: screenWidth *0.93,
-    height: isIphoneX() ? screenHeight*0.22 : isAndroid() ? screenHeight*0.3 : screenHeight*0.26,
+    width: screenWidth *0.95,
+    paddingTop:10,
+    paddingBottom:10,
     backgroundColor: '#fff',
-    borderRadius:10,
+    borderRadius:6,
     borderWidth:1,
-    borderColor:'#a5a5a5',
-    marginTop:screenHeight*0.01,
-    marginLeft:screenWidth *0.03,
+    borderColor:'#006400',
+    marginTop:8,
+    marginLeft:screenWidth *0.025,
   },
 
   barraLateralVerde:{
-    backgroundColor:'green',
-    width:screenWidth *0.03,
+    backgroundColor:'#006400',
+    width:screenWidth *0.01,
     height:'100%',
-    borderTopLeftRadius:15,
-    borderBottomLeftRadius:15
   },
 
   barraLateralCinza:{
@@ -282,9 +279,7 @@ var styles = StyleSheet.create({
 
   ticketText:{
     color:'#5d5d5d',
-    marginTop:screenHeight*0.01,
-    marginBottom:screenHeight*0.01,
-    marginLeft:screenWidth*0.01,
+    marginBottom:5,
     fontWeight:'bold',
     textAlign:"center",
     fontSize:15,
@@ -340,7 +335,7 @@ var styles = StyleSheet.create({
     backgroundColor:'green',
     marginTop:screenHeight*0.015,
     marginRight:screenWidth*0.01,
-    padding:6,
+    padding:4,
     borderRadius:6,
 
   },

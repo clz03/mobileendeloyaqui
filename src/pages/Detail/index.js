@@ -577,7 +577,6 @@ var styles = StyleSheet.create({
     marginTop:5,
     color:'#595959',
     borderColor: '#c3c3c3',
-    borderBottomWidth: 1,
   },
 
   textoEntrar:{

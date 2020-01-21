@@ -88,37 +88,42 @@ export default function Search({ navigation }) {
           <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('Detail', { idestab: item._id }) }}>
             <View style={styles.ItemImg}>
             
-            {item.cardapio &&
-              <View style={styles.containerBadge}>
-                <View style={styles.viewBadge}>
-                  <Text numberOfLines={1} style={styles.textTitle}>{item.nome}</Text>
-                </View>
-                <View style={styles.viewBadge2}>
-                  <Text numberOfLines={1} style={styles.textDescBadge}>Pedido Online</Text>
-                </View>
-              </View>
-            }
+            
 
-            {item.pedonline &&
-              <View style={styles.containerBadge}>
-                <View style={styles.viewBadge}>
-                  <Text numberOfLines={1} style={styles.textTitle}>{item.nome}</Text>
-                </View>
-                <View style={styles.viewBadge2}>
-                  <Text numberOfLines={1} style={styles.textDescBadge}>Agendamento Online</Text>
-                </View>
-              </View>
-            }
-
-            {!item.cardapio && !item.pedonline &&
-                <Text numberOfLines={1} style={styles.textTitle}>{item.nome}</Text>
-            }
+            
             
               <View style={styles.containerGeral}>
                 <View style={styles.imgContainer}>
                   <Image style={styles.imagem} source={{uri: item.imagem }}></Image>
                 </View>
                 <View style={styles.txtContainer}>
+
+                    {item.cardapio &&
+                      <View style={styles.containerBadge}>
+                        <View style={styles.viewBadge}>
+                          <Text numberOfLines={1} style={styles.textTitle}>{item.nome}</Text>
+                        </View>
+                        <View style={styles.viewBadge2}>
+                          <Text numberOfLines={1} style={styles.textDescBadge}>Pedido Online</Text>
+                        </View>
+                      </View>
+                    }
+
+                    {item.pedonline &&
+                      <View style={styles.containerBadge}>
+                        <View style={styles.viewBadge}>
+                          <Text numberOfLines={1} style={styles.textTitle}>{item.nome}</Text>
+                        </View>
+                        <View style={styles.viewBadge2}>
+                          <Text numberOfLines={1} style={styles.textDescBadge}>Agenda Online</Text>
+                        </View>
+                      </View>
+                    }
+
+                    {!item.cardapio && !item.pedonline &&
+                        <Text numberOfLines={1} style={styles.textTitle}>{item.nome}</Text>
+                    }
+
                   <Text numberOfLines={1} style={styles.textDesc}>{item.tipo} / {item.subtipo}</Text>
                   <Text numberOfLines={1} style={styles.textDesc}>{item.rua}, {item.numero}</Text>
                   <Text numberOfLines={1} style={styles.textDescAberto}>{item.descr}</Text>
@@ -145,7 +150,7 @@ var styles = StyleSheet.create({
   
   container: {
     flex: 1,
-    backgroundColor:'#fff'
+    backgroundColor:'#e5e5e5'
   },
 
   containerBadge: {
@@ -160,20 +165,31 @@ var styles = StyleSheet.create({
   },
 
   ItemImg: {
-    height: isIphoneX() ? screenHeight*0.125 : isAndroid() ? screenHeight*0.175 : screenHeight*0.155,
+    // height: isIphoneX() ? screenHeight*0.115 : isAndroid() ? screenHeight*0.175 : screenHeight*0.145,
+    paddingTop:1,
+    paddingBottom:1,
     backgroundColor:'#fff',
-    borderBottomColor:'#d5d5d5',
-    borderBottomWidth:1,
-    marginTop:8,
-    marginLeft:10,
+    borderRadius:5,
+    marginTop:5,
+    marginBottom:4,
+    marginLeft:screenWidth*0.025,
+    marginRight:screenWidth*0.025,
+  },
+
+  direita:{
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor:'#484848'
   },
 
   viewBadge: {
-      width: screenWidth *0.6,
+    width:screenWidth*0.52,
+    flexDirection:'row',
   },
 
   viewBadge2: {
-    width: screenWidth *0.3,
+    width: screenWidth *0.22,
     alignItems:"center",
     backgroundColor:"#fff",
     borderColor:'#004c00',
@@ -184,7 +200,7 @@ var styles = StyleSheet.create({
   textDescBadge: {
     fontSize: 10,
     paddingTop:1,
-    color:'#004c00'
+    color:'#004c00',
   },
 
   textTitle: {
@@ -212,15 +228,14 @@ var styles = StyleSheet.create({
 
   imgContainer:{
     width:screenWidth *0.2,
-    marginTop:5
+    borderTopLeftRadius:5,
+    borderBottomLeftRadius:10,
+    overflow: "hidden"
   },
 
   imagem:{
     width:screenWidth *0.19,
-    height:screenWidth *0.19,
-    borderRadius:5,
-    borderColor:'#d3d3d3',
-    borderWidth:3
+    height: isIphoneX() ? screenHeight*0.115 : isAndroid() ? screenHeight*0.175 : screenHeight*0.145,
   },
 
   txtContainer:{
