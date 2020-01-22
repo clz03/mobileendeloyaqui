@@ -1,5 +1,5 @@
 import React, { useState, useEffect }  from 'react';
-import { View, Text, StyleSheet, TextInput, Dimensions, ScrollView, ActivityIndicator, TouchableOpacity, AsyncStorage } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Dimensions, ScrollView, ActivityIndicator, TouchableOpacity, AsyncStorage, Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
@@ -41,23 +41,51 @@ export default function ItemPedido({ navigation }) {
     if(qtdy > 1) setQtdy(qtdy - 1);
   };
 
-  async function Limpapedido(){
-    for (i = 1; i <= 20; i++) {
-      await AsyncStorage.removeItem('eloypedido');
-      await AsyncStorage.removeItem('eloyitem'+i);
-      await AsyncStorage.removeItem('eloyqtdy'+i);
-      await AsyncStorage.removeItem('eloyvalorun'+i);
-      await AsyncStorage.removeItem('eloyvalortotal'+i);
-    }
-    navigation.state.params.onNavigateBack();
-    navigation.goBack(null);
-  }
+  // async function Limpapedido(){
+  //   for (i = 1; i <= 20; i++) {
+  //     await AsyncStorage.removeItem('eloypedido');
+  //     await AsyncStorage.removeItem('eloyitem'+i);
+  //     await AsyncStorage.removeItem('eloyqtdy'+i);
+  //     await AsyncStorage.removeItem('eloyvalorun'+i);
+  //     await AsyncStorage.removeItem('eloyvalortotal'+i);
+  //   }
+  //   navigation.state.params.onNavigateBack();
+  //   navigation.goBack(null);
+  // }
 
   async function adicionaItem(itemcardapio){
+
+   const iduser = await AsyncStorage.getItem('eloyuserid');
+   if(iduser === null){
+      Alert.alert(
+        'Login',
+        'Para pedidos online é preciso fazer login',
+        [
+          {text: 'OK'},
+          {text: 'Ir para Login', onPress: () => navigation.navigate('Login')}
+        ]
+      );
+      return;
+    };
+
+    const response = await fetch(
+      'https://backendeloyaqui.herokuapp.com/usuarios/'+ iduser
+    );
+
+    const datareturn = await response.json();
+    
+    if(!datareturn[0].validado){
+      Alert.alert(
+        'Seu cadastro ainda não está validado',
+        'Por favor ative seu cadastro, verifique o e-mail recebido para ativar sua conta.'
+      );
+      return;
+    }
+
     var i;
     var item;
 
-    for (i = 1; i <= 20; i++) {
+    for (i = 1; i <= 15; i++) {
       item = await AsyncStorage.getItem('eloyitem'+i);
       if (item === null){
         await AsyncStorage.setItem('eloyitem'+i, JSON.stringify(itemcardapio));
@@ -78,7 +106,7 @@ export default function ItemPedido({ navigation }) {
     var vlTotal = 0;
     var vlAcumulado = 0;
 
-    for (i = 1; i <= 20; i++) {
+    for (i = 1; i <= 15; i++) {
       vlTotal = await AsyncStorage.getItem('eloyvalortotal'+i);
 
       if(vlTotal != null){

@@ -43,6 +43,10 @@ export default function MeusPedidos({ navigation }) {
   async function loadPage(pageNumber = page, shouldRefresh = false) {
 
     const iduser = await AsyncStorage.getItem('eloyuserid');
+    if(iduser === null){
+      setLoading(false);
+      return;
+    }
     if(totalCount && pageNumber > totalCount) return;
 
     const query = 'https://backendeloyaqui.herokuapp.com/pedidos/usuario/' + iduser + `?page=${pageNumber}`;
@@ -79,6 +83,7 @@ export default function MeusPedidos({ navigation }) {
         onEndReachedThreshold={0.1}
         onRefresh={refreshList}
         refreshing={refreshing}
+        ListEmptyComponent={<Text style={styles.textEmpty}>Estamos aguardando seu primeiro pedido aqui =)</Text>}
         ListHeaderComponent={
           loading ? (
             <ActivityIndicator size="large" style={styles.LoadingIndicator} />
@@ -186,6 +191,14 @@ var styles = StyleSheet.create({
     fontSize:14,
     fontWeight:'bold',
     color:'#12299B',
+  },
+
+  textEmpty: {
+    fontSize:13,
+    fontWeight:'bold',
+    color:'#585858',
+    marginLeft:screenWidth*0.025,
+    marginTop:10
   },
 
   textDesc: {

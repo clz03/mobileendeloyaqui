@@ -1,6 +1,8 @@
 import React, { useState, useEffect }  from 'react';
-import { View, Text, StyleSheet, TextInput, Dimensions, ScrollView, ActivityIndicator, TouchableOpacity, AsyncStorage } from 'react-native';
+import { View, Text, StyleSheet, TextInput, Dimensions, ScrollView, ActivityIndicator, TouchableOpacity, AsyncStorage, Modal } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import moment from 'moment';
+import 'moment/locale/pt-br';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 //const screenHeight = Math.round(Dimensions.get('window').height);
@@ -12,6 +14,12 @@ export default function Sacola({ navigation }) {
 
   const [estab, setEstab] = useState([]);
   const [endereco, setEndereco] = useState([]);  
+  const [apelido, setApelido] = useState('');  
+  const [cep, setCep] = useState('');  
+  const [rua, setRua] = useState('');  
+  const [numero, setNumero] = useState('');  
+  const [bairro, setBairro] = useState('');  
+  const [complemento, setComplemento] = useState('');  
   const [itens, setItens] = useState([]);  
   const [loading, setLoading] = useState(false);
   const [tipoEntrega, setTipoEntrega] = useState("E");
@@ -19,6 +27,8 @@ export default function Sacola({ navigation }) {
   const [valortaxaE, setValortaxaE] = useState(0);
   const [valorGrandTotal, setValorGrandTotal] = useState(0);
   const [tipoPag, setTipoPag] = useState("D"); // D=Debito - C=Credito - E=Especie
+  const [showEnd, setShowEnd] = useState(false);
+  const [erroValidador, setErroValidador] = useState('');
 
   async function loadEstab() {
     const response = await fetch(
@@ -28,13 +38,20 @@ export default function Sacola({ navigation }) {
     setEstab(data);
   };
 
-  async function loadEndereco() {
+  async function loadEndereco(indice) {
     const iduser = await AsyncStorage.getItem('eloyuserid');
+    if(indice === null) indice = 0;
     const response = await fetch(
       'https://backendeloyaqui.herokuapp.com/enderecos/usuario/' + iduser
     );
     const data = await response.json();
     setEndereco(data);
+    setApelido(data[indice].apelido);
+    setRua(data[indice].rua);
+    setNumero(data[indice].numero);
+    setBairro(data[indice].bairro);
+    setComplemento(data[indice].complemento);
+    setCep(data[indice].cep);
   };
 
   async function Limpapedido(){
@@ -48,8 +65,10 @@ export default function Sacola({ navigation }) {
   };
 
   async function handlePedido(){
-    //grava Pedido
     setLoading(true);
+    const iduser = await AsyncStorage.getItem('eloyuserid');
+    var today = new Date();
+    today = moment(today).format("YYYY-MM-DD HH:mm:ss");
 
     const apireturn = await fetch(
        'https://backendeloyaqui.herokuapp.com/pedidos', {
@@ -59,23 +78,45 @@ export default function Sacola({ navigation }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-         //model
+          data:today, 
+          status:'Pedido enviado ao restaurante', 
+          subtotal: valortotal.toFixed(2), 
+          taxaentrega: valortaxaE.toFixed(2), 
+          total: valorGrandTotal.toFixed(2), 
+          tipopag: tipoPag, 
+          tipoentrega: tipoEntrega,
+          apelido:apelido,
+          rua:rua,
+          numero:numero,
+          bairro:bairro,
+          cep:cep,
+          complemento:complemento,
+          idestabelecimento:idestab, 
+          idusuario:iduser
         }),
     });
+
+    // BUSCAR ID DO PEDIDO E GRAVAR
+    // ITENS PEDIDO
+    // item, 
+    // descr, 
+    // valorun,
+    // valortotal,
+    // qtde, 
+    // idpedido
 
     const responseJson = await apireturn.json();
     
     if (!apireturn.ok) {
       setErroValidador(responseJson.error);
       setLoading(false);
-      return;
     } else {
       setErroValidador('');
+      setLoading(false);
+      Limpapedido();
+      navigation.navigate('Status', { idestab: idestab });
     }
-
-    //LimpapedidoStorage;
-    //Navega para Status
-    navigation.navigate('Status', { idestab: idestab });
+    
   };
 
   async function CarregaItensPedido(){
@@ -143,13 +184,14 @@ export default function Sacola({ navigation }) {
     navigation.state.params.onNavigateBack();
   };
 
+
   useEffect(() => {
     setLoading(true);
     navigation.setParams({ 
       categoria: nomeestab
     }); 
     loadEstab();
-    loadEndereco();
+    loadEndereco(0);
     setTimeout(() => {CarregaItensPedido();}, 2000);
   }, []);
 
@@ -203,15 +245,15 @@ export default function Sacola({ navigation }) {
         <View style={styles.secao}>
           <View style={styles.containerGeral}>
             <Text style={styles.textDestaques}>Entregar em </Text>
-            <TouchableOpacity><Text style={styles.textDestaquesLink}>( Alterar Endereço )</Text></TouchableOpacity>
+            <TouchableOpacity onPress={() => setShowEnd(true)}><Text style={styles.textDestaquesLink}>( Alterar Endereço )</Text></TouchableOpacity>
           </View>
           <View style={styles.containerGeral}>
             <Icon style={styles.icone} name='near-me' size={24} color='#817E9F' />
             <View style={styles.containerColumnComplemento}>
               {endereco.length > 0 && (
               <>
-                <Text numberOfLines={1} style={styles.textDesc}>{endereco[0].rua}, {endereco[0].numero}</Text>
-                <Text numberOfLines={1} style={styles.textItemDesc}>{endereco[0].bairro} - {endereco[0].complemento}</Text>
+                <Text numberOfLines={1} style={styles.textDesc}>{rua}, {numero}</Text>
+                <Text numberOfLines={1} style={styles.textItemDesc}>{bairro} - {complemento}</Text>
               </>
               )}
             </View>
@@ -310,6 +352,38 @@ export default function Sacola({ navigation }) {
 
       </ScrollView>
 
+
+        {showEnd && <Modal
+          transparent={true}
+          animationType={'none'}
+          visible={showEnd}>
+          <View style={styles.modalBackground}>
+            <View style={styles.ModalFormEnd}>
+              <Text style={styles.textDescPrincEnd}>Meu(s) Endereço(s)</Text>
+              <Text></Text>
+              {endereco.map((endereco, index) => 
+                <View key={endereco._id}>
+                  <Text style={styles.textDescPrinc2}>Apelido: <Text style={styles.textDesc}>{endereco.apelido}</Text></Text>
+                  <Text style={styles.textDescPrinc2}>End: <Text style={styles.textDesc}>{endereco.rua}, {endereco.numero}</Text></Text>
+                  <Text style={styles.textDescPrinc2}>Bairro: <Text style={styles.textDesc}>{endereco.bairro}</Text></Text>
+                  <Text style={styles.textDescPrinc2}>Complemento: <Text style={styles.textDesc}>{endereco.complemento}</Text></Text>
+                  <Text style={styles.textDescPrinc2}>CEP: <Text style={styles.textDesc}>{endereco.cep}</Text></Text>
+                  <TouchableOpacity onPress={() => {loadEndereco(index); setShowEnd(false) }}>
+                      <Text style={styles.textoRemoverEnd}>( Selecionar )</Text>
+                  </TouchableOpacity>
+                  <Text></Text>
+                </View>
+              )}
+                
+                <TouchableOpacity style={styles.btnEntrarModal2} onPress={() => setShowEnd(false)}>
+                <Text style={styles.textoEntrar}>Fechar</Text>
+                </TouchableOpacity>
+
+            </View>
+          </View>
+        </Modal>
+        }
+
     </View>
   );
 }
@@ -356,6 +430,34 @@ var styles = StyleSheet.create({
     width: (screenWidth - 0.1) /3,
     marginTop:13,
     color:'#fff'
+  },
+
+  modalBackground: {
+    flex: 1,
+    alignItems: 'center',
+    flexDirection: 'column',
+    justifyContent: 'space-around',
+    backgroundColor: '#00000080'
+  },
+
+  activityIndicatorWrapper: {
+    backgroundColor: '#FFFFFF',
+    height: 100,
+    width: 100,
+    borderRadius: 10,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-around'
+  },
+
+  ModalFormEnd: {
+    backgroundColor: '#FFFFFF',
+    width: screenWidth * 0.9,
+    borderRadius: 10,
+    display: 'flex',
+    alignItems: 'flex-start',
+    paddingLeft:screenWidth*0.05,
+    paddingTop:10,
   },
 
   Item: {
@@ -409,6 +511,11 @@ var styles = StyleSheet.create({
     marginTop:10,
     marginLeft: screenWidth * 0.025,
     marginBottom:10
+  },
+
+  textoRemoverEnd:{
+    color:'red',
+    fontSize:13,
   },
 
   ItemImg: {
@@ -695,7 +802,7 @@ var styles = StyleSheet.create({
   btnEntrar:{
     width: screenWidth * 0.80,
     backgroundColor:'#471a88',
-    height:35,
+    padding:6,
     marginLeft: screenWidth * 0.08,
     marginTop: 15,
     marginBottom:10,
@@ -706,7 +813,6 @@ var styles = StyleSheet.create({
     color:'#fff',
     textAlign:'center',
     fontSize:18,
-    marginTop:5
   },
 
   txtPedido:{
@@ -714,6 +820,28 @@ var styles = StyleSheet.create({
     fontWeight:'600',
     color:'#fff',
     marginHorizontal:16
+  },
+
+  btnEntrarModal:{
+    width: screenWidth * 0.8,
+    borderWidth:1,
+    backgroundColor:'#471a88',
+    borderColor:'#fff',
+    padding:6,
+    marginTop: 10,
+    borderRadius:6,
+    marginBottom: 5
+  },
+
+  btnEntrarModal2:{
+    width: screenWidth * 0.8,
+    borderWidth:1,
+    backgroundColor:'#794F9B',
+    borderColor:'#fff',
+    padding:6,
+    marginTop: 2,
+    borderRadius:6,
+    marginBottom: 5
   },
 
 })
