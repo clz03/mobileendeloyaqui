@@ -91,6 +91,7 @@ export default function ItemPedido({ navigation }) {
         await AsyncStorage.setItem('eloyitem'+i, JSON.stringify(itemcardapio));
         await AsyncStorage.setItem('eloyqtdy'+i, JSON.stringify(qtdy));
         await AsyncStorage.setItem('eloyitemobs'+i, JSON.stringify(obs));
+        await AsyncStorage.setItem('eloyvalorun'+i, JSON.stringify(valorun));
         await AsyncStorage.setItem('eloyvalortotal'+i, JSON.stringify(valortotal));
         break;
       }

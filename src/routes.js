@@ -21,6 +21,7 @@ import ItemPedido from './pages/Delivery/itemPedido';
 import Sacola from './pages/Delivery/sacola';
 import Status from './pages/Delivery/status';
 import MeusPedidos from './pages/Delivery/meuspedidos';
+import MeuPedidoDet from './pages/Delivery/meupedidoDet';
 
 const PagesNavigator = createStackNavigator({
   Search:{
@@ -101,6 +102,15 @@ const DeliveryNavigator = createStackNavigator({
     navigationOptions: {
       headerStyle: {backgroundColor:'#471a88'},
       headerTitle:'Meus Pedidos',
+      headerTitleStyle: {color:'#fff'},
+      headerTintColor: '#fff',
+    },
+  },
+  MeuPedidoDet:{
+    screen: MeuPedidoDet,
+    navigationOptions: {
+      headerStyle: {backgroundColor:'#471a88'},
+      headerTitle:'Meu Pedido',
       headerTitleStyle: {color:'#fff'},
       headerTintColor: '#fff',
     },

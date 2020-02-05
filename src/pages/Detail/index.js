@@ -346,7 +346,7 @@ export default function Detail({ navigation }) {
                       )} */}
 
                       
-                        <TouchableHighlight style={styles.pedidoOnline} onPress={() => { navigation.navigate('Pedido', { idestab: idestab, nomeestab: estab.nome }) }}>
+                        <TouchableHighlight style={styles.pedidoOnline} onPress={() => { navigation.navigate('Pedido', { idestab: idestab, nomeestab: estab.nome, pagina:'detail' }) }}>
                           <Text style={styles.textoEntrar}>Peça Online Aqui</Text>
                         </TouchableHighlight>
                    

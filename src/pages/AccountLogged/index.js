@@ -191,15 +191,6 @@ export default function AccountLogged({ navigation }) {
     setCadEmail(true);
   };
 
-  async function SubmitNome(){
-  }
-
-  async function SubmitTelefone(){
-  }
-
-  async function SubmitEmail(){
-  }
-
   async function SubmitEndereco(){
 
     const iduser = await AsyncStorage.getItem('eloyuserid');

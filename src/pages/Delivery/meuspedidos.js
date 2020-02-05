@@ -92,7 +92,7 @@ export default function MeusPedidos({ navigation }) {
           )
         }
         renderItem={({ item }) => (
-          <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('PedidoDetalhe', { idestab: item._id, nomeestab: item.nome }) }}>
+          <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('MeuPedidoDet', { idpedido: item._id, nomeestab: item.nome }) }}>
             <View style={styles.ItemImg}>
         
               <View style={styles.containerGeral}>

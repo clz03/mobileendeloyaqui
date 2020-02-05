@@ -4,11 +4,14 @@ import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 //const screenHeight = Math.round(Dimensions.get('window').height);
+var paginafrom;
+var idestab
 
 export default function Pedido({ navigation }) {
  
-  const idestab = navigation.getParam('idestab');
+  idestab = navigation.getParam('idestab');
   const nomeestab = navigation.getParam('nomeestab');
+  paginafrom = navigation.getParam('pagina');
 
   const [cardapio, setCardapio] = useState([]);  
   const [categorias, setCategorias] = useState([]);  
@@ -136,8 +139,12 @@ Pedido.navigationOptions = ({ navigation }) => {
     headerTitle: () => (
       <Text style={styles.txtPedido}>{navigation.getParam('categoria')}</Text>
     ),
+    // headerLeft: () => (
+    //   <Icon name={'chevron-left'} size={24} color='#fff' onPress={ () => { paginafrom === 'detail' ? navigation.navigate('Detail', { idestab: idestab }) : navigation.goBack(null) } }  />
+    // ),
   }
 }
+
 
 var styles = StyleSheet.create({
   

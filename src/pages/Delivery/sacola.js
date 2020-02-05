@@ -28,7 +28,10 @@ export default function Sacola({ navigation }) {
   const [valorGrandTotal, setValorGrandTotal] = useState(0);
   const [tipoPag, setTipoPag] = useState("D"); // D=Debito - C=Credito - E=Especie
   const [showEnd, setShowEnd] = useState(false);
+  const [cadEnd, setCadEnd] = useState(false);
+  const [confirmaPedido, setConfirmaPedido] = useState(false);
   const [erroValidador, setErroValidador] = useState('');
+
 
   async function loadEstab() {
     const response = await fetch(
@@ -37,6 +40,8 @@ export default function Sacola({ navigation }) {
     const data = await response.json();
     setEstab(data);
   };
+
+
 
   async function loadEndereco(indice) {
     const iduser = await AsyncStorage.getItem('eloyuserid');
@@ -54,6 +59,8 @@ export default function Sacola({ navigation }) {
     setCep(data[indice].cep);
   };
 
+
+
   async function Limpapedido(){
     for (i = 1; i <= 15; i++) {
       await AsyncStorage.removeItem('eloypedido');
@@ -64,11 +71,54 @@ export default function Sacola({ navigation }) {
     }
   };
 
-  async function handlePedido(){
+
+
+  function handlePedido(){
+    setConfirmaPedido(true);
+  };
+
+
+
+  async function confirmPedido(){
+    var itensPed = [];
+
+    setConfirmaPedido(false);
     setLoading(true);
+
     const iduser = await AsyncStorage.getItem('eloyuserid');
     var today = new Date();
     today = moment(today).format("YYYY-MM-DD HH:mm:ss");
+
+
+    for (i = 1; i <= 15; i++) {
+
+      vlUnitario = await AsyncStorage.getItem('eloyvalorun'+i);
+      if(vlUnitario !== null)
+      vlUnitario = vlUnitario.replace(/"/g,'');
+
+      vlTotal = await AsyncStorage.getItem('eloyvalortotal'+i);
+      if(vlTotal !== null)
+        vlTotal = vlTotal.replace(/"/g,'');
+
+      quantidade = await AsyncStorage.getItem('eloyqtdy'+i);
+      if(quantidade !== null)
+        quantidade = quantidade.replace(/"/g,'');
+
+      observacao = await AsyncStorage.getItem('eloyitemobs'+i);
+      nome = await AsyncStorage.getItem('eloyitem'+i);
+
+      if(nome !== null){
+        nome = nome.replace(/"/g,'');
+        itensPed.push({
+          item: nome,
+          valorun: vlUnitario,
+          qtdy: quantidade,
+          valortotal: vlTotal,
+          obs: observacao        
+        });
+      };
+
+    };
 
     const apireturn = await fetch(
        'https://backendeloyaqui.herokuapp.com/pedidos', {
@@ -79,7 +129,7 @@ export default function Sacola({ navigation }) {
         },
         body: JSON.stringify({
           data:today, 
-          status:'Pedido enviado ao restaurante', 
+          status:'1', 
           subtotal: valortotal.toFixed(2), 
           taxaentrega: valortaxaE.toFixed(2), 
           total: valorGrandTotal.toFixed(2), 
@@ -92,18 +142,11 @@ export default function Sacola({ navigation }) {
           cep:cep,
           complemento:complemento,
           idestabelecimento:idestab, 
-          idusuario:iduser
+          idusuario:iduser,
+          itensPed: itensPed
         }),
     });
 
-    // BUSCAR ID DO PEDIDO E GRAVAR
-    // ITENS PEDIDO
-    // item, 
-    // descr, 
-    // valorun,
-    // valortotal,
-    // qtde, 
-    // idpedido
 
     const responseJson = await apireturn.json();
     
@@ -116,8 +159,10 @@ export default function Sacola({ navigation }) {
       Limpapedido();
       navigation.navigate('Status', { idestab: idestab });
     }
-    
   };
+
+
+
 
   async function CarregaItensPedido(){
     var itensPed = [];
@@ -173,6 +218,76 @@ export default function Sacola({ navigation }) {
     setLoading(false);
   };  
 
+
+
+
+  async function SubmitEndereco(){
+
+    const iduser = await AsyncStorage.getItem('eloyuserid');
+    var cError = false;
+
+    if(cep == '') {
+      setErroValidador2('cep não pode ser vazio');
+      cError = true;
+    }
+
+    if(bairro == '') {
+      setErroValidador2('bairro não pode ser vazio');
+      cError = true;
+    }
+
+    if(numero == '') {
+      setErroValidador2('numero não pode ser vazio');
+      cError = true;
+    }
+
+    if(rua == '') {
+      setErroValidador2('rua não pode ser vazio');
+      cError = true;
+    }
+
+    if(apelido == '') {
+      setErroValidador2('apelido não pode ser vazio');
+      cError = true;
+    }
+   
+    if(cError) return;
+    setLoading(true);
+
+    const apireturn = await fetch(
+       'https://backendeloyaqui.herokuapp.com/enderecos', {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          apelido,
+          rua,
+          numero,
+          bairro,
+          cep,
+          complemento:complemento,
+          idusuario:iduser
+        }),
+    });
+
+    const responseJson = await apireturn.json();
+    
+    if (apireturn.ok) {
+      setErroValidador('');
+      setLoading(false);
+      setCadEnd(false);
+      loadEndereco();
+    } else {
+      setErroValidador(responseJson.error);
+      setLoading(false);
+    }
+
+};
+
+
+
   async function RemoveItemPedido(i){
     const qtdyItens = parseInt(await AsyncStorage.getItem('eloypedido'));
     await AsyncStorage.setItem('eloypedido',JSON.stringify(qtdyItens - 1));
@@ -185,6 +300,8 @@ export default function Sacola({ navigation }) {
   };
 
 
+
+
   useEffect(() => {
     setLoading(true);
     navigation.setParams({ 
@@ -194,6 +311,8 @@ export default function Sacola({ navigation }) {
     loadEndereco(0);
     setTimeout(() => {CarregaItensPedido();}, 2000);
   }, []);
+
+
 
   useEffect(() => {
     CarregaItensPedido();
@@ -240,7 +359,7 @@ export default function Sacola({ navigation }) {
 
         </View>
 
-        { tipoEntrega === "E" && (
+        { tipoEntrega === "E" && endereco.length > 0 && (
 
         <View style={styles.secao}>
           <View style={styles.containerGeral}>
@@ -257,6 +376,17 @@ export default function Sacola({ navigation }) {
               </>
               )}
             </View>
+          </View>
+        </View>
+
+        )}
+
+        { tipoEntrega === "E" && endereco.length === 0 && (
+
+        <View style={styles.secao}>
+          <View style={styles.containerGeral}>
+            <Text style={styles.textDestaques}>Entregar em </Text>
+            <TouchableOpacity onPress={() => setCadEnd(true)}><Text style={styles.textDestaquesLink}>( Cadastrar Endereço )</Text></TouchableOpacity>
           </View>
         </View>
 
@@ -360,6 +490,7 @@ export default function Sacola({ navigation }) {
           <View style={styles.modalBackground}>
             <View style={styles.ModalFormEnd}>
               <Text style={styles.textDescPrincEnd}>Meu(s) Endereço(s)</Text>
+              <TouchableOpacity onPress={() => { setShowEnd(false); setCadEnd(true)}}><Text style={styles.textDestaquesLink}>( Cadastrar Endereço )</Text></TouchableOpacity>
               <Text></Text>
               {endereco.map((endereco, index) => 
                 <View key={endereco._id}>
@@ -374,15 +505,129 @@ export default function Sacola({ navigation }) {
                   <Text></Text>
                 </View>
               )}
-                
                 <TouchableOpacity style={styles.btnEntrarModal2} onPress={() => setShowEnd(false)}>
-                <Text style={styles.textoEntrar}>Fechar</Text>
+                  <Text style={styles.textoEntrar}>Fechar</Text>
                 </TouchableOpacity>
 
             </View>
           </View>
         </Modal>
         }
+
+        {cadEnd && <Modal
+                transparent={true}
+                animationType={'none'}
+                visible={cadEnd}>
+                <View style={styles.modalBackground}>
+                  <View style={styles.ModalFormEnd}>
+                    <Text style={styles.textDescPrincEnd}>Novo Endereço</Text>
+                    <Text style={styles.labelLogin}>Apelido</Text>
+                    <TextInput 
+                      style={ styles.inputLoginModal } 
+                      autoCorrect={false} 
+                      maxLength={20}
+                      placeholder="Apelido para identificar"
+                      value={apelido}
+                      onChangeText={(text) => setApelido(text)}
+                    />
+                      <Text style={styles.labelLogin}>Rua</Text>
+                    <TextInput 
+                      style={ styles.inputLoginModal } 
+                      autoCorrect={false} 
+                      maxLength={20}
+                      placeholder="Rua/Av do seu Endereço"
+                      value={rua}
+                      onChangeText={(text) => setRua(text)}
+                    />
+                      <Text style={styles.labelLogin}>Número</Text>
+                    <TextInput 
+                      style={ styles.inputLoginModal } 
+                      autoCorrect={false} 
+                      maxLength={20}
+                      placeholder="ex: 856"
+                      value={numero}
+                      onChangeText={(text) => setNumero(text)}
+                    />
+                      <Text style={styles.labelLogin}>Bairro</Text>
+                    <TextInput 
+                      style={ styles.inputLoginModal } 
+                      autoCorrect={false} 
+                      maxLength={20}
+                      placeholder="ex: Jd Ermida I"
+                      value={bairro}
+                      onChangeText={(text) => setBairro(text)}
+                    />
+                      <Text style={styles.labelLogin}>Complemento</Text>
+                    <TextInput 
+                      style={ styles.inputLoginModal } 
+                      autoCorrect={false} 
+                      maxLength={20}
+                      placeholder="ex: Torre Lest - AP 85"
+                      value={complemento}
+                      onChangeText={(text) => setComplemento(text)}
+                    />
+                      <Text style={styles.labelLogin}>CEP</Text>
+                    <TextInput 
+                      style={ styles.inputLoginModal } 
+                      autoCorrect={false} 
+                      maxLength={20}
+                      placeholder="ex: 13212-070"
+                      value={cep}
+                      onChangeText={(text) => setCep(text)}
+                    />
+
+                     <Text style={styles.labelError}>{erroValidador}</Text>
+                     <TouchableOpacity style={styles.btnEntrarModal} onPress={SubmitEndereco}>
+                      <Text style={styles.textoEntrar}>Cadastrar Endereço</Text>
+                     </TouchableOpacity>
+                     
+                     <TouchableOpacity style={styles.btnEntrarModal2} onPress={() => setCadEnd(false)}>
+                      <Text style={styles.textoEntrar}>Cancelar</Text>
+                     </TouchableOpacity>
+                     <Text></Text>
+                  </View>
+                </View>
+              </Modal>
+              }
+
+
+    {confirmaPedido && <Modal
+          transparent={true}
+          animationType={'none'}
+          visible={confirmaPedido}>
+          <View style={styles.modalBackground}>
+            <View style={styles.ModalFormEnd}>
+              <Text style={styles.textDescPrincEnd}>Confirmação dos dados</Text>
+              <Text></Text>
+              {tipoEntrega === 'E' && endereco.map((endereco, index) => 
+                <View key={endereco._id}>
+                  <Text style={styles.textDescPrinc2}>Entregar em:</Text>
+                  <Text style={styles.textDescPrinc2}>End:<Text style={styles.textDesc}>{endereco.rua}, {endereco.numero}</Text></Text>
+                  <Text style={styles.textDescPrinc2}>Bairro: <Text style={styles.textDesc}>{endereco.bairro}</Text></Text>
+                  <Text style={styles.textDescPrinc2}>Complemento: <Text style={styles.textDesc}>{endereco.complemento}</Text></Text>                 
+                </View>
+              )}
+              <Text></Text>
+              <View>
+                <Text style={styles.textDescPrincEnd}>Pague na entrega</Text>
+                <Text style={styles.textDescPrincEnd}>{tipoPag === 'E' ? 'Dinheiro' : 'Cartão Débito/Crédito' }</Text>
+                <Text></Text>
+              </View>
+                
+                <TouchableOpacity style={styles.btnEntrarModal} onPress={() => confirmPedido()}>
+                <Text style={styles.textoEntrar}>Confirmar Pedido</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.btnEntrarModal2} onPress={() => setConfirmaPedido(false)}>
+                <Text style={styles.textoEntrar}>Alterar Dados</Text>
+                </TouchableOpacity>
+                <Text></Text>
+
+            </View>
+          </View>
+        </Modal>
+        }
+
 
     </View>
   );
@@ -548,7 +793,8 @@ var styles = StyleSheet.create({
 
   textDesc: {
     fontSize: 15,
-    marginLeft: screenWidth * 0.025
+    marginLeft: screenWidth * 0.025,
+    fontWeight:'normal',
   },
 
   textDescBold: {
@@ -575,6 +821,11 @@ var styles = StyleSheet.create({
     fontSize: 12,
     paddingTop:5,
     color:'red'
+  },
+
+  textDescPrinc2: {
+    fontSize: 14,
+    fontWeight:'bold',
   },
 
   containerMaisMenos:{

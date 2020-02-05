@@ -42,9 +42,9 @@ export default function Status({ navigation }) {
             <View style={styles.containerColumnStatus}>
               <Text numberOfLines={1} style={styles.textItemDesc}>Pedido enviado ao estabelecimento <Icon style={styles.icone} name='check-circle' size={12} color='green' /></Text>
               <Text numberOfLines={1} style={styles.textItemDesc}>Aguardando confirmação do estabelecimento</Text>
-              {/* <Text numberOfLines={1} style={styles.textItemDesc}>O pedido foi confirmado <Icon style={styles.icone} name='check-circle' size={12} color='green' /> </Text>
+              <Text numberOfLines={1} style={styles.textItemDesc}>O pedido foi confirmado <Icon style={styles.icone} name='check-circle' size={12} color='green' /> </Text>
               <Text numberOfLines={1} style={styles.textItemDesc}>O pedido está sendo preparado</Text>
-              <Text numberOfLines={1} style={styles.textItemDesc}>O pedido saiu para entrega</Text> */}
+              <Text numberOfLines={1} style={styles.textItemDesc}>O pedido saiu para entrega</Text>
             </View>
           </View>
         </View>
