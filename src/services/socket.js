@@ -1,6 +1,6 @@
 import socketio from 'socket.io-client';
 
-const socket = socketio('http://localhost:8080', {
+const socket = socketio('https://backendeloyaqui.herokuapp.com', {
     autoConnect: false,
 });
 
