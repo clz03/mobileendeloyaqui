@@ -2,6 +2,8 @@ import React, { useState, useEffect }  from 'react';
 import { View, Text, StyleSheet, TextInput, Dimensions, ScrollView, ActivityIndicator, TouchableOpacity, AsyncStorage } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import { connect, disconnect } from '../../services/socket';
+
 const screenWidth = Math.round(Dimensions.get('window').width);
 //const screenHeight = Math.round(Dimensions.get('window').height);
 
@@ -21,8 +23,13 @@ export default function Status({ navigation }) {
 
   //loadpedido
 
+  function setupWebsocket() {
+    connect();
+  }
+
   useEffect(() => {
     setLoading(true);
+    setupWebsocket();
   }, []);
 
   return (

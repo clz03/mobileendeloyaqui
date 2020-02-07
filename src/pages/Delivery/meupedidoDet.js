@@ -2,13 +2,13 @@ import React, { useState, useEffect }  from 'react';
 import { View, Text, StyleSheet, TextInput, Dimensions, ScrollView, ActivityIndicator, TouchableOpacity, AsyncStorage } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+import { connect, disconnect } from '../../services/socket';
+
 const screenWidth = Math.round(Dimensions.get('window').width);
 //const screenHeight = Math.round(Dimensions.get('window').height);
 
 export default function MeuPedidoDet({ navigation }) {
  
-  const idestab = navigation.getParam('idestab');
-
   const [estab, setEstab] = useState([]);
   const [endereco, setEndereco] = useState([]);  
   const [itens, setItens] = useState([]);  
@@ -22,7 +22,15 @@ export default function MeuPedidoDet({ navigation }) {
   //loadpedido
 
   useEffect(() => {
+
+    function setupWebsocket() {
+      connect(idestab);
+    }
+
+    const idestab = navigation.getParam('idestab');
     setLoading(true);
+    setupWebsocket();
+
   }, []);
 
   return (
