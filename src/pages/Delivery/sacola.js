@@ -121,7 +121,7 @@ export default function Sacola({ navigation }) {
     };
 
     const apireturn = await fetch(
-       'https://backendeloyaqui.herokuapp.com/pedidos', {
+      'https://backendeloyaqui.herokuapp.com/pedidos', {
         method: 'POST',
         headers: {
           Accept: 'application/json',

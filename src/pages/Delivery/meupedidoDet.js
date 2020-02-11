@@ -1,14 +1,15 @@
 import React, { useState, useEffect }  from 'react';
-import { View, Text, StyleSheet, TextInput, Dimensions, ScrollView, ActivityIndicator, TouchableOpacity, AsyncStorage } from 'react-native';
+import { View, Text, StyleSheet, Alert, Dimensions, ScrollView, ActivityIndicator, TouchableOpacity, AsyncStorage } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-import { connect, disconnect } from '../../services/socket';
+import { connect, disconnect, subscribeToStatusPed } from '../../services/socket';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 //const screenHeight = Math.round(Dimensions.get('window').height);
 
 export default function MeuPedidoDet({ navigation }) {
  
+
   const [estab, setEstab] = useState([]);
   const [endereco, setEndereco] = useState([]);  
   const [itens, setItens] = useState([]);  
@@ -19,18 +20,24 @@ export default function MeuPedidoDet({ navigation }) {
   const [valorGrandTotal, setValorGrandTotal] = useState(0);
   const [tipoPag, setTipoPag] = useState("D"); // D=Debito - C=Credito - E=Especie
 
-  //loadpedido
+  function loadPedido(){
+    Alert.alert(
+      'Atualização',
+      'pedido atualizado pelo restaurante'
+    );
+    setLoading(false);
+  }
+
+  async function setupWebsocket() {
+    const idusuario = await AsyncStorage.getItem('eloyuserid');
+    disconnect();
+    connect(0, idusuario);
+  }
 
   useEffect(() => {
-
-    function setupWebsocket() {
-      connect(idestab);
-    }
-
-    const idestab = navigation.getParam('idestab');
     setLoading(true);
     setupWebsocket();
-
+    subscribeToStatusPed(status => loadPedido());
   }, []);
 
   return (

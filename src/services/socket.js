@@ -4,13 +4,17 @@ const socket = socketio('https://backendeloyaqui.herokuapp.com', {
     autoConnect: false,
 });
 
-function connect(idestab) {
-    socket.io.opts.query = { idestab };
-    socket.connect();
+// const socket = socketio('http://localhost:8080', {
+//     autoConnect: false,
+// });
 
-    socket.on('message', text => {
-        console.log(text);
-    });
+function subscribeToStatusPed(subscribeFunction){
+    socket.on('status-ped', subscribeFunction);
+}
+
+function connect(idestab, idusuario) {
+    socket.io.opts.query = { idestab, idusuario };
+    socket.connect();
 };
  
 function disconnect(){
@@ -21,5 +25,6 @@ function disconnect(){
 
 export {
     connect,
-    disconnect
+    disconnect,
+    subscribeToStatusPed
 };

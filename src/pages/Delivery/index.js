@@ -166,12 +166,13 @@ var styles = StyleSheet.create({
   },
 
   ItemImg: {
-    // height: isIphoneX() ? screenHeight*0.115 : isAndroid() ? screenHeight*0.175 : screenHeight*0.145,
-    paddingTop:1,
-    paddingBottom:1,
+    //height: isIphoneX() ? screenHeight*0.115 : isAndroid() ? screenHeight*0.175 : screenHeight*0.145,
+    //paddingTop:1,
+    //paddingBottom:1,
     backgroundColor:'#fff',
     borderRadius:5,
     marginTop:8,
+    //marginBottom:4,
     marginLeft:screenWidth*0.025,
     marginRight:screenWidth*0.025,
   },

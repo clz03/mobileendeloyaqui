@@ -69,18 +69,25 @@ export default function Search({ navigation }) {
       }
       renderItem={({ item }) => (
         <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('NewsDetail', { id: item._id }) }}>
+
           <View style={styles.ItemImg}>
-          <Text style={styles.textTitle} numberOfLines={1}>{item.titulo}</Text>
             <View style={styles.containerGeral}>
               <View style={styles.imgContainer}>
                 <Image style={styles.imagem} source={{uri: item.imagem }}></Image>
               </View>
               <View style={styles.txtContainer}>
+                <Text style={styles.textTitle} numberOfLines={2}>{item.titulo}</Text>
                 <Text style={styles.textDesc}>{item.data.substring(8,10) + "/" + item.data.substring(5,7) + "/" + item.data.substring(0,4)}</Text>
                 <Text style={styles.textDesc} numberOfLines={2} >{item.descr}</Text>
               </View>
             </View>
           </View>
+
+
+
+
+
+      
         </TouchableHighlight>
       )}            
     />
@@ -92,7 +99,7 @@ var styles = StyleSheet.create({
 
 container: {
   flex: 1,
-  backgroundColor:'#fff'
+  backgroundColor:'#e5e5e5'
 },
 
 LoadingIndicator:{
@@ -111,13 +118,32 @@ Item: {
 
 },
 
+// ItemImg: {
+//   height: isIphoneX() ? screenHeight*0.125 : isAndroid() ? screenHeight*0.175 : screenHeight*0.155,
+//   backgroundColor:'#fff',
+//   borderBottomColor:'#d5d5d5',
+//   borderBottomWidth:1,
+//   marginTop:8,
+//   marginLeft:10,
+// },
+
 ItemImg: {
-  height: isIphoneX() ? screenHeight*0.125 : isAndroid() ? screenHeight*0.175 : screenHeight*0.155,
+  //height: isIphoneX() ? screenHeight*0.115 : isAndroid() ? screenHeight*0.175 : screenHeight*0.145,
+  //paddingTop:1,
+  //paddingBottom:1,
   backgroundColor:'#fff',
-  borderBottomColor:'#d5d5d5',
-  borderBottomWidth:1,
-  marginTop:8,
-  marginLeft:10,
+  borderRadius:5,
+  marginTop:5,
+  marginBottom:4,
+  marginLeft:screenWidth*0.025,
+  marginRight:screenWidth*0.025,
+},
+
+imgContainer:{
+  width:screenWidth *0.2,
+  borderTopLeftRadius:5,
+  borderBottomLeftRadius:10,
+  overflow: "hidden"
 },
 
 textTitle: {
@@ -147,22 +173,27 @@ containerGeral:{
   flexDirection:'row',
 },
 
-imgContainer:{
-  width:screenWidth *0.2,
-  marginTop:5,
-},
+// imgContainer:{
+//   width:screenWidth *0.2,
+//   marginTop:5,
+// },
+
+// imagem:{
+//   width:screenWidth *0.19,
+//   height:screenWidth *0.19,
+//   borderRadius:5,
+//   borderColor:'#d3d3d3',
+//   borderWidth:3,
+// },
 
 imagem:{
   width:screenWidth *0.19,
-  height:screenWidth *0.19,
-  borderRadius:5,
-  borderColor:'#d3d3d3',
-  borderWidth:3,
+  height: isIphoneX() ? screenHeight*0.115 : isAndroid() ? screenHeight*0.175 : screenHeight*0.145,
 },
 
 txtContainer:{
   width:screenWidth *0.7,
-  marginTop:8
+  marginTop:3
 },
 
 viewPedido:{
