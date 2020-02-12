@@ -41,17 +41,18 @@ export default function ItemPedido({ navigation }) {
     if(qtdy > 1) setQtdy(qtdy - 1);
   };
 
-  // async function Limpapedido(){
-  //   for (i = 1; i <= 20; i++) {
-  //     await AsyncStorage.removeItem('eloypedido');
-  //     await AsyncStorage.removeItem('eloyitem'+i);
-  //     await AsyncStorage.removeItem('eloyqtdy'+i);
-  //     await AsyncStorage.removeItem('eloyvalorun'+i);
-  //     await AsyncStorage.removeItem('eloyvalortotal'+i);
-  //   }
-  //   navigation.state.params.onNavigateBack();
-  //   navigation.goBack(null);
-  // }
+  async function Limpapedido(){
+    await AsyncStorage.removeItem('eloypedido');
+    await AsyncStorage.removeItem('eloyitemestab');
+    for (i = 1; i <= 15; i++) {
+      await AsyncStorage.removeItem('eloyitem'+i);
+      await AsyncStorage.removeItem('eloyqtdy'+i);
+      await AsyncStorage.removeItem('eloyitemobs'+i);
+      await AsyncStorage.removeItem('eloyvalorun'+i);
+      await AsyncStorage.removeItem('eloyvalortotal'+i);
+    }
+    setPedido(false);
+  }
 
   async function adicionaItem(itemcardapio){
 
@@ -82,6 +83,22 @@ export default function ItemPedido({ navigation }) {
       return;
     }
 
+    var eloyitemestab = await AsyncStorage.getItem('eloyitemestab');
+    if(eloyitemestab !== null)
+      eloyitemestab = eloyitemestab.replace(/"/g,'');
+
+    if(eloyitemestab !== null && eloyitemestab != idestab){
+      Alert.alert(
+        'Limpar cesta de compras',
+        'É preciso limpar sua cesta de compras para adicionar esse item. Deseja limpar agora ?',
+        [
+          {text: 'Não'},
+          {text: 'Sim', onPress: () => Limpapedido()}
+        ]
+      );
+      return;
+    }
+
     var i;
     var item;
 
@@ -97,6 +114,7 @@ export default function ItemPedido({ navigation }) {
       }
     }  
     await AsyncStorage.setItem('eloypedido', JSON.stringify(i));
+    await AsyncStorage.setItem('eloyitemestab', JSON.stringify(idestab));
 
     setPedido(true);
     navigation.state.params.onNavigateBack();

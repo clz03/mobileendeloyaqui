@@ -164,11 +164,11 @@ export default function Reward({navigation}) {
                     <View style={styles.txtContainer}>
                       <Text numberOfLines={1} style={styles.dadosText}>{item.idestabelecimento.nome}</Text>
                       <Text numberOfLines={1} style={styles.dadosText}>{item.idestabelecimento.tipo}/{item.idestabelecimento.subtipo}</Text>
-                      <Text numberOfLines={1} style={styles.dadosTextRegras}>{item.idestabelecimento.rua}, {item.idestabelecimento.numero}</Text>
+                      <Text numberOfLines={1} style={styles.dadosText}>{item.idestabelecimento.rua}, {item.idestabelecimento.numero}</Text>
                       <Text style={styles.dadosTextRegras}>*{item.regra}</Text>
                       <Text style={styles.dadosTextRegras}>*Válido até {item.validade.substring(8,10) + "/" + item.validade.substring(5,7) + "/" + item.validade.substring(0,4)}*</Text>
                       <TouchableHighlight style={styles.btnEntrar} onPress={() => { handleCupom(item._id, item.idestabelecimento) }}>
-                        <Text style={styles.textoEntrar}>Eu Quero !</Text>
+                        <Text style={styles.textoEntrar}>Utilizar Cupom</Text>
                       </TouchableHighlight>
                     </View>
 
@@ -257,7 +257,7 @@ var styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius:6,
     borderWidth:1,
-    borderColor:'#006400',
+    borderColor:'#a1a1a1',
     marginTop:8,
     marginLeft:screenWidth *0.025,
   },
@@ -280,7 +280,7 @@ var styles = StyleSheet.create({
   ticketText:{
     color:'#5d5d5d',
     marginBottom:5,
-    fontWeight:'bold',
+    fontWeight:'300',
     textAlign:"center",
     fontSize:15,
   },
@@ -299,13 +299,13 @@ var styles = StyleSheet.create({
     color:'#5d5d5d',
     marginLeft:screenWidth*0.01,
     marginTop:screenHeight*0.01,
-    fontWeight:'bold'
+    fontWeight:'300'
   },
 
   dadosTextRegras:{
     color:'#5d5d5d',
     marginLeft:screenWidth*0.01,
-    fontSize:13,
+    fontSize:11,
   },
 
   containerGeral:{
@@ -332,11 +332,11 @@ var styles = StyleSheet.create({
 
   btnEntrar:{
     width: screenWidth * 0.68,
-    backgroundColor:'green',
+    backgroundColor:'#471a88',
     marginTop:screenHeight*0.015,
     marginRight:screenWidth*0.01,
     padding:4,
-    borderRadius:6,
+    borderRadius:20,
 
   },
 

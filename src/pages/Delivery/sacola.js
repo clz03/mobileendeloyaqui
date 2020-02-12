@@ -9,10 +9,11 @@ const screenWidth = Math.round(Dimensions.get('window').width);
 
 export default function Sacola({ navigation }) {
  
-  const idestab = navigation.getParam('idestab');
-  const nomeestab = navigation.getParam('nomeestab');
+  //const idestab = navigation.getParam('idestab');
+  //const nomeestab = navigation.getParam('nomeestab');
 
   const [estab, setEstab] = useState([]);
+  const [nomeestab, setNomeestab] = useState('');
   const [endereco, setEndereco] = useState([]);  
   const [apelido, setApelido] = useState('');  
   const [cep, setCep] = useState('');  
@@ -27,6 +28,7 @@ export default function Sacola({ navigation }) {
   const [valortaxaE, setValortaxaE] = useState(0);
   const [valorGrandTotal, setValorGrandTotal] = useState(0);
   const [tipoPag, setTipoPag] = useState("D"); // D=Debito - C=Credito - E=Especie
+  const [troco, setTroco] = useState(''); // Troco para E=Especie
   const [showEnd, setShowEnd] = useState(false);
   const [cadEnd, setCadEnd] = useState(false);
   const [confirmaPedido, setConfirmaPedido] = useState(false);
@@ -34,11 +36,15 @@ export default function Sacola({ navigation }) {
 
 
   async function loadEstab() {
+    var idestab = await AsyncStorage.getItem('eloyitemestab');
+    idestab = idestab.replace(/"/g,'');
+    
     const response = await fetch(
       'https://backendeloyaqui.herokuapp.com/estabelecimentos/' + idestab
     );
     const data = await response.json();
     setEstab(data);
+    setNomeestab(data[0].nome);
   };
 
 
@@ -81,6 +87,7 @@ export default function Sacola({ navigation }) {
 
   async function confirmPedido(){
     var itensPed = [];
+    const idestab = await AsyncStorage.getItem('eloyitemestab');
 
     setConfirmaPedido(false);
     setLoading(true);
@@ -134,6 +141,7 @@ export default function Sacola({ navigation }) {
           taxaentrega: valortaxaE.toFixed(2), 
           total: valorGrandTotal.toFixed(2), 
           tipopag: tipoPag, 
+          troco: troco,
           tipoentrega: tipoEntrega,
           apelido:apelido,
           rua:rua,
@@ -157,7 +165,7 @@ export default function Sacola({ navigation }) {
       setErroValidador('');
       setLoading(false);
       Limpapedido();
-      navigation.navigate('Status', { idestab: idestab });
+      navigation.navigate('MeusPedidos');
     }
   };
 
@@ -304,9 +312,6 @@ export default function Sacola({ navigation }) {
 
   useEffect(() => {
     setLoading(true);
-    navigation.setParams({ 
-      categoria: nomeestab
-    }); 
     loadEstab();
     loadEndereco(0);
     setTimeout(() => {CarregaItensPedido();}, 2000);
@@ -327,6 +332,7 @@ export default function Sacola({ navigation }) {
       <ScrollView>
 
         <View style={styles.secao}>
+          <Text style={styles.textDestaques}>{nomeestab}</Text>
           <Text style={styles.textDestaques}>Entrega ou Retirada</Text>
           
           <View style={styles.buttonContainer}>
@@ -473,6 +479,24 @@ export default function Sacola({ navigation }) {
               { tipoPag === "E" && (<View style={styles.checkedCircle} />) }
             </TouchableOpacity>
           </View>
+          
+          {tipoPag === 'E' &&
+          <View style={styles.buttonContainer}>
+            <View style={styles.containerColumn}>
+              <Text style={styles.textDesc}>Troco para:</Text>
+            </View>
+            <TextInput 
+              style={ styles.inputLogin } 
+              autoCapitalize='none' 
+              autoCorrect={false} 
+              keyboardType="email-address"
+              maxLength={40}
+              placeholder="ex: 100"
+              value={troco}
+              onChangeText={(text) => setTroco(text)}
+            />
+          </View>
+          }
 
           <TouchableOpacity style={styles.btnEntrar} onPress={() => { handlePedido() }}>
             <Text style={styles.textoEntrar}>Fazer Pedido</Text>
@@ -637,7 +661,7 @@ export default function Sacola({ navigation }) {
 Sacola.navigationOptions = ({ navigation }) => {
   return {
     headerTitle: () => (
-      <Text style={styles.txtPedido}>{navigation.getParam('categoria')}</Text>
+      <Text style={styles.txtPedido}>Finalizar Pedido</Text>
     ),
   }
 }
@@ -769,13 +793,11 @@ var styles = StyleSheet.create({
   },
 
   inputLogin:{
-    height: 40,
-    width:screenWidth * 0.90,
-    marginLeft: screenWidth * 0.05,
-    borderColor: '#471a88', 
+    width:screenWidth * 0.2,
+    borderColor: '#484848', 
     borderWidth: 1,
     borderRadius:5,
-    paddingLeft:3
+    padding:5
   },
 
   labelLogin:{

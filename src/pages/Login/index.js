@@ -11,9 +11,10 @@ import {
   ScrollView, 
   KeyboardAvoidingView,
   Platform,
-  Modal
+  Modal,
+  AsyncStorage
  } from 'react-native';
-import {AsyncStorage} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
@@ -107,7 +108,7 @@ export default function Login({ navigation }) {
           <ScrollView style={styles.container}>
           <KeyboardAvoidingView behavior="padding" keyboardVerticalOffset={70}>
             <Text style={styles.txtTitle}>Login</Text>
-            <Text style={styles.txtTitleDesc}>Em breve teremos novidades para os inscritos no Eloy Aqui</Text>
+            <Text style={styles.txtTitleDesc}>Faça login e aproveite todos os serviços do nosso bairro !</Text>
 
             <View style={styles.formAuth}>
 
@@ -146,7 +147,7 @@ export default function Login({ navigation }) {
               </TouchableHighlight>
 
               <TouchableHighlight style={styles.btnEntrar2} onPress={handleRegistered}>
-                <Text style={styles.textoEntrar}>Cadastre-se</Text>
+                <Text style={styles.textoEntrar2}>Ainda não tenho cadastro</Text>
               </TouchableHighlight>
 
               {
@@ -176,12 +177,6 @@ var styles = StyleSheet.create({
   backContainer: {
     flex: 1,
     paddingHorizontal: 0,
-  },
-
-  containerBotoes: {
-    flexDirection: 'row',
-    flex: 1,
-    backgroundColor:'#fff'
   },
   
   LoadingIndicator:{
@@ -223,7 +218,7 @@ var styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
     flex: 1,
-    backgroundColor:'#fff'
+    backgroundColor:'#f0f0f0'
   },
 
   txtTitle:{
@@ -235,8 +230,9 @@ var styles = StyleSheet.create({
   },
 
   txtTitleDesc:{
-    color:'#000',
-    fontSize:20,
+    color:'#484848',
+    fontSize:18,
+    fontWeight:'300',
     marginTop:screenHeight*0.008,
     marginLeft:5,
     marginRight:5,
@@ -244,8 +240,8 @@ var styles = StyleSheet.create({
   },
 
   labelLogin:{
-    color:'#471a88',
-    marginLeft: screenWidth * 0.05,
+    color:'#484848',
+    marginLeft: screenWidth * 0.06,
     marginTop:screenHeight*0.005,
   },
 
@@ -258,7 +254,8 @@ var styles = StyleSheet.create({
     height: screenHeight*0.06,
     width:screenWidth * 0.90,
     marginLeft: screenWidth * 0.05,
-    borderColor: '#471a88', 
+    borderColor: '#a1a1a1', 
+    backgroundColor:'#fff',
     borderWidth: 1,
     borderRadius:5,
     paddingLeft:3
@@ -266,13 +263,11 @@ var styles = StyleSheet.create({
 
   btnEntrar:{
     width: screenWidth * 0.90,
-    borderWidth:1,
     backgroundColor:'#471a88',
-    borderColor:'#fff',
     marginLeft: screenWidth * 0.05,
-    marginTop: 15,
-    padding:6,
-    borderRadius:6,
+    marginTop: 20,
+    padding:8,
+    borderRadius:20,
   },
 
   textoEntrar:{
@@ -283,14 +278,20 @@ var styles = StyleSheet.create({
 
   btnEntrar2:{
     width: screenWidth * 0.90,
-    borderWidth:1,
-    backgroundColor:'#794F9B',
-    borderColor:'#fff',
-    padding:6,
+    padding:8,
     marginLeft: screenWidth * 0.05,
-    marginTop: 10,
-    borderRadius:6,
-    marginBottom: 25
+    marginTop: 15,
+    borderRadius:20,
+    marginBottom: 25,
+    borderWidth: 1,
+    borderColor:'#a1a1a1',
+    backgroundColor:'#fff'
+  },
+
+  textoEntrar2:{
+    color:'#484848',
+    textAlign:'center',
+    fontSize:15,
   },
   
 

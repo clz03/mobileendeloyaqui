@@ -39,6 +39,15 @@ export default function MeusPedidos({ navigation }) {
   const [refreshing, setRefreshing] = useState(false);
   const [busca, setBusca] = useState('');   
 
+  const statusArr = [
+    { label: "Pedido enviado ao restaurante", value: "1" },
+    { label: "Pedido em preparação e sairá para entrega em breve", value: "2" },
+    { label: "Pedido em preparação e estará pronto para retirada em breve", value: "3" },
+    { label: "Pedido saiu para entrega", value: "4" },
+    { label: "Pedido pronto para ser retirado", value: "5" },
+    { label: "Pedido cancelado", value: "6" },
+    { label: "Pedido entregue", value: "7" }
+  ];
 
   async function loadPage(pageNumber = page, shouldRefresh = false) {
 
@@ -83,7 +92,7 @@ export default function MeusPedidos({ navigation }) {
         onEndReachedThreshold={0.1}
         onRefresh={refreshList}
         refreshing={refreshing}
-        ListEmptyComponent={<Text style={styles.textEmpty}>Estamos aguardando seu primeiro pedido aqui =)</Text>}
+        ListEmptyComponent={<><Text style={styles.textEmpty}>Estamos anciosos pelo seu primeiro pedido conosco !</Text><Icon style={styles.iconCenter} name='mood' size={48} color='#484848' /></>}
         ListHeaderComponent={
           loading ? (
             <ActivityIndicator size="large" style={styles.LoadingIndicator} />
@@ -92,18 +101,24 @@ export default function MeusPedidos({ navigation }) {
           )
         }
         renderItem={({ item }) => (
-          <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('MeuPedidoDet', { idpedido: item._id, idestab: item.idestabelecimento }) }}>
+          <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('MeuPedidoDet', { idpedido: item._id, nomeestab: item.idestabelecimento.nome, status: item.status }) }}>
+            
             <View style={styles.ItemImg}>
-        
-              <View style={styles.containerGeral}>
                 <View style={styles.txtContainer}>
-                  <Text numberOfLines={1} style={styles.textTitle}>{item.idestabelecimento.nome}</Text>
-                  <Text numberOfLines={1} style={styles.textDesc}>Data: {item.data.substring(8,10) + "/" + item.data.substring(5,7) + "/" + item.data.substring(0,4)}</Text>
-                  <Text numberOfLines={1} style={styles.textDesc}>Status: {item.status}</Text>
-                  <Text numberOfLines={1} style={styles.textDesc}>Valor: {item.total.toFixed(2)}</Text>
+                  <Text style={styles.textPrinc}>{item.idestabelecimento.nome}</Text>
+                  <Text style={styles.textDescBold}>Data/Hora: <Text style={styles.textDesc}>{item.data.substring(8,10) + "/" + item.data.substring(5,7) + "/" + item.data.substring(0,4) + ' - ' + item.data.substring(11,16)}</Text></Text>
+                  <Text numberOfLines={1} style={styles.textDescBold}>Pedido: <Text style={styles.textDesc}>#{item.seq}</Text></Text>
+                  {statusArr.map((statusArr) =>
+                    statusArr.value === item.status && <Text key={statusArr.value} numberOfLines={1} style={styles.textDescBold}>Status: <Text style={styles.textDesc}>{statusArr.label}</Text></Text>
+                  )}
+                
+                     {item.status < 5 &&
+                    <Text style={styles.textoAdicionar}>Acompanhar pedido</Text>
+                    }
+                  
                 </View>
-              </View>
             </View>
+
           </TouchableHighlight>
         )}            
       />
@@ -121,6 +136,19 @@ export default function MeusPedidos({ navigation }) {
 //     ),
 //   }
 // }
+
+MeusPedidos.navigationOptions = ({ navigation }) => {
+  return {
+    headerLeft: () => (
+      <TouchableOpacity onPress={() => navigation.navigate("Delivery")} style={styles.buttonBack}>
+        <Icon name='chevron-left' size={24} color='#fff' />
+        {Platform.OS === 'ios' &&
+          <Text style={styles.textbuttonBack}>Voltar</Text>
+        }
+      </TouchableOpacity>
+    ),
+  }
+}
 
 var styles = StyleSheet.create({
   
@@ -141,50 +169,13 @@ var styles = StyleSheet.create({
   },
 
   ItemImg: {
-    height: isIphoneX() ? screenHeight*0.115 : isAndroid() ? screenHeight*0.175 : screenHeight*0.145,
     backgroundColor:'#fff',
     borderRadius:5,
-    marginTop:8,
+    marginTop:5,
     marginLeft:8,
-    marginRight:8
-  },
-
-  viewBadge: {
-      width: screenWidth *0.6,
-  },
-
-  viewBadge2: {
-    width: screenWidth *0.3,
-    alignItems:"center",
-    backgroundColor:"#fff",
-    borderColor:'#004c00',
-    borderWidth:1,
-    borderRadius:8
-  },
-
-  textbutton: {
-    fontSize:14,
-    color:'#12299B',
-    marginTop:4,
-    marginLeft:3,
-    fontWeight:'500',
-  },
-
-  textbuttonBack: {
-    fontSize:16,
-    color:'#fff'
-  },
-
-  buttonBack: {
-    flexDirection: 'row',
-    marginRight:10
-  },
-
-
-  textDescBadge: {
-    fontSize: 10,
-    paddingTop:1,
-    color:'#004c00'
+    marginRight:8,
+    marginBottom:5,
+    paddingBottom:8
   },
 
   textTitle: {
@@ -194,22 +185,31 @@ var styles = StyleSheet.create({
   },
 
   textEmpty: {
-    fontSize:13,
-    fontWeight:'bold',
-    color:'#585858',
+    fontSize:14,
+    fontWeight:'300',
+    color:'#484848',
     marginLeft:screenWidth*0.025,
-    marginTop:10
+    marginTop:10,
+    textAlign:'center'
   },
 
   textDesc: {
-    fontSize: 12,
-    paddingTop:5
+    fontSize: 13,
+    paddingTop:2,
+    fontWeight:'300'
   },
 
-  textDescAberto: {
-    fontSize: 12,
-    paddingTop:5,
-    color:'green'
+  textDescBold: {
+    fontSize: 13,
+    paddingTop:2,
+    fontWeight:'600'
+  },
+
+  textPrinc: {
+    fontSize: 14,
+    fontWeight:'600',
+    marginBottom:5,
+    marginTop:5
   },
 
   containerGeral:{
@@ -217,55 +217,46 @@ var styles = StyleSheet.create({
   },
 
   imgContainer:{
-    width:screenWidth *0.2,
-    borderTopLeftRadius:5,
-    borderBottomLeftRadius:10,
-    overflow: "hidden"
-  },
-
-  containerBusca:{
-    flexDirection: 'row',
-  },
-
-  containerPedidos:{
-    flexDirection: 'row',
-    marginTop:5,
-    marginLeft: screenWidth * 0.025
-  },
-
-  buttonBusca:{
     marginTop:8,
     marginLeft:8,
+    width:screenWidth *0.8,
+    height: screenWidth *0.1,
   },
 
   imagem:{
-    width:screenWidth *0.19,
-    height: isIphoneX() ? screenHeight*0.115 : isAndroid() ? screenHeight*0.175 : screenHeight*0.145,
+    width:screenWidth *0.1,
+    height: screenWidth *0.1
   },
 
   txtContainer:{
-    width:screenWidth *0.7,
     marginLeft: screenWidth*0.025,
-    marginTop:5
+    marginTop:2
   },
 
+  btnAdicionar:{
+    width: screenWidth * 0.80,
 
-  txtPedido:{
-    fontSize:17,
-    fontWeight:'600',
-    color:'#fff',
-    marginHorizontal:16
+    borderRadius:6,
   },
 
-  inputLogin:{
-    height: screenHeight*0.04,
-    width:screenWidth * 0.85,
-    marginLeft: 8,
-    marginTop:5,
-    backgroundColor:'#fff',
-    borderColor: '#fff', 
-    borderWidth: 1,
-    borderRadius:5,
-    paddingLeft:3
+  textoAdicionar:{
+    color:'darkgreen',
+    fontSize:16,
+    marginTop: 5,
   },
+
+  buttonBack: {
+    flexDirection: 'row'
+  },
+
+  textbuttonBack: {
+    fontSize:18,
+    color:'#fff'
+  },
+
+  iconCenter:{
+    marginTop:10,
+    textAlign:'center'
+  }
+
 })

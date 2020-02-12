@@ -44,13 +44,12 @@ export default function AccountLogged({ navigation }) {
   const [cep, setCep] = useState("");
   const [telefone, setTelefone] = useState("");
   const [email, setEmail] = useState("");
-  const [usuario, setUsuario] = useState("");
+  //const [usuario, setUsuario] = useState("");
   const [evento, setEvento] = useState([]);
   const [cupom, setCupom] = useState([]);
   const [loading, setLoading] = useState(false);
   const [msginativo, setMsginativo] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [erroValidador, setErroValidador] = useState("");
   const [erroValidador2, setErroValidador2] = useState("");
   const [cadNome, setCadNome] = useState(false);
   const [cadEnd, setCadEnd] = useState(false);
@@ -164,7 +163,7 @@ export default function AccountLogged({ navigation }) {
       'https://backendeloyaqui.herokuapp.com/usuarios/' + iduser
     );
     const data = await response.json();
-    setUsuario(data);
+    //setUsuario(data);
 
     if (typeof data[0] === 'object'){
       data[0].validado === false ? setMsginativo(true) : setMsginativo(false);
@@ -306,6 +305,7 @@ export default function AccountLogged({ navigation }) {
           <View style={styles.container}>
           <Icon style={styles.Iconcenter} name='account-circle' size={48} color='#585858' />
             <Text style={styles.txtTitle} numberOfLines={1}>Seja Bem Vindo, {nome}</Text>
+
 
             { msginativo &&
               <View style={styles.msguserinativo}>
@@ -710,12 +710,12 @@ var styles = StyleSheet.create({
   backContainer: {
     flex: 1,
     paddingHorizontal: 0,
+    backgroundColor:'#e5e5e5'
   },
 
   container: {
     flexDirection: 'column',
     flex: 1,
-    backgroundColor:'#fff'
   },
 
   containerGeral:{

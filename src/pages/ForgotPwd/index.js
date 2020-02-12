@@ -89,7 +89,7 @@ export default function Forgot({ navigation }) {
               </TouchableHighlight>
 
               <TouchableHighlight style={styles.btnEntrar2} onPress={handleRegistered}>
-                <Text style={styles.textoEntrar}>Voltar</Text>
+                <Text style={styles.textoEntrar2}>Voltar</Text>
               </TouchableHighlight>
 
               {
@@ -122,7 +122,7 @@ var styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
     flex: 1,
-    backgroundColor:'#fff'
+    backgroundColor:'#f0f0f0'
   },
 
   LoadingIndicator:{
@@ -146,18 +146,20 @@ var styles = StyleSheet.create({
   },
 
   txtTitleDesc:{
-    color:'#000',
+    color:'#484848',
     fontSize:18,
+    fontWeight:'300',
     marginTop:10,
+    marginBottom:10,
     marginLeft:5,
     marginRight:5,
     textAlign:'center',
   },
 
   labelLogin:{
-    color:'#471a88',
+    color:'#484848',
     marginLeft: screenWidth * 0.05,
-    marginTop:5,
+    marginTop:screenHeight*0.005,
   },
 
   labelError:{
@@ -166,59 +168,48 @@ var styles = StyleSheet.create({
   },
 
   inputLogin:{
-    height: 40, 
+    height: screenHeight*0.06,
     width:screenWidth * 0.90,
     marginLeft: screenWidth * 0.05,
-    marginTop:2,
-    borderColor: '#471a88', 
+    borderColor: '#a1a1a1', 
+    backgroundColor:'#fff',
     borderWidth: 1,
     borderRadius:5,
     paddingLeft:3
   },
 
-  labelSenha:{
-    color:'#471a88',
-    marginLeft: screenWidth * 0.05,
-    marginTop:10,
-  },
-
-  inputSenha:{
-    height: 40, 
-    width:screenWidth * 0.90,
-    marginLeft: screenWidth * 0.05,
-    marginTop:2,
-    borderColor: '#471a88', 
-    borderWidth: 1,
-    borderRadius:5
-  },
-
   btnEntrar:{
     width: screenWidth * 0.90,
     backgroundColor:'#471a88',
-    padding:6,
     marginLeft: screenWidth * 0.05,
-    marginTop: 15,
-    borderRadius:6,
-
-  },
-
-  btnEntrar2:{
-    width: screenWidth * 0.90,
-    borderWidth:1,
-    backgroundColor:'#794F9B',
-    borderColor:'#fff',
-    padding:6,
-    marginLeft: screenWidth * 0.05,
-    marginTop: 10,
-    borderRadius:6,
-    marginBottom: 25
+    marginTop: 20,
+    padding:8,
+    borderRadius:20,
   },
 
   textoEntrar:{
     color:'#fff',
     textAlign:'center',
     fontSize:18,
-  }
+  },
+
+  btnEntrar2:{
+    width: screenWidth * 0.90,
+    padding:8,
+    marginLeft: screenWidth * 0.05,
+    marginTop: 15,
+    borderRadius:20,
+    marginBottom: 25,
+    borderWidth: 1,
+    borderColor:'#a1a1a1',
+    backgroundColor:'#fff'
+  },
+
+  textoEntrar2:{
+    color:'#484848',
+    textAlign:'center',
+    fontSize:15,
+  },
   
 
 });

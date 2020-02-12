@@ -19,7 +19,7 @@ import Delivery from './pages/Delivery';
 import Pedido from './pages/Delivery/pedido';
 import ItemPedido from './pages/Delivery/itemPedido';
 import Sacola from './pages/Delivery/sacola';
-import Status from './pages/Delivery/status';
+// import Status from './pages/Delivery/status';
 import MeusPedidos from './pages/Delivery/meuspedidos';
 import MeuPedidoDet from './pages/Delivery/meupedidoDet';
 
@@ -87,16 +87,16 @@ const DeliveryNavigator = createStackNavigator({
       headerTintColor: '#fff'
     },
   },
-  Status:{
-    screen: Status,
-    navigationOptions: {
-      headerStyle: {backgroundColor:'#471a88'},
-      headerTitle:'Acompanhar Pedido',
-      headerTitleStyle: {color:'#fff'},
-      headerTintColor: '#fff',
-      gesturesEnabled: false
-    },
-  },
+  // Status:{
+  //   screen: Status,
+  //   navigationOptions: {
+  //     headerStyle: {backgroundColor:'#471a88'},
+  //     headerTitle:'Acompanhar Pedido',
+  //     headerTitleStyle: {color:'#fff'},
+  //     headerTintColor: '#fff',
+  //     gesturesEnabled: false
+  //   },
+  // },
   MeusPedidos:{
     screen: MeusPedidos,
     navigationOptions: {
@@ -104,6 +104,7 @@ const DeliveryNavigator = createStackNavigator({
       headerTitle:'Meus Pedidos',
       headerTitleStyle: {color:'#fff'},
       headerTintColor: '#fff',
+      gesturesEnabled: false
     },
   },
   MeuPedidoDet:{

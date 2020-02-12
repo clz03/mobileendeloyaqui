@@ -9,36 +9,89 @@ const screenWidth = Math.round(Dimensions.get('window').width);
 
 export default function MeuPedidoDet({ navigation }) {
  
-
-  const [estab, setEstab] = useState([]);
-  const [endereco, setEndereco] = useState([]);  
+  const [rua, setRua] = useState('');  
+  const [numero, setNumero] = useState('');  
+  const [complemento, setComplemento] = useState('');  
   const [itens, setItens] = useState([]);  
   const [loading, setLoading] = useState(false);
-  const [tipoEntrega, setTipoEntrega] = useState("E");
+  const [pedido, setPedido] = useState('');
+  const [seq, setSeq] = useState('');
+  const [status, setStatus] = useState(1);
+  const [tipoEntrega, setTipoEntrega] = useState('');
+  const [dataPedido, setDataPedido] = useState('2020-01-01');
+  const [previsao1, setPrevisao1] = useState('');
+  const [previsao2, setPrevisao2] = useState('');
   const [valortotal, setValortotal] = useState(0);
   const [valortaxaE, setValortaxaE] = useState(0);
   const [valorGrandTotal, setValorGrandTotal] = useState(0);
-  const [tipoPag, setTipoPag] = useState("D"); // D=Debito - C=Credito - E=Especie
 
-  function loadPedido(){
-    Alert.alert(
-      'Atualização',
-      'pedido atualizado pelo restaurante'
+  const idpedido = navigation.getParam('idpedido');
+  const statusParam = parseInt(navigation.getParam('status'));
+  const nomeestab = navigation.getParam('nomeestab');
+
+  async function loadPedido() {
+    const response = await fetch(
+      'https://backendeloyaqui.herokuapp.com/pedidos/' + idpedido
     );
+    const data = await response.json();
+    setStatus(data[0].status);
+    setRua(data[0].rua);
+    setNumero(data[0].numero);
+    setComplemento(data[0].complemento);
+    setSeq(data[0].seq);
+    setTipoEntrega(data[0].tipoentrega);
+    setDataPedido(data[0].data);
+    setValortotal(data[0].subtotal);
+    setValorGrandTotal(data[0].total);
+    setValortaxaE(data[0].taxaentrega);
+    setPedido(data);
     setLoading(false);
-  }
+  };
+
+  async function loadItensPedido() {
+    const response = await fetch(
+      'https://backendeloyaqui.herokuapp.com/itenspedido/pedido/' + idpedido
+    );
+    const data = await response.json();
+    setItens(data);
+    setLoading(false);
+  };
 
   async function setupWebsocket() {
-    const idusuario = await AsyncStorage.getItem('eloyuserid');
     disconnect();
+    const idusuario = await AsyncStorage.getItem('eloyuserid');
     connect(0, idusuario);
+  }
+
+  function calculaPrevisao(){
+    let prev1 = new Date(dataPedido);
+    let prev2 = new Date(dataPedido);
+
+    if(tipoEntrega === 'E'){
+      prev1.setMinutes(prev1.getMinutes()+60);
+      prev2.setMinutes(prev2.getMinutes()+70);
+    } else {
+      prev1.setMinutes(prev1.getMinutes()+30);
+      prev2.setMinutes(prev2.getMinutes()+40);
+    }
+
+    setPrevisao1(prev1.getUTCHours() + ':' + prev1.getMinutes());
+    setPrevisao2(prev2.getUTCHours() + ':' + prev2.getMinutes());
   }
 
   useEffect(() => {
     setLoading(true);
-    setupWebsocket();
-    subscribeToStatusPed(status => loadPedido());
+    if(statusParam < 5) {
+      setupWebsocket();
+      subscribeToStatusPed(status => loadPedido());
+    }
+    loadPedido();
+    loadItensPedido();
   }, []);
+
+  useEffect(() => {
+    calculaPrevisao()
+  }, [pedido]);
 
   return (
 
@@ -47,46 +100,115 @@ export default function MeuPedidoDet({ navigation }) {
       <ScrollView>
 
         <View style={styles.secao}>
-          <Text style={styles.textDestaques}>Status do pedido</Text>
-          <Text style={styles.textItemDesc}>Previsão de entrega</Text>
-          <Text style={styles.textBold}>12:50 / 13:00</Text>
+          {
+            loading && <ActivityIndicator size="small" style={styles.LoadingIndicator} />
+          }
+          
+          <Text style={styles.textDestaques}>{nomeestab}</Text>
+          <Text style={styles.textItemDesc}>Pedido: #{seq}</Text>
+          <Text style={styles.textItemDesc}>Realizado às {dataPedido.substring(11,16)} - {dataPedido.substring(8,10) + "/" + dataPedido.substring(5,7) + "/" + dataPedido.substring(0,4)}</Text>
+          {/* {statusArr.map((statusArr) =>
+            statusArr.value == status && <Text key={statusArr.value} style={styles.textItemDesc}>{statusArr.label}</Text>
+          )} */}
+
+          {status < 6 &&
+            <>
+              { tipoEntrega === "E" &&
+                <>
+                  <Text style={styles.textItemDescPadding}>Previsão de entrega</Text>
+                  <Text style={styles.textBold}>{previsao1} / {previsao2}</Text>
+                </>
+              }
+              { tipoEntrega !== "E" &&
+                <>
+                  <Text style={styles.textItemDescPadding}>Previsão para retirada</Text>
+                  <Text style={styles.textBold}>{previsao1} / {previsao2}</Text>
+                </>
+              }
+            </>
+          }
           <View style={styles.containerGeral}>
-            {
-              loading && <ActivityIndicator size="small" style={styles.LoadingIndicator} />
-            }
+           
             <View style={styles.containerColumnStatus}>
-              <Text numberOfLines={1} style={styles.textItemDesc}>Pedido enviado ao estabelecimento <Icon style={styles.icone} name='check-circle' size={12} color='green' /></Text>
-              <Text numberOfLines={1} style={styles.textItemDesc}>Aguardando confirmação do estabelecimento</Text>
-              <Text numberOfLines={1} style={styles.textItemDesc}>O pedido foi confirmado <Icon style={styles.icone} name='check-circle' size={12} color='green' /> </Text>
-              <Text numberOfLines={1} style={styles.textItemDesc}>O pedido está sendo preparado</Text>
-              <Text numberOfLines={1} style={styles.textItemDesc}>O pedido saiu para entrega</Text>
+              <Text style={styles.textDestaques}>Acompanhar Status</Text>
+
+              { status > 0 &&
+                <Text numberOfLines={1} style={styles.textItemDesc}>
+                  Pedido enviado ao estabelecimento&nbsp;
+                  <Icon style={styles.icone} name='check-circle' size={12} color='green' />
+                </Text>
+              }
+              { status > 0 &&
+                <Text numberOfLines={1} style={styles.textItemDesc}>
+                  Aguardando confirmação do estabelecimento&nbsp;
+                  <Icon style={styles.icone} name='check-circle' size={12} color='green' />
+                </Text>
+              }
+              { status > 1 &&
+                <Text numberOfLines={1} style={styles.textItemDesc}>
+                  O pedido foi confirmado&nbsp;
+                  <Icon style={styles.icone} name='check-circle' size={12} color='green' /> 
+                </Text>
+              }
+              { status > 1 &&
+                <Text numberOfLines={1} style={styles.textItemDesc}>
+                  O pedido está sendo preparado&nbsp;
+                  <Icon style={styles.icone} name='check-circle' size={12} color='green' />
+                </Text>
+              }
+              { status > 3 && tipoEntrega === "E" &&
+              <Text numberOfLines={1} style={styles.textItemDesc}>
+                O pedido saiu para entrega&nbsp;
+                <Icon style={styles.icone} name='check-circle' size={12} color='green' />
+              </Text>
+              }
+              { status > 3 && tipoEntrega !== "E" &&
+                <Text numberOfLines={1} style={styles.textItemDesc}>
+                  O pedido está pronto para retirada&nbsp;
+                  <Icon style={styles.icone} name='check-circle' size={12} color='green' />
+                </Text>
+              }
+              { status > 6 && tipoEntrega === "E" &&
+              <Text numberOfLines={1} style={styles.textItemDesc}>
+                O pedido foi entregue&nbsp;
+                <Icon style={styles.icone} name='check-circle' size={12} color='green' />
+              </Text>
+              }
+              { status > 6 && tipoEntrega !== "E" &&
+                <Text numberOfLines={1} style={styles.textItemDesc}>
+                  O pedido foi recebido pelo cliente&nbsp;
+                  <Icon style={styles.icone} name='check-circle' size={12} color='green' />
+                </Text>
+              }
+              { status === 6 && 
+              <Text numberOfLines={1} style={styles.textItemDesc}>
+                O pedido foi cancelado&nbsp;
+                <Icon style={styles.icone} name='check-circle' size={12} color='green' />
+              </Text>
+              }
+
             </View>
           </View>
         </View>
         
-        { tipoEntrega === "E" && (
+        { tipoEntrega === "E" &&
 
-        <View style={styles.secao}>
-          <Text style={styles.textDestaques}>Endereço de entrega</Text>
-          <View style={styles.containerGeral}>
-            <Icon style={styles.icone} name='near-me' size={24} color='#817E9F' />
-            <View style={styles.containerColumnComplemento}>
-              <Text numberOfLines={1} style={styles.textDesc}>Rua Chiara Lubich, 371</Text>
-              <Text numberOfLines={1} style={styles.textItemDesc}>Torre Figueira, AP 74 - Residencial Atmospheraasd</Text>
+          <View style={styles.secao}>
+            <Text style={styles.textDestaques}>Endereço de entrega</Text>
+            <View style={styles.containerGeral}>
+              <Icon style={styles.icone} name='near-me' size={24} color='#817E9F' />
+              <View style={styles.containerColumnComplemento}>
+                <Text numberOfLines={1} style={styles.textDesc}>{rua}, {numero}</Text>
+                <Text numberOfLines={1} style={styles.textItemDesc}>{complemento}</Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        )}
+        }
 
         <View style={styles.secao}>
           <Text style={styles.textDestaques}>Detalhe do pedido</Text>
 
-          <View style={styles.containerGeral}>
-            <View style={styles.containerColumnComplemento}>
-              <Text numberOfLines={1} style={styles.textDesc}>Danilo Picanha</Text>
-            </View>
-          </View>
 
           {/* {itens.map(item => 
               <View key={item.id}>
@@ -103,6 +225,21 @@ export default function MeuPedidoDet({ navigation }) {
               </View>
             )} */}
 
+
+            {itens.map(item => 
+              <View key={item._id}>
+
+                <View style={styles.buttonContainer}>
+                  <View style={styles.containerColumn}>
+                    <Text style={styles.textDestaquesCardapio}>{item.qtde}x {item.item}</Text>
+                    <Text style={styles.textDesc}>R${item.valortotal}</Text>
+                    {item.obs.length > 2 &&
+                      <Text style={styles.textItemDesc}>Obs: {item.obs}</Text>
+                    }
+                  </View>
+                </View>
+              </View>
+            )}
 
           
           { tipoEntrega == "E" &&
@@ -359,7 +496,7 @@ var styles = StyleSheet.create({
     flexDirection:'column',
     marginRight:35,
     marginBottom:15,
-    marginTop: 15
+    marginTop: 5
   },
 
   botaomais:{
@@ -436,6 +573,13 @@ var styles = StyleSheet.create({
     marginBottom:15
   },
 
+  textItemDescPadding:{
+    fontSize:12,
+    marginLeft:screenWidth*0.025,
+    marginTop:10,
+    color:'#595959'
+  },
+
   textItemSubValor:{
     fontSize:15,
     color:'#808080',
@@ -472,7 +616,7 @@ var styles = StyleSheet.create({
     fontWeight:'bold',
     color:'#484848',
     marginLeft:screenWidth*0.025,
-    marginBottom:10,
+    marginBottom:5,
     marginTop: 10
   },
 
@@ -488,7 +632,7 @@ var styles = StyleSheet.create({
     fontSize:15,
     color:'#484848',
     marginLeft:screenWidth*0.025,
-    marginTop: 10,
+    marginTop: 5,
   },
 
   buttonContainerPag: {

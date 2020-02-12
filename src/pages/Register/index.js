@@ -184,7 +184,7 @@ useEffect(() => {
               </TouchableHighlight>
 
               <TouchableHighlight style={styles.btnEntrar2} onPress={handleRegistered}>
-                <Text style={styles.textoEntrar}>Já tenho cadastro</Text>
+                <Text style={styles.textoEntrar2}>Já tenho cadastro</Text>
               </TouchableHighlight>
 
               {
@@ -213,11 +213,6 @@ var styles = StyleSheet.create({
   backContainer: {
     flex: 1,
     paddingHorizontal: 0,
-  },
-
-  container: {
-    flexDirection: 'column',
-    backgroundColor:'#fff'
   },
 
   LoadingIndicator:{
@@ -252,7 +247,7 @@ var styles = StyleSheet.create({
   container: {
     flexDirection: 'column',
     flex: 1,
-    backgroundColor:'#fff'
+    backgroundColor:'#f0f0f0'
   },
 
   txtTitle:{
@@ -264,16 +259,18 @@ var styles = StyleSheet.create({
   },
 
   txtTitleDesc:{
-    color:'#000',
-    fontSize:20,
-    marginTop:screenHeight*0.008,
+    color:'#484848',
+    fontSize:18,
+    fontWeight:'300',
+    marginTop:10,
+    marginBottom:10,
     marginLeft:5,
     marginRight:5,
     textAlign:'center',
   },
 
   labelLogin:{
-    color:'#471a88',
+    color:'#484848',
     marginLeft: screenWidth * 0.05,
     marginTop:screenHeight*0.005,
   },
@@ -287,7 +284,8 @@ var styles = StyleSheet.create({
     height: screenHeight*0.06,
     width:screenWidth * 0.90,
     marginLeft: screenWidth * 0.05,
-    borderColor: '#471a88', 
+    borderColor: '#a1a1a1', 
+    backgroundColor:'#fff',
     borderWidth: 1,
     borderRadius:5,
     paddingLeft:3
@@ -295,13 +293,11 @@ var styles = StyleSheet.create({
 
   btnEntrar:{
     width: screenWidth * 0.90,
-    borderWidth:1,
     backgroundColor:'#471a88',
-    borderColor:'#fff',
-    padding:6,
     marginLeft: screenWidth * 0.05,
-    marginTop: 15,
-    borderRadius:6,
+    marginTop: 20,
+    padding:8,
+    borderRadius:20,
   },
 
   textoEntrar:{
@@ -312,14 +308,20 @@ var styles = StyleSheet.create({
 
   btnEntrar2:{
     width: screenWidth * 0.90,
-    borderWidth:1,
-    backgroundColor:'#794F9B',
-    borderColor:'#fff',
-    padding:6,
+    padding:8,
     marginLeft: screenWidth * 0.05,
-    marginTop: 10,
-    borderRadius:6,
-    marginBottom: 25
+    marginTop: 15,
+    borderRadius:20,
+    marginBottom: 25,
+    borderWidth: 1,
+    borderColor:'#a1a1a1',
+    backgroundColor:'#fff'
+  },
+
+  textoEntrar2:{
+    color:'#484848',
+    textAlign:'center',
+    fontSize:15,
   },
 
   

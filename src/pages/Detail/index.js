@@ -281,7 +281,7 @@ export default function Detail({ navigation }) {
                 </Tab>
       
                 {plano > 0 &&
-                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Destaque/Cupom</Text></TabHeading>}>
+                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Destaques</Text></TabHeading>}>
                                        
                     <ScrollView>
 
@@ -475,7 +475,8 @@ var styles = StyleSheet.create({
   
   backContainer: {
     flex: 1,
-    paddingHorizontal: 0
+    paddingHorizontal: 0,
+    marginBottom:20
   },
 
   backImageHeader: {
