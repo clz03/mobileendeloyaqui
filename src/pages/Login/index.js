@@ -33,6 +33,7 @@ export default function Login({ navigation }) {
   const [erroValidador2, setErroValidador2] = useState("");
   const [loading, setLoading] = useState(false);
 
+
   async function CheckRedirect(){
     if (await AsyncStorage.getItem('eloyuseremail') != null)
       navigation.navigate('AccountLogged');

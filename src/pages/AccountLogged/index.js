@@ -15,6 +15,9 @@ import {
     Modal
 } from 'react-native';
 import {Container, Tab, Tabs, TabHeading } from 'native-base';
+import { Notifications } from 'expo';
+import * as Permissions from 'expo-permissions';
+
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
@@ -57,6 +60,36 @@ export default function AccountLogged({ navigation }) {
   const [cadTel, setCadTel] = useState(false);
   const [showEnd, setShowEnd] = useState(false);
 
+
+  async function registerForPushNotificationsAsync() {
+    const iduser = await AsyncStorage.getItem('eloyuserid');
+    const { status } = await Permissions.askAsync(Permissions.NOTIFICATIONS);
+    // only asks if permissions have not already been determined, because
+    // iOS won't necessarily prompt the user a second time.
+    // On Android, permissions are granted on app installation, so
+    // `askAsync` will never prompt the user
+  
+    // Stop here if the user did not grant permissions
+    if (status !== 'granted') {
+      alert('Não obtivemos permissão para enviar notificações');
+      return;
+    }
+  
+    // Get the token that identifies this device
+    let token = await Notifications.getExpoPushTokenAsync();
+  
+    // POST the token to your backend server from where you can retrieve it to send push notifications.
+    return fetch('https://backendeloyaqui.herokuapp.com/usuarios/' + iduser , {
+      method: 'PUT',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        pushToken: token
+      }),
+    });
+  }
 
   async function handleLogout(){
     await AsyncStorage.removeItem('eloyuseremail');
@@ -297,6 +330,7 @@ export default function AccountLogged({ navigation }) {
     loadCupons();
     loadEndereco();
     checkUserAtivo();
+    registerForPushNotificationsAsync()
   }, []);
 
   return (

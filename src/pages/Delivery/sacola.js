@@ -28,7 +28,7 @@ export default function Sacola({ navigation }) {
   const [valortaxaE, setValortaxaE] = useState(0);
   const [valorGrandTotal, setValorGrandTotal] = useState(0);
   const [tipoPag, setTipoPag] = useState("D"); // D=Debito - C=Credito - E=Especie
-  const [troco, setTroco] = useState(''); // Troco para E=Especie
+  const [troco, setTroco] = useState("0"); // Troco para E=Especie
   const [showEnd, setShowEnd] = useState(false);
   const [cadEnd, setCadEnd] = useState(false);
   const [confirmaPedido, setConfirmaPedido] = useState(false);
@@ -86,8 +86,10 @@ export default function Sacola({ navigation }) {
 
 
   async function confirmPedido(){
+
     var itensPed = [];
-    const idestab = await AsyncStorage.getItem('eloyitemestab');
+    var idestab = await AsyncStorage.getItem('eloyitemestab');
+    idestab = idestab.replace(/"/g,'');
 
     setConfirmaPedido(false);
     setLoading(true);
@@ -96,12 +98,11 @@ export default function Sacola({ navigation }) {
     var today = new Date();
     today = moment(today).format("YYYY-MM-DD HH:mm:ss");
 
-
     for (i = 1; i <= 15; i++) {
 
       vlUnitario = await AsyncStorage.getItem('eloyvalorun'+i);
       if(vlUnitario !== null)
-      vlUnitario = vlUnitario.replace(/"/g,'');
+        vlUnitario = vlUnitario.replace(/"/g,'');
 
       vlTotal = await AsyncStorage.getItem('eloyvalortotal'+i);
       if(vlTotal !== null)
@@ -112,6 +113,9 @@ export default function Sacola({ navigation }) {
         quantidade = quantidade.replace(/"/g,'');
 
       observacao = await AsyncStorage.getItem('eloyitemobs'+i);
+      if(observacao !== null)
+        observacao = observacao.replace(/"/g,'');
+
       nome = await AsyncStorage.getItem('eloyitem'+i);
 
       if(nome !== null){
@@ -153,13 +157,13 @@ export default function Sacola({ navigation }) {
           idusuario:iduser,
           itensPed: itensPed
         }),
-    });
-
+    })
 
     const responseJson = await apireturn.json();
     
     if (!apireturn.ok) {
       setErroValidador(responseJson.error);
+      alert(responseJson.error);
       setLoading(false);
     } else {
       setErroValidador('');
