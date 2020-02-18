@@ -168,7 +168,7 @@ export default function Reward({navigation}) {
                       <Text style={styles.dadosTextRegras}>*{item.regra}</Text>
                       <Text style={styles.dadosTextRegras}>*Válido até {item.validade.substring(8,10) + "/" + item.validade.substring(5,7) + "/" + item.validade.substring(0,4)}*</Text>
                       <TouchableHighlight style={styles.btnEntrar} onPress={() => { handleCupom(item._id, item.idestabelecimento) }}>
-                        <Text style={styles.textoEntrar}>Utilizar Cupom</Text>
+                        <Text style={styles.textoEntrar}>Obter Cupom</Text>
                       </TouchableHighlight>
                     </View>
 

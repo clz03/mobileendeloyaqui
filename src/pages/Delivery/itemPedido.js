@@ -60,7 +60,7 @@ export default function ItemPedido({ navigation }) {
    if(iduser === null){
       Alert.alert(
         'Login',
-        'Para pedidos online é preciso fazer login',
+        'Para realizar pedidos online é preciso fazer login',
         [
           {text: 'OK'},
           {text: 'Ir para Login', onPress: () => navigation.navigate('Login')}
@@ -172,7 +172,7 @@ async function CheckPedido(){
 
             <View style={styles.ItemImg2}>
               <Text style={styles.textItem}>{cardapio.item}</Text>
-              <Text style={styles.textItemDesc}>Arroz, Feijão, Farofa, Batata</Text>
+              <Text style={styles.textItemDesc}>{cardapio.descr}</Text>
               <Text style={styles.textItemValor}>R${cardapio.valor}</Text> 
             </View>
 

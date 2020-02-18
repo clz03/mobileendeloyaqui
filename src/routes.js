@@ -125,7 +125,7 @@ const Cupomnavigator = createStackNavigator({
     screen: Reward,
     navigationOptions: {
       headerStyle: {backgroundColor:'#471a88'},
-      headerTitle:'Cupom Semanal',
+      headerTitle:'Cupons Desconto',
       headerTitleStyle: {color:'#fff'},
       headerTintColor: '#fff'
     },

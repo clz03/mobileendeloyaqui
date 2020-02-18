@@ -1,5 +1,5 @@
 import React, { useState, useEffect }  from 'react';
-import { View, Text, StyleSheet, Alert, Dimensions, ScrollView, ActivityIndicator, TouchableOpacity, AsyncStorage } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, ScrollView, ActivityIndicator, AsyncStorage } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 import { connect, disconnect, subscribeToStatusPed } from '../../services/socket';
@@ -25,6 +25,7 @@ export default function MeuPedidoDet({ navigation }) {
   const [valortaxaE, setValortaxaE] = useState(0);
   const [valorGrandTotal, setValorGrandTotal] = useState(0);
 
+
   const idpedido = navigation.getParam('idpedido');
   const statusParam = parseInt(navigation.getParam('status'));
   const nomeestab = navigation.getParam('nomeestab');
@@ -45,7 +46,6 @@ export default function MeuPedidoDet({ navigation }) {
     setValorGrandTotal(data[0].total);
     setValortaxaE(data[0].taxaentrega);
     setPedido(data);
-    setLoading(false);
   };
 
   async function loadItensPedido() {
@@ -54,7 +54,6 @@ export default function MeuPedidoDet({ navigation }) {
     );
     const data = await response.json();
     setItens(data);
-    setLoading(false);
   };
 
   async function setupWebsocket() {
@@ -84,6 +83,7 @@ export default function MeuPedidoDet({ navigation }) {
     if(statusParam < 5) {
       setupWebsocket();
       subscribeToStatusPed(status => loadPedido());
+      setLoading(true);
     }
     loadPedido();
     loadItensPedido();
@@ -100,9 +100,6 @@ export default function MeuPedidoDet({ navigation }) {
       <ScrollView>
 
         <View style={styles.secao}>
-          {
-            loading && <ActivityIndicator size="small" style={styles.LoadingIndicator} />
-          }
           
           <Text style={styles.textDestaques}>{nomeestab}</Text>
           <Text style={styles.textItemDesc}>Pedido: #{seq}</Text>
@@ -185,6 +182,14 @@ export default function MeuPedidoDet({ navigation }) {
                 O pedido foi cancelado&nbsp;
                 <Icon style={styles.icone} name='check-circle' size={12} color='green' />
               </Text>
+              }
+
+              {
+                loading && 
+                  <View style={styles.activityIndicatorWrapper}>
+                    <ActivityIndicator
+                      animating={loading} />
+                  </View>
               }
 
             </View>
@@ -711,5 +716,9 @@ var styles = StyleSheet.create({
     color:'#fff',
     marginHorizontal:16
   },
+
+  activityIndicatorWrapper:{
+    marginTop:5
+  }
 
 })

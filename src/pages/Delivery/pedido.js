@@ -107,7 +107,7 @@ export default function Pedido({ navigation }) {
                 <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('itemPedido', { idcardapio: cardapio._id, idestab: idestab, nomeestab: nomeestab, onNavigateBack: handleOnNavigateBack }) }}>
                   <View style={styles.ItemImg2}>
                       <Text style={styles.textItem}>{cardapio.item}</Text>
-                      <Text style={styles.textItemDesc}>Arroz, Feijão, Farofa, Batata</Text>
+                      <Text style={styles.textItemDesc}>{cardapio.descr}</Text>
                       <Text style={styles.textItemValor}>R${cardapio.valor}</Text> 
                   </View>
                 </TouchableHighlight>
@@ -160,7 +160,8 @@ var styles = StyleSheet.create({
   },
 
   viewCardapio:{
-    marginTop:5
+    marginTop:5,
+    marginBottom:45
   },
 
   ItemImg2: {

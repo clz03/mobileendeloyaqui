@@ -5,11 +5,9 @@ import {
   StyleSheet, 
   TouchableHighlight,
   TouchableOpacity,
-  Image, 
   Dimensions, 
   FlatList, 
   ActivityIndicator, 
-  TextInput,
   Platform,
   AsyncStorage } from 'react-native';
 
@@ -37,7 +35,6 @@ export default function MeusPedidos({ navigation }) {
   const [totalCount, setTotalCount] = useState(0);   
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [busca, setBusca] = useState('');   
 
   const statusArr = [
     { label: "Pedido enviado ao restaurante", value: "1" },
@@ -141,6 +138,7 @@ MeusPedidos.navigationOptions = ({ navigation }) => {
   return {
     headerLeft: () => (
       <TouchableOpacity onPress={() => navigation.navigate("Delivery")} style={styles.buttonBack}>
+        { /* variar android aqui */ }
         <Icon name='chevron-left' size={24} color='#fff' />
         {Platform.OS === 'ios' &&
           <Text style={styles.textbuttonBack}>Voltar</Text>

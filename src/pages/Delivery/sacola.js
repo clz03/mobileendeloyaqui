@@ -1,5 +1,17 @@
 import React, { useState, useEffect }  from 'react';
-import { View, Text, StyleSheet, TextInput, Dimensions, ScrollView, ActivityIndicator, TouchableOpacity, AsyncStorage, Modal } from 'react-native';
+import { 
+  View, 
+  KeyboardAvoidingView ,
+  Text, StyleSheet, 
+  TextInput, 
+  Dimensions, 
+  ScrollView, 
+  ActivityIndicator, 
+  TouchableOpacity, 
+  AsyncStorage, 
+  Modal,
+  Platform,
+  Alert } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import moment from 'moment';
 import 'moment/locale/pt-br';
@@ -16,11 +28,19 @@ export default function Sacola({ navigation }) {
   const [nomeestab, setNomeestab] = useState('');
   const [endereco, setEndereco] = useState([]);  
   const [apelido, setApelido] = useState('');  
-  const [cep, setCep] = useState('');  
   const [rua, setRua] = useState('');  
   const [numero, setNumero] = useState('');  
   const [bairro, setBairro] = useState('');  
   const [complemento, setComplemento] = useState('');  
+  const [cep, setCep] = useState('');  
+
+  const [apelidoNovo, setApelidoNovo] = useState('');  
+  const [ruaNovo, setRuaNovo] = useState('');  
+  const [numeroNovo, setNumeroNovo] = useState('');  
+  const [bairroNovo, setBairroNovo] = useState('');  
+  const [complementoNovo, setComplementoNovo] = useState('');  
+  const [cepNovo, setCepNovo] = useState('');
+
   const [itens, setItens] = useState([]);  
   const [loading, setLoading] = useState(false);
   const [tipoEntrega, setTipoEntrega] = useState("E");
@@ -51,18 +71,21 @@ export default function Sacola({ navigation }) {
 
   async function loadEndereco(indice) {
     const iduser = await AsyncStorage.getItem('eloyuserid');
-    if(indice === null) indice = 0;
     const response = await fetch(
       'https://backendeloyaqui.herokuapp.com/enderecos/usuario/' + iduser
     );
     const data = await response.json();
-    setEndereco(data);
-    setApelido(data[indice].apelido);
-    setRua(data[indice].rua);
-    setNumero(data[indice].numero);
-    setBairro(data[indice].bairro);
-    setComplemento(data[indice].complemento);
-    setCep(data[indice].cep);
+    if (typeof data[0] === 'object'){
+      setEndereco(data);
+      if(indice !== ''){
+        setApelido(data[indice].apelido);
+        setRua(data[indice].rua);
+        setNumero(data[indice].numero);
+        setBairro(data[indice].bairro);
+        setComplemento(data[indice].complemento);
+        setCep(data[indice].cep);
+      }
+    }
   };
 
 
@@ -80,6 +103,18 @@ export default function Sacola({ navigation }) {
 
 
   function handlePedido(){
+    if(rua === '' && tipoEntrega === 'E') {
+      Alert.alert(
+        'Endereço de Entrega',
+        'Por favor cadastre seu endereço',
+        [
+          {text: 'Não'},
+          {text: 'Sim', onPress: () => setCadEnd(true)}
+        ]
+      );
+      return
+    }
+    
     setConfirmaPedido(true);
   };
 
@@ -238,33 +273,45 @@ export default function Sacola({ navigation }) {
     const iduser = await AsyncStorage.getItem('eloyuserid');
     var cError = false;
 
-    if(cep == '') {
-      setErroValidador2('cep não pode ser vazio');
+    if(cepNovo === '') {
+      setErroValidador('cep não pode ser vazio');
       cError = true;
     }
 
-    if(bairro == '') {
-      setErroValidador2('bairro não pode ser vazio');
+    if(bairroNovo === '') {
+      setErroValidador('bairro não pode ser vazio');
       cError = true;
     }
 
-    if(numero == '') {
-      setErroValidador2('numero não pode ser vazio');
+    if(numeroNovo === '') {
+      setErroValidador('numero não pode ser vazio');
       cError = true;
     }
 
-    if(rua == '') {
-      setErroValidador2('rua não pode ser vazio');
+    if(ruaNovo === '') {
+      setErroValidador('rua não pode ser vazio');
       cError = true;
     }
 
-    if(apelido == '') {
-      setErroValidador2('apelido não pode ser vazio');
+    if(apelidoNovo === '') {
+      setErroValidador('apelido não pode ser vazio');
       cError = true;
     }
    
     if(cError) return;
     setLoading(true);
+
+    const arrlog ={
+      apelidoNovo,
+      ruaNovo,
+      numeroNovo,
+      bairroNovo,
+      cepNovo,
+      complemento:complementoNovo,
+      idusuario:iduser
+    };
+
+    console.log(arrlog);
 
     const apireturn = await fetch(
        'https://backendeloyaqui.herokuapp.com/enderecos', {
@@ -274,12 +321,12 @@ export default function Sacola({ navigation }) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          apelido,
-          rua,
-          numero,
-          bairro,
-          cep,
-          complemento:complemento,
+          apelido: apelidoNovo,
+          rua: ruaNovo,
+          numero: numeroNovo,
+          bairro: bairroNovo,
+          cep: cepNovo,
+          complemento:complementoNovo,
           idusuario:iduser
         }),
     });
@@ -290,7 +337,14 @@ export default function Sacola({ navigation }) {
       setErroValidador('');
       setLoading(false);
       setCadEnd(false);
-      loadEndereco();
+      loadEndereco('');
+      setShowEnd(true);
+      setApelidoNovo('');
+      setRuaNovo('');
+      setNumeroNovo('');
+      setBairroNovo('');
+      setCepNovo('');
+      setComplementoNovo('');
     } else {
       setErroValidador(responseJson.error);
       setLoading(false);
@@ -456,7 +510,7 @@ export default function Sacola({ navigation }) {
 
         </View>
 
-        <View style={styles.secaoLast}>
+        <KeyboardAvoidingView style={styles.secaoLast} behavior='padding'>
           <Text style={styles.textDestaques}>Pagamento</Text>
           {/* <Text style={styles.textItemDesc}>*Pague no recebimento</Text> */}
 
@@ -493,7 +547,7 @@ export default function Sacola({ navigation }) {
               style={ styles.inputLogin } 
               autoCapitalize='none' 
               autoCorrect={false} 
-              keyboardType="email-address"
+              keyboardType="numeric"
               maxLength={40}
               placeholder="ex: 100"
               value={troco}
@@ -506,7 +560,7 @@ export default function Sacola({ navigation }) {
             <Text style={styles.textoEntrar}>Fazer Pedido</Text>
           </TouchableOpacity>
           
-        </View>
+        </KeyboardAvoidingView>
 
       </ScrollView>
 
@@ -518,20 +572,16 @@ export default function Sacola({ navigation }) {
           <View style={styles.modalBackground}>
             <View style={styles.ModalFormEnd}>
               <Text style={styles.textDescPrincEnd}>Meu(s) Endereço(s)</Text>
-              <TouchableOpacity onPress={() => { setShowEnd(false); setCadEnd(true)}}><Text style={styles.textDestaquesLink}>( Cadastrar Endereço )</Text></TouchableOpacity>
+              <TouchableOpacity onPress={() => { setShowEnd(false); setCadEnd(true)}}><Text style={styles.textDestaquesButton}>Novo Endereço</Text></TouchableOpacity>
               <Text></Text>
               {endereco.map((endereco, index) => 
-                <View key={endereco._id}>
+                <TouchableOpacity style={styles.viewBorda} key={endereco._id} onPress={() => {loadEndereco(index); setShowEnd(false) }}>
                   <Text style={styles.textDescPrinc2}>Apelido: <Text style={styles.textDesc}>{endereco.apelido}</Text></Text>
                   <Text style={styles.textDescPrinc2}>End: <Text style={styles.textDesc}>{endereco.rua}, {endereco.numero}</Text></Text>
                   <Text style={styles.textDescPrinc2}>Bairro: <Text style={styles.textDesc}>{endereco.bairro}</Text></Text>
-                  <Text style={styles.textDescPrinc2}>Complemento: <Text style={styles.textDesc}>{endereco.complemento}</Text></Text>
+                  <Text style={styles.textDescPrinc2}>Compl: <Text style={styles.textDesc}>{endereco.complemento}</Text></Text>
                   <Text style={styles.textDescPrinc2}>CEP: <Text style={styles.textDesc}>{endereco.cep}</Text></Text>
-                  <TouchableOpacity onPress={() => {loadEndereco(index); setShowEnd(false) }}>
-                      <Text style={styles.textoRemoverEnd}>( Selecionar )</Text>
-                  </TouchableOpacity>
-                  <Text></Text>
-                </View>
+                </TouchableOpacity>
               )}
                 <TouchableOpacity style={styles.btnEntrarModal2} onPress={() => setShowEnd(false)}>
                   <Text style={styles.textoEntrar}>Fechar</Text>
@@ -546,17 +596,26 @@ export default function Sacola({ navigation }) {
                 transparent={true}
                 animationType={'none'}
                 visible={cadEnd}>
-                <View style={styles.modalBackground}>
+
+                <KeyboardAvoidingView 
+                  behavior='padding'
+                  style={styles.modalBackground}
+                  keyboardVerticalOffset={
+                  Platform.select({
+                    ios: () => -50,
+                    android: () => 100
+                  })()
+                  }>
                   <View style={styles.ModalFormEnd}>
-                    <Text style={styles.textDescPrincEnd}>Novo Endereço</Text>
+                    <Text style={styles.textDescPrinc2}>Novo Endereço</Text>
                     <Text style={styles.labelLogin}>Apelido</Text>
                     <TextInput 
                       style={ styles.inputLoginModal } 
                       autoCorrect={false} 
                       maxLength={20}
                       placeholder="Apelido para identificar"
-                      value={apelido}
-                      onChangeText={(text) => setApelido(text)}
+                      value={apelidoNovo}
+                      onChangeText={(text) => setApelidoNovo(text)}
                     />
                       <Text style={styles.labelLogin}>Rua</Text>
                     <TextInput 
@@ -564,17 +623,18 @@ export default function Sacola({ navigation }) {
                       autoCorrect={false} 
                       maxLength={20}
                       placeholder="Rua/Av do seu Endereço"
-                      value={rua}
-                      onChangeText={(text) => setRua(text)}
+                      value={ruaNovo}
+                      onChangeText={(text) => setRuaNovo(text)}
                     />
                       <Text style={styles.labelLogin}>Número</Text>
                     <TextInput 
                       style={ styles.inputLoginModal } 
                       autoCorrect={false} 
+                      keyboardType="numeric"
                       maxLength={20}
                       placeholder="ex: 856"
-                      value={numero}
-                      onChangeText={(text) => setNumero(text)}
+                      value={numeroNovo}
+                      onChangeText={(text) => setNumeroNovo(text)}
                     />
                       <Text style={styles.labelLogin}>Bairro</Text>
                     <TextInput 
@@ -582,8 +642,8 @@ export default function Sacola({ navigation }) {
                       autoCorrect={false} 
                       maxLength={20}
                       placeholder="ex: Jd Ermida I"
-                      value={bairro}
-                      onChangeText={(text) => setBairro(text)}
+                      value={bairroNovo}
+                      onChangeText={(text) => setBairroNovo(text)}
                     />
                       <Text style={styles.labelLogin}>Complemento</Text>
                     <TextInput 
@@ -591,8 +651,8 @@ export default function Sacola({ navigation }) {
                       autoCorrect={false} 
                       maxLength={20}
                       placeholder="ex: Torre Lest - AP 85"
-                      value={complemento}
-                      onChangeText={(text) => setComplemento(text)}
+                      value={complementoNovo}
+                      onChangeText={(text) => setComplementoNovo(text)}
                     />
                       <Text style={styles.labelLogin}>CEP</Text>
                     <TextInput 
@@ -600,8 +660,8 @@ export default function Sacola({ navigation }) {
                       autoCorrect={false} 
                       maxLength={20}
                       placeholder="ex: 13212-070"
-                      value={cep}
-                      onChangeText={(text) => setCep(text)}
+                      value={cepNovo}
+                      onChangeText={(text) => setCepNovo(text)}
                     />
 
                      <Text style={styles.labelError}>{erroValidador}</Text>
@@ -614,7 +674,7 @@ export default function Sacola({ navigation }) {
                      </TouchableOpacity>
                      <Text></Text>
                   </View>
-                </View>
+                </KeyboardAvoidingView>
               </Modal>
               }
 
@@ -625,29 +685,37 @@ export default function Sacola({ navigation }) {
           visible={confirmaPedido}>
           <View style={styles.modalBackground}>
             <View style={styles.ModalFormEnd}>
-              <Text style={styles.textDescPrincEnd}>Confirmação dos dados</Text>
+              <Text style={styles.textDescPrinc2}>Confirmação dos dados</Text>
               <Text></Text>
-              {tipoEntrega === 'E' && endereco.map((endereco, index) => 
-                <View key={endereco._id}>
+              {tipoEntrega === 'E' ?
+                <View>
                   <Text style={styles.textDescPrinc2}>Entregar em:</Text>
-                  <Text style={styles.textDescPrinc2}>End:<Text style={styles.textDesc}>{endereco.rua}, {endereco.numero}</Text></Text>
-                  <Text style={styles.textDescPrinc2}>Bairro: <Text style={styles.textDesc}>{endereco.bairro}</Text></Text>
-                  <Text style={styles.textDescPrinc2}>Complemento: <Text style={styles.textDesc}>{endereco.complemento}</Text></Text>                 
-                </View>
-              )}
+                  <Text style={styles.textDesc}>{rua}, {numero}</Text>
+                  <Text style={styles.textDesc}>{bairro}</Text>
+                  <Text style={styles.textDesc}>{complemento}</Text> 
+                </View>    
+                :
+                <View>
+                  <Text style={styles.textDesc}>Retirar no estabelecimento</Text>
+                </View>  
+              }
               <Text></Text>
               <View>
-                <Text style={styles.textDescPrincEnd}>Pague na entrega</Text>
-                <Text style={styles.textDescPrincEnd}>{tipoPag === 'E' ? 'Dinheiro' : 'Cartão Débito/Crédito' }</Text>
+                <Text style={styles.textDescPrinc2}>Forma de pagamento:</Text>
+                <Text style={styles.textDesc}>Pague na entrega</Text>
+                <Text style={styles.textDesc}>{tipoPag === 'E' ? 'Dinheiro' : 'Cartão Débito/Crédito' }</Text>
+                {tipoPag === 'E' &&
+                  <Text style={styles.textDesc}>Troco para: R${troco}</Text>
+                }
                 <Text></Text>
               </View>
                 
                 <TouchableOpacity style={styles.btnEntrarModal} onPress={() => confirmPedido()}>
-                <Text style={styles.textoEntrar}>Confirmar Pedido</Text>
+                  <Text style={styles.textoEntrar}>Confirmar Pedido</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity style={styles.btnEntrarModal2} onPress={() => setConfirmaPedido(false)}>
-                <Text style={styles.textoEntrar}>Alterar Dados</Text>
+                  <Text style={styles.textoEntrar}>Alterar Dados</Text>
                 </TouchableOpacity>
                 <Text></Text>
 
@@ -804,10 +872,19 @@ var styles = StyleSheet.create({
     padding:5
   },
 
+  inputLoginModal:{
+    width:screenWidth * 0.8,
+    borderColor: '#484848', 
+    borderWidth: 1,
+    borderRadius:5,
+    padding:5,
+    marginBottom:5
+  },
+
+
   labelLogin:{
     color:'#471a88',
-    marginLeft: screenWidth * 0.05,
-    marginBottom:3,
+    marginTop:5,
   },
 
   textTitle: {
@@ -1008,6 +1085,15 @@ var styles = StyleSheet.create({
     marginTop: 12
   },
 
+  textDestaquesButton:{
+    fontSize:12,
+    fontWeight:'bold',
+    color:'#484848',
+    backgroundColor:'#d3d3d3',
+    marginTop: 10,
+    padding:10
+  },
+
   textDestaquesValores:{
     fontSize:16,
     fontWeight:'bold',
@@ -1120,5 +1206,14 @@ var styles = StyleSheet.create({
     borderRadius:6,
     marginBottom: 5
   },
+
+  viewBorda:{
+    width:'95%',
+    borderWidth:1,
+    borderColor:'#c5c5c5',
+    borderRadius:5,
+    marginBottom:10,
+    paddingLeft:5
+  }
 
 })
