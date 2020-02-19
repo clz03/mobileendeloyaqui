@@ -46,6 +46,7 @@ export default function MeuPedidoDet({ navigation }) {
     setValorGrandTotal(data[0].total);
     setValortaxaE(data[0].taxaentrega);
     setPedido(data);
+    if(data[0].status > 4) setLoading(false);
   };
 
   async function loadItensPedido() {
@@ -141,25 +142,25 @@ export default function MeuPedidoDet({ navigation }) {
                   <Icon style={styles.icone} name='check-circle' size={12} color='green' />
                 </Text>
               }
-              { status > 1 &&
+              { status > 1 && status != 6 &&
                 <Text numberOfLines={1} style={styles.textItemDesc}>
                   O pedido foi confirmado&nbsp;
                   <Icon style={styles.icone} name='check-circle' size={12} color='green' /> 
                 </Text>
               }
-              { status > 1 &&
+              { status > 1 && status != 6 &&
                 <Text numberOfLines={1} style={styles.textItemDesc}>
                   O pedido está sendo preparado&nbsp;
                   <Icon style={styles.icone} name='check-circle' size={12} color='green' />
                 </Text>
               }
-              { status > 3 && tipoEntrega === "E" &&
+              { status > 3 && status != 6 && tipoEntrega === "E" &&
               <Text numberOfLines={1} style={styles.textItemDesc}>
                 O pedido saiu para entrega&nbsp;
                 <Icon style={styles.icone} name='check-circle' size={12} color='green' />
               </Text>
               }
-              { status > 3 && tipoEntrega !== "E" &&
+              { status > 3 && status != 6 && tipoEntrega !== "E" &&
                 <Text numberOfLines={1} style={styles.textItemDesc}>
                   O pedido está pronto para retirada&nbsp;
                   <Icon style={styles.icone} name='check-circle' size={12} color='green' />
@@ -177,7 +178,7 @@ export default function MeuPedidoDet({ navigation }) {
                   <Icon style={styles.icone} name='check-circle' size={12} color='green' />
                 </Text>
               }
-              { status === 6 && 
+              { status == 6 && 
               <Text numberOfLines={1} style={styles.textItemDesc}>
                 O pedido foi cancelado&nbsp;
                 <Icon style={styles.icone} name='check-circle' size={12} color='green' />

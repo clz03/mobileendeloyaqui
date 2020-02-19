@@ -71,7 +71,7 @@ export default function AccountLogged({ navigation }) {
   
     // Stop here if the user did not grant permissions
     if (status !== 'granted') {
-      alert('Não obtivemos permissão para enviar notificações');
+      //alert('Não obtivemos permissão para enviar notificações');
       return;
     }
   
