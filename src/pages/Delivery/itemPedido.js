@@ -321,8 +321,8 @@ var styles = StyleSheet.create({
   textDesc: {
     fontSize: 15,
     marginTop:10,
-    marginLeft:screenWidth*0.025,
-    marginRight:8
+    marginLeft:screenWidth*0.02,
+    marginRight:screenWidth*0.02
   },
 
   textAdicionar: {
@@ -353,7 +353,8 @@ var styles = StyleSheet.create({
     width:screenWidth*0.3,
     height:40,
     marginLeft: screenWidth * 0.05,
-    marginTop:15
+    marginTop:15,
+    marginBottom:10
   },
 
   containerAdicionar:{
@@ -373,12 +374,12 @@ var styles = StyleSheet.create({
   },
 
   botaomais:{
-    marginLeft:screenWidth*0.025,
+    marginLeft:screenWidth*0.02,
     marginTop:8,
   },
 
   botaomenos:{
-    marginLeft:screenWidth*0.025,
+    marginLeft:screenWidth*0.02,
     marginRight:8,
     marginTop:8,
   },

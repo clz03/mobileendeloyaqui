@@ -117,8 +117,9 @@ export default function Pedido({ navigation }) {
             )}
                
           </View>
-        )}            
+        )}      
       />
+      <View style={styles.viewCardapioBottom}></View>
 
     {pedido &&
       <TouchableOpacity style={styles.pedidoBottom} onPress={() => { navigation.navigate('Sacola', { idestab: idestab, nomeestab: nomeestab, onNavigateBack: handleOnNavigateBack  }) }}>
@@ -161,8 +162,14 @@ var styles = StyleSheet.create({
 
   viewCardapio:{
     marginTop:5,
-    marginBottom:45
+    marginBottom:15
   },
+
+  viewCardapioBottom:{
+    marginTop:5,
+    marginBottom:35
+  },
+
 
   ItemImg2: {
     borderWidth:1,

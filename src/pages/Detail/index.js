@@ -43,21 +43,79 @@ export default function Detail({ navigation }) {
   
   const [estab, setEstab] = useState([]);
   const [plano, setPlano] = useState([]);
-  const [pedonline, setPedonline] = useState([]);
+  const [agendaonline, setAgendaonline] = useState([]);
   const [cardapio, setCardapio] = useState("");
   const [cardapioonline, setCardapioonline] = useState(false);
   const [categorias, setCategorias] = useState([]);  
   const [prod, setProd] = useState([]);
-  const [cupom, setCupom] = useState([]);
+  const [servico, setServico] = useState([]);
+  const [servicoid, setServicoid] = useState([]);
+  const [nomeagenda, setNomeagenda] = useState('');
+  //const [diasemanaState, setDiasemanaState] = useState([]);
+  const [blackdates, setBlackdates] = useState([]);  
+  const [startdate, setStartdate] = useState('');  
+  const [seldate, setSeldate] = useState('');  
+  // const [cupom, setCupom] = useState([]);
   const [evento, setEvento] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [pagina, setPagina] = useState(1);
   
   const idestab = navigation.getParam('idestab');
 
-  async function loadEvento(date) {
+  let datesWhitelist = [{
+    start: moment(),
+    end: moment().add(30,'days')
+  }];
+
+  //Blacklist, tudo que nao for 1 e 3
+
+  function gotoCalendar(nome, dias, idservico){
+    let datesBlacklist = [];
+    var curDate;
+    var checkStart = false;
+    var loadDate;
+
+    //Current Date
+    curDate = moment().day();
+    if(!dias.includes(curDate.toString())){
+      datesBlacklist.push(moment())
+    }
+
+    // Next 30 days
+    for (let i = 1; i <= 30; ++i){
+      curDate = moment().add(i,'days').day()
+      if(!dias.includes(curDate.toString())){
+        datesBlacklist.push(moment().add(i,'days'))
+      } else {
+        if(!checkStart){
+          setStartdate(moment().add(i,'days'));
+          setSeldate(moment().add(i,'days'));
+          loadDate = moment().add(i,'days');
+          checkStart = true;
+        }
+      }
+    }
+    setServicoid(idservico);
+    setBlackdates(datesBlacklist);
+    setNomeagenda(nome);
+    loadEvento(moment(loadDate).format("YYYY-MM-DD"),idservico)
+    setPagina(2);
+  }
+
+  const weekday = [
+   "Domingo",
+   "Segunda-Feira", 
+   "Terça-Feira", 
+   "Quarta-Feira", 
+   "Quinta-Feira", 
+   "Sexta-Feira",
+   "Sábado"
+  ]
+
+  async function loadEvento(date, idservico) {
     setLoading(true);
      const response4 = await fetch(
-       'https://backendeloyaqui.herokuapp.com/eventos/dia/' + date + '/' + idestab
+        'https://backendeloyaqui.herokuapp.com/eventos/dia/' + date + '/' + idservico
       );
 
      const data4 = await response4.json();
@@ -72,36 +130,47 @@ export default function Detail({ navigation }) {
 
       const data = await response.json();
       const plano = data[0].plano;
-      const agendaonline = data[0].pedonline;
+      const agendaonline = data[0].agendamento;
       const cardapionline = data[0].cardapio;
       setEstab(data);
       setPlano(plano);
-      setPedonline(agendaonline);
+      setAgendaonline(agendaonline);
       setCardapioonline(cardapionline);
       if (plano > 0) {
         loadProd();
-        loadCupom();
-        if (agendaonline) loadEvento(moment().format("YYYY-MM-DD"));
+        loadServico();
+        //loadCupom();
+        // if (agendaonline) {
+        //   if(startdate !== '') loadEvento(startdate);
+        // }
         if (cardapionline) loadCardapio();
       }
     };
 
     async function loadProd() {
-      const response2 = await fetch(
+      const response = await fetch(
         'https://backendeloyaqui.herokuapp.com/produtos/estabelecimento/' + idestab
       );
-      const data2 = await response2.json();
-      setProd(data2);
+      const data = await response.json();
+      setProd(data);
     };
 
-    async function loadCupom() {
-     const response3 = await fetch(
-       'https://backendeloyaqui.herokuapp.com/cupons/estabelecimento/' + idestab
-     );
+    async function loadServico() {
+      const response = await fetch(
+        'https://backendeloyaqui.herokuapp.com/servicos/estabelecimento/' + idestab
+      );
+      const data = await response.json();
+      setServico(data);
+    };
 
-     const data3 = await response3.json();
-     setCupom(data3);
-   };
+  //   async function loadCupom() {
+  //    const response3 = await fetch(
+  //      'https://backendeloyaqui.herokuapp.com/cupons/estabelecimento/' + idestab
+  //    );
+
+  //    const data3 = await response3.json();
+  //    setCupom(data3);
+  //  };
 
 
   async function loadCardapio() {
@@ -185,12 +254,13 @@ export default function Detail({ navigation }) {
             hora: hora,
             comentario: datareturn[0].telefone,
             idestabelecimento: idestab,
+            idservico: servicoid,
             idusuario: iduser
           }),
       });
 
       if(responseApi.ok)
-        loadEvento(data);
+        loadEvento(data, servicoid);
 
       setLoading(false);
 
@@ -272,6 +342,17 @@ export default function Detail({ navigation }) {
                               </TouchableOpacity>
 
                             }
+                             {agendaonline &&
+                             
+                             <TouchableOpacity onPress={() => { go }}>
+                                <View style={styles.menuItem}>
+                                  <Icon name='event' size={24} color='#794F9B' />
+                                  <Text style={styles.tabSubRS}>Agendamento</Text>
+                                  <Text style={styles.tabSubRS}>Online</Text>
+                                </View>
+                              </TouchableOpacity>
+
+                            }
                             </View>
                           </>
                         }
@@ -296,7 +377,7 @@ export default function Detail({ navigation }) {
                         ) : <Text style={styles.txtNoData}>Em breve novos Destaques. Fique de olho !</Text>
                       }
 
-                      {cupom.length > 0 ? cupom.map(cupom => 
+                      {/* {cupom.length > 0 ? cupom.map(cupom => 
                           <View style={styles.cupomItem} key={cupom._id}>
                             <View style={styles.barraLateralVerde}></View>
                             <View style={styles.ticket}>
@@ -306,7 +387,7 @@ export default function Detail({ navigation }) {
                             </View>
                           </View>
                         ) : <Text style={styles.txtNoData}>Em breve novos Cupons. Fique de olho !</Text>
-                      }
+                      } */}
 
                     </ScrollView>
                     
@@ -399,12 +480,74 @@ export default function Detail({ navigation }) {
                   </Tab>
                 }
 
-                {plano > 0 && pedonline == 1 && 
+                {plano > 0 && agendaonline == 1 && 
 
                   <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Agendar</Text></TabHeading>}>
 
-                    <View style={styles.backContainer}>               
-                  
+                    
+                  {pagina === 1 &&
+                      <ScrollView style={styles.container} visible='false'>
+                        <Text style={styles.tabTitle}>Selecione o serviço a ser agendado:</Text>
+                    
+                    {/* // 0 DOMINGO
+                        // 1 SEGUNDA
+                        // 2 TERCA
+                        // 3 QUARTA
+                        // 4 QUINTA
+                        // 5 SEXTA
+                        // 6 SABADO */}
+
+                          <FlatList
+                            data={servico}
+                            keyExtractor={servico => servico._id}
+                            ListHeaderComponent={
+                              loading ? (
+                                <ActivityIndicator size="large" style={styles.LoadingIndicator} />
+                              ) : (
+                                ""
+                              )
+                            }
+                            renderItem={({ item }) => (
+
+                              <View style={styles.viewCardapio}>
+
+                                  <TouchableHighlight style={styles.ItemImg2} onPress={() => { gotoCalendar(item.nome, item.diasemana, item._id) }}>
+                                    <View>
+                                      <Text style={styles.textItem}>{item.nome}</Text>
+                                      <Text style={styles.textItemDesc}>{item.descr}</Text>
+                                      <View style={styles.containersemana}>
+                                        {item.diasemana.map(diasemana => 
+                                          <Text style={styles.textItemDesc} key={diasemana}>{weekday[parseInt(diasemana)]}</Text>
+                                        )}
+                                      </View>
+                                      <Text style={styles.textItemValor}>R${item.preco}</Text> 
+                                      </View>
+                                  </TouchableHighlight>
+                                
+                              </View>
+                              
+                                
+                            )}                      
+                          />
+                      </ScrollView>
+
+                    
+                }                         
+                        
+                      {pagina === 2 &&
+                     
+
+
+                    <View style={styles.backContainer}>        
+                      <TouchableOpacity style={styles.buttonBack2} onPress={() => {setPagina(1); setEvento('')}}>
+                        <Icon name='chevron-left' size={24} color='#484848' />
+                        <Text style={styles.textback}>Voltar</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.tabTitle}>Agendar: {nomeagenda}</Text>
+                      <Text></Text>
+
+                    
+            
                     <CalendarStrip
                       calendarAnimation={{type: 'sequence', duration: 30}}
                       daySelectionAnimation={{type: 'border', duration: 200, borderWidth: 1, borderHighlightColor: 'white'}}
@@ -417,10 +560,15 @@ export default function Detail({ navigation }) {
                       highlightDateNameStyle={{color: 'purple'}}
                       disabledDateNameStyle={{color: 'grey'}}
                       disabledDateNumberStyle={{color: 'grey'}}
+                      startingDate={startdate}
+                      selectedDate={seldate}
                       maxDate={moment().add(30, 'days') }
                       minDate={moment()}
+                      updateWeek={false}
+                      datesWhitelist={datesWhitelist}
+                      datesBlacklist={blackdates}
                       iconContainer={{flex: 0.1}}
-                      onDateSelected={date => loadEvento(moment(date).format("YYYY-MM-DD"))}
+                      onDateSelected={date => loadEvento(moment(date).format("YYYY-MM-DD"), servicoid)}
                     />
                    
                    <FlatList
@@ -445,21 +593,23 @@ export default function Detail({ navigation }) {
                         ""
                       )
                     }
-                    ListEmptyComponent={<Text style={styles.tabTitle}>Desculpe, o estabelecimento não possuí atendimento nesse dia.</Text>}
+                    ListEmptyComponent={<Text style={styles.tabTitle}>Desculpe, o estabelecimento não possuí atendimento disponível nesse dia.</Text>}
                     renderItem={({ item }) => (
                       <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { handleAgendamento(item.data,item.hora,item.status) }}>
                         <View style={styles.ItemAgenda}>
                           <Text style={styles.textMenu}>Agendar para {item.hora}:00</Text>
                           { 
-                            item.status == 'D' ? <Text style={styles.textMenuGreen}>Disponível</Text> : <Text style={styles.textMenuRed}>Indisponível</Text>
+                            item.status == 'D' ? <Text style={styles.textMenuGreen}>Disponível</Text> : <Text style={styles.textMenuRed}>Agendado</Text>
                           }
                         </View>
                       </TouchableHighlight>
                     )}            
                   />
-
+                
                     </View>  
-                    
+                  }
+                  
+
                   </Tab>
                 }
 
@@ -638,6 +788,10 @@ var styles = StyleSheet.create({
     fontSize: 10,
   },
 
+  containersemana:{
+    flexDirection:'row'
+  },
+
   container2: {
     flexWrap: 'wrap',
     backgroundColor:'#fff',
@@ -713,6 +867,16 @@ var styles = StyleSheet.create({
     paddingLeft: 10,
     marginTop: screenHeight * 0.07,
     flexDirection: 'row'
+  },
+
+  buttonBack2: {
+    color:'#484848',
+    paddingTop:10,
+    flexDirection: 'row'
+  },
+
+  textback: {
+    paddingTop:5,
   },
 
   textDestaques:{

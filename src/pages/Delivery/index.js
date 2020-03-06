@@ -106,6 +106,7 @@ export default function Delivery({ navigation }) {
         onEndReachedThreshold={0.1}
         onRefresh={refreshList}
         refreshing={refreshing}
+        ListEmptyComponent={<><Text style={styles.textEmpty}>Nenhum restaurante online no momento</Text><Icon style={styles.iconCenter} name='restaurant' size={24} color='#484848' /></>}
         ListHeaderComponent={
           loading ? (
             <ActivityIndicator size="large" style={styles.LoadingIndicator} />
@@ -163,6 +164,20 @@ var styles = StyleSheet.create({
     flex:1,
     justifyContent:"center",
     marginTop:15
+  },
+
+  textEmpty: {
+    fontSize:14,
+    fontWeight:'300',
+    color:'#484848',
+    marginLeft:screenWidth*0.025,
+    marginTop:10,
+    textAlign:'center'
+  },
+
+  iconCenter:{
+    marginTop:10,
+    textAlign:'center'
   },
 
   ItemImg: {

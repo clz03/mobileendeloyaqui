@@ -89,6 +89,7 @@ export default function Login({ navigation }) {
     if (responseApi.ok) {
       await AsyncStorage.setItem('eloyuseremail', email);
       await AsyncStorage.setItem('eloyusernome', data.nome);
+      await AsyncStorage.setItem('eloyuserestab', data.idestabelecimento === undefined ? "" : data.idestabelecimento);
       await AsyncStorage.setItem('eloyuserid', data._id);
       setLoading(false);
       navigation.navigate('AccountLogged')
@@ -97,10 +98,9 @@ export default function Login({ navigation }) {
       setLoading(false);
     }
 
-
 }
 
-  CheckRedirect();
+  //CheckRedirect();
 
   return (
     

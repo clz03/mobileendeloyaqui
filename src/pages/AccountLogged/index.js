@@ -408,6 +408,9 @@ export default function AccountLogged({ navigation }) {
                               <Text style={styles.textDesc}>Valido até: {item.idcupom.validade.substring(8,10) + "/" + item.idcupom.validade.substring(5,7) + "/" + item.idcupom.validade.substring(0,4)}</Text>
                               <Text style={styles.textDesc}>{item.idestabelecimento.nome}</Text>
                               <Text style={styles.textDesc}>{item.idestabelecimento.rua}, {item.idestabelecimento.numero}</Text>
+                              {item.utilizado === true &&
+                                <Text style={styles.textDescUtilizado}>Cupom utilizado</Text>
+                              }
                               <Text style={styles.dadosTextRegras}>*{item.idcupom.regra}</Text>
                               <Text style={styles.dadosTextRegras}>*Apresentar esse cupom no estabelecimento*</Text>
                             </View>
@@ -532,6 +535,7 @@ export default function AccountLogged({ navigation }) {
                 <View style={styles.modalBackground}>
                   <View style={styles.ModalFormEnd}>
                     <Text style={styles.textDescPrincEnd}>Alterar Nome</Text>
+                    <Text></Text>
                     <Text style={styles.labelLogin}>Nome</Text>
                     <TextInput 
                       style={ styles.inputLoginModal } 
@@ -548,7 +552,7 @@ export default function AccountLogged({ navigation }) {
                      </TouchableHighlight>
                      
                      <TouchableHighlight style={styles.btnEntrarModal2} onPress={() => setCadNome(false)}>
-                      <Text style={styles.textoEntrar}>Cancelar</Text>
+                      <Text style={styles.textoEntrar2}>Cancelar</Text>
                      </TouchableHighlight>
                      <Text></Text>
                   </View>
@@ -563,6 +567,7 @@ export default function AccountLogged({ navigation }) {
                 <View style={styles.modalBackground}>
                   <View style={styles.ModalFormEnd}>
                     <Text style={styles.textDescPrincEnd}>Alterar Telefone</Text>
+                    <Text></Text>
                     <Text style={styles.labelLogin}>Telefone</Text>
                     <TextInput 
                       style={ styles.inputLoginModal } 
@@ -579,7 +584,7 @@ export default function AccountLogged({ navigation }) {
                      </TouchableHighlight>
                      
                      <TouchableHighlight style={styles.btnEntrarModal2} onPress={() => setCadTel(false)}>
-                      <Text style={styles.textoEntrar}>Cancelar</Text>
+                      <Text style={styles.textoEntrar2}>Cancelar</Text>
                      </TouchableHighlight>
                      <Text></Text>
                   </View>
@@ -594,6 +599,7 @@ export default function AccountLogged({ navigation }) {
                 <View style={styles.modalBackground}>
                   <View style={styles.ModalFormEnd}>
                     <Text style={styles.textDescPrincEnd}>Alterar E-mail</Text>
+                    <Text></Text>
                     <Text style={styles.labelLogin}>E-mail</Text>
                     <TextInput 
                       style={ styles.inputLoginModal } 
@@ -610,7 +616,7 @@ export default function AccountLogged({ navigation }) {
                      </TouchableHighlight>
                      
                      <TouchableHighlight style={styles.btnEntrarModal2} onPress={() => setCadEmail(false)}>
-                      <Text style={styles.textoEntrar}>Cancelar</Text>
+                      <Text style={styles.textoEntrar2}>Cancelar</Text>
                      </TouchableHighlight>
                      <Text></Text>
                   </View>
@@ -631,7 +637,9 @@ export default function AccountLogged({ navigation }) {
                         <Text style={styles.textDescPrinc2}>Apelido: <Text style={styles.textDesc}>{endereco.apelido}</Text></Text>
                         <Text style={styles.textDescPrinc2}>End: <Text style={styles.textDesc}>{endereco.rua}, {endereco.numero}</Text></Text>
                         <Text style={styles.textDescPrinc2}>Bairro: <Text style={styles.textDesc}>{endereco.bairro}</Text></Text>
-                        <Text style={styles.textDescPrinc2}>Complemento: <Text style={styles.textDesc}>{endereco.complemento}</Text></Text>
+                        {endereco.complemento !== '' && 
+                          <Text style={styles.textDescPrinc2}>Complemento: <Text style={styles.textDesc}>{endereco.complemento}</Text></Text>
+                        }
                         <Text style={styles.textDescPrinc2}>CEP: <Text style={styles.textDesc}>{endereco.cep}</Text></Text>
                         <TouchableHighlight onPress={() => handleDeleteEnd(endereco._id)}>
                           <Text style={styles.textoRemoverEnd}>( Remover )</Text>
@@ -647,7 +655,7 @@ export default function AccountLogged({ navigation }) {
                      </TouchableHighlight>
                      
                      <TouchableHighlight style={styles.btnEntrarModal2} onPress={() => setShowEnd(false)}>
-                      <Text style={styles.textoEntrar}>Cancelar</Text>
+                      <Text style={styles.textoEntrar2}>Cancelar</Text>
                      </TouchableHighlight>
                      <Text></Text>
                   </View>
@@ -725,7 +733,7 @@ export default function AccountLogged({ navigation }) {
                      </TouchableHighlight>
                      
                      <TouchableHighlight style={styles.btnEntrarModal2} onPress={() => setCadEnd(false)}>
-                      <Text style={styles.textoEntrar}>Cancelar</Text>
+                      <Text style={styles.textoEntrar2}>Cancelar</Text>
                      </TouchableHighlight>
                      <Text></Text>
                   </View>
@@ -845,6 +853,12 @@ var styles = StyleSheet.create({
     fontWeight:'normal',
   },
 
+  textDescUtilizado: {
+    fontSize: 13,
+    fontWeight:'normal',
+    color:'red'
+  },
+
   textPadrao: {
     fontSize: 14,
     fontWeight:'normal',
@@ -894,28 +908,32 @@ var styles = StyleSheet.create({
 
   btnEntrarModal:{
     width: screenWidth * 0.8,
-    borderWidth:1,
     backgroundColor:'#471a88',
-    borderColor:'#fff',
     padding:6,
     marginTop: 10,
-    borderRadius:6,
+    borderRadius:20,
     marginBottom: 5
   },
 
   btnEntrarModal2:{
     width: screenWidth * 0.8,
     borderWidth:1,
-    backgroundColor:'#794F9B',
-    borderColor:'#fff',
+    backgroundColor:'#fff',
+    borderColor:'#a1a1a1',
     padding:6,
     marginTop: 2,
-    borderRadius:6,
+    borderRadius:20,
     marginBottom: 5
   },
 
   textoEntrar:{
     color:'#fff',
+    textAlign:'center',
+    fontSize:16,
+  },
+
+  textoEntrar2:{
+    color:'#484848',
     textAlign:'center',
     fontSize:16,
   },
@@ -992,7 +1010,7 @@ var styles = StyleSheet.create({
   },
 
   labelLogin:{
-    color:'#471a88',
+    color:'#484848',
     marginTop:screenHeight*0.005,
   },
 
@@ -1024,12 +1042,13 @@ var styles = StyleSheet.create({
 
   inputLoginModal:{
     width:screenWidth * 0.8,
-    borderColor: '#471a88', 
+    paddingBottom:5,
+    paddingTop: 5,
+    borderColor: '#a1a1a1', 
+    backgroundColor:'#fff',
     borderWidth: 1,
     borderRadius:5,
-    paddingLeft:3,
-    paddingBottom:5,
-    paddingTop: 5
+    paddingLeft:3
   },
 
   buttonContainer: {
