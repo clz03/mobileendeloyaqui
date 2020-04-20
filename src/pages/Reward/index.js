@@ -143,7 +143,9 @@ export default function Reward({navigation}) {
             onEndReached={() => loadPage()}
             onEndReachedThreshold={0.1}
             onRefresh={refreshList}
-            ListEmptyComponent={<Text style={styles.tabTitle}>Em breve novos cupons disponíveis.</Text>}
+            ListEmptyComponent={loading == false &&
+                                <Text style={styles.tabTitle}>Em breve novos cupons disponíveis.</Text>
+                               }
             refreshing={refreshing}
             ListHeaderComponent={
               loading ? (

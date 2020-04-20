@@ -32,7 +32,9 @@ export default function Sacola({ navigation }) {
   const [numero, setNumero] = useState('');  
   const [bairro, setBairro] = useState('');  
   const [complemento, setComplemento] = useState('');  
-  const [cep, setCep] = useState('');  
+  const [cep, setCep] = useState('');
+  const [entrega, setEntrega] = useState('');
+  const [retira, setRetira] = useState('');
 
   const [apelidoNovo, setApelidoNovo] = useState('');  
   const [ruaNovo, setRuaNovo] = useState('');  
@@ -43,7 +45,7 @@ export default function Sacola({ navigation }) {
 
   const [itens, setItens] = useState([]);  
   const [loading, setLoading] = useState(false);
-  const [tipoEntrega, setTipoEntrega] = useState("E");
+  const [tipoEntrega, setTipoEntrega] = useState('');
   const [valortotal, setValortotal] = useState(0);
   const [valortaxaE, setValortaxaE] = useState(0);
   const [valorGrandTotal, setValorGrandTotal] = useState(0);
@@ -65,6 +67,10 @@ export default function Sacola({ navigation }) {
     const data = await response.json();
     setEstab(data);
     setNomeestab(data[0].nome);
+    setEntrega(data[0].entrega);
+    setRetira(data[0].retira);
+    if(data[0].retira == true) setTipoEntrega('R')
+    if(data[0].entrega == true) setTipoEntrega('E')
   };
 
 
@@ -208,9 +214,6 @@ export default function Sacola({ navigation }) {
     }
   };
 
-
-
-
   async function CarregaItensPedido(){
     var itensPed = [];
     var nome;
@@ -301,18 +304,6 @@ export default function Sacola({ navigation }) {
     if(cError) return;
     setLoading(true);
 
-    const arrlog ={
-      apelidoNovo,
-      ruaNovo,
-      numeroNovo,
-      bairroNovo,
-      cepNovo,
-      complemento:complementoNovo,
-      idusuario:iduser
-    };
-
-    console.log(arrlog);
-
     const apireturn = await fetch(
        'https://backendeloyaqui.herokuapp.com/enderecos', {
         method: 'POST',
@@ -372,13 +363,14 @@ export default function Sacola({ navigation }) {
     setLoading(true);
     loadEstab();
     loadEndereco(0);
-    setTimeout(() => {CarregaItensPedido();}, 2000);
+    setTimeout(() => {CarregaItensPedido();}, 1000);
   }, []);
 
 
 
   useEffect(() => {
-    CarregaItensPedido();
+    setTimeout(() => {CarregaItensPedido();}, 3000);
+    //CarregaItensPedido();
   }, [tipoEntrega]);
 
   
@@ -393,6 +385,8 @@ export default function Sacola({ navigation }) {
           <Text style={styles.textDestaques}>{nomeestab}</Text>
           <Text style={styles.textDestaques}>Entrega ou Retirada</Text>
           
+          {entrega == true && 
+
           <View style={styles.buttonContainer}>
             <View style={styles.containerColumn}>
               <Text style={styles.textDesc}>Entrega</Text>
@@ -406,7 +400,9 @@ export default function Sacola({ navigation }) {
               { tipoEntrega === "E" && (<View style={styles.checkedCircle} />) }
             </TouchableOpacity>
           </View>
+          }
 
+          {retira == true && 
           <View style={styles.buttonContainer}>
             <View style={styles.containerColumn}>
               <Text style={styles.textDesc}>Retirada</Text>
@@ -420,6 +416,7 @@ export default function Sacola({ navigation }) {
               { tipoEntrega === "R" && (<View style={styles.checkedCircle} />) }
             </TouchableOpacity>
           </View>
+          }
 
         </View>
 

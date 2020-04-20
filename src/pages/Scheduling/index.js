@@ -4,9 +4,11 @@ import {
   Text, 
   StyleSheet, 
   TouchableHighlight, 
+  TouchableOpacity,
   Image, 
   Dimensions, 
   FlatList, 
+  TextInput,
   ActivityIndicator, 
   Platform } from 'react-native';
 
@@ -25,7 +27,7 @@ export function isAndroid() {
   );
 }
 
-export default function Search({ navigation }) {
+export default function Scheduling({ navigation }) {
  
   const cat_id = navigation.getParam('cat_id');
   const busca = navigation.getParam('busca');
@@ -41,7 +43,7 @@ export default function Search({ navigation }) {
     
     if(totalCount && pageNumber > totalCount) return;
 
-    const query = (busca == undefined ? 'https://backendeloyaqui.herokuapp.com/estabelecimentos/categoria/' + cat_id + `?page=${pageNumber}` : 'https://backendeloyaqui.herokuapp.com/estabelecimentos/busca/' + busca + `?page=${pageNumber}`);
+    const query = 'https://backendeloyaqui.herokuapp.com/estabelecimentos/com/agendamento/habilitado' + `?page=${pageNumber}`;
     const response = await fetch(
       query
     );
@@ -70,6 +72,22 @@ export default function Search({ navigation }) {
   return (
 
     <View style={styles.container}>
+
+      <View style={styles.containerGeral}>
+        <TextInput 
+          style={ styles.inputLogin } 
+          autoCapitalize='none' 
+          autoCorrect={false} 
+          maxLength={40}
+          placeholder="Filtrar / Buscar"
+        />
+
+        <TouchableOpacity style={styles.labelLogin}>
+          <Text>Buscar</Text>
+        </TouchableOpacity>
+
+      </View>
+
       <FlatList
         data={estab}
         keyExtractor={estab => String(estab._id)}
@@ -85,7 +103,7 @@ export default function Search({ navigation }) {
           )
         }
         renderItem={({ item }) => (
-          <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('Detail', { idestab: item._id }) }}>
+          <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('Detail', { idestab: item._id, schedule:true }) }}>
             <View style={styles.ItemImg}> 
             
               <View style={styles.containerGeral}>
@@ -94,18 +112,8 @@ export default function Search({ navigation }) {
                 </View>
                 <View style={styles.txtContainer}>
 
-                    {item.delivery &&
-                      <View style={styles.containerBadge}>
-                        <View style={styles.viewBadge}>
-                          <Text numberOfLines={1} style={styles.textTitle}>{item.nome}</Text>
-                        </View>
-                        <View style={styles.viewBadge2}>
-                          <Text numberOfLines={1} style={styles.textDescBadge}>Cardápio Aqui</Text>
-                        </View>
-                      </View>
-                    }
-
-                    {item.agendamento &&
+                   
+                    
                       <View style={styles.containerBadge}>
                         <View style={styles.viewBadge}>
                           <Text numberOfLines={1} style={styles.textTitle}>{item.nome}</Text>
@@ -114,11 +122,9 @@ export default function Search({ navigation }) {
                           <Text numberOfLines={1} style={styles.textDescBadge}>Agenda Online</Text>
                         </View>
                       </View>
-                    }
+                    
 
-                    {!item.delivery && !item.agendamento &&
-                        <Text numberOfLines={1} style={styles.textTitle}>{item.nome}</Text>
-                    }
+                    
 
                   <Text numberOfLines={1} style={styles.textDesc}>{item.tipo} / {item.subtipo}</Text>
                   <Text numberOfLines={1} style={styles.textDesc}>{item.rua}, {item.numero}</Text>
@@ -132,15 +138,6 @@ export default function Search({ navigation }) {
     </View>
   );
 }
-
-Search.navigationOptions = ({ navigation }) => {
-  return {
-    headerTitle: () => (
-      <Text style={styles.txtPedido}>{navigation.getParam('categoria')}</Text>
-    ),
-  }
-}
-
 
 var styles = StyleSheet.create({
   
@@ -171,7 +168,6 @@ var styles = StyleSheet.create({
     marginLeft:screenWidth*0.025,
     marginRight:screenWidth*0.025,
   },
-  
 
   direita:{
     flexDirection: 'row',
@@ -209,6 +205,28 @@ var styles = StyleSheet.create({
   textDesc: {
     fontSize: 12,
     paddingTop:5
+  },
+
+  labelLogin:{
+    width:screenWidth * 0.20,
+    color:'#484848',
+    marginTop:screenHeight*0.005,
+    alignItems:'center',
+    textAlign:'center',
+    alignSelf:'center'
+  },
+
+  inputLogin:{
+    width:screenWidth * 0.75,
+    height: screenHeight*0.06,
+    marginLeft: screenWidth * 0.025,
+    marginTop:screenHeight*0.005,
+    marginBottom:screenHeight*0.005,
+    borderColor: '#d3d3d3', 
+    backgroundColor:'#fff',
+    borderWidth: 1,
+    borderRadius:5,
+    paddingLeft:3
   },
 
   textDescAberto: {

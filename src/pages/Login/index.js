@@ -100,7 +100,7 @@ export default function Login({ navigation }) {
 
 }
 
-  //CheckRedirect();
+  CheckRedirect();
 
   return (
     

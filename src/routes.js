@@ -14,6 +14,7 @@ import News from './pages/News';
 import NewsDetail from './pages/NewsDetail';
 import Search from './pages/Search'; 
 import Detail from './pages/Detail';
+import Scheduling from './pages/Scheduling'; 
 // import TelUteis from './pages/TelUteis';
 import Delivery from './pages/Delivery';
 import Pedido from './pages/Delivery/pedido';
@@ -50,14 +51,36 @@ const PagesNavigator = createStackNavigator({
   initialRouteName:'Home'
 });
 
+const SchedulingNavigator = createStackNavigator({
+  Scheduling:{
+    screen: Scheduling,
+    navigationOptions: {
+      headerStyle: {backgroundColor:'#471a88'},
+      title:'Agende aqui',
+      headerTitleStyle: {color:'#fff'},
+      headerTintColor: '#fff'
+    },
+  },
+  Detail:{
+    screen: Detail,
+    navigationOptions: {
+      header: null,
+    },
+  },
+},{
+  initialRouteName:'Scheduling'
+});
+
 const DeliveryNavigator = createStackNavigator({
   Delivery:{
     screen: Delivery,
     navigationOptions: {
       headerStyle: {backgroundColor:'#471a88'},
-      headerTitle:'Delivery',
+      headerTitle:'Pedidos Online',
       headerTitleStyle: {color:'#fff'},
-      headerTintColor: '#fff'
+      headerTintColor: '#fff',
+      headerBackTitle: ' ',
+      headerBackTitleVisible: false
     },
   },
   Pedido:{
@@ -66,7 +89,9 @@ const DeliveryNavigator = createStackNavigator({
       headerStyle: {backgroundColor:'#471a88'},
       //headerTitle:'Cardápio Online - Pedido',
       headerTitleStyle: {color:'#fff'},
-      headerTintColor: '#fff'
+      headerTintColor: '#fff',
+      headerBackTitle: ' ',
+      headerBackTitleVisible: false
     },
   },
   itemPedido:{
@@ -75,7 +100,9 @@ const DeliveryNavigator = createStackNavigator({
       headerStyle: {backgroundColor:'#471a88'},
       //headerTitle:'Item Pedido',
       headerTitleStyle: {color:'#fff'},
-      headerTintColor: '#fff'
+      headerTintColor: '#fff',
+      headerBackTitle: ' ',
+      headerBackTitleVisible: false
     },
   },
   Sacola:{
@@ -84,7 +111,9 @@ const DeliveryNavigator = createStackNavigator({
       headerStyle: {backgroundColor:'#471a88'},
       //headerTitle:'Sacola Pedido',
       headerTitleStyle: {color:'#fff'},
-      headerTintColor: '#fff'
+      headerTintColor: '#fff',
+      headerBackTitle: ' ',
+      headerBackTitleVisible: false
     },
   },
   // Status:{
@@ -104,7 +133,9 @@ const DeliveryNavigator = createStackNavigator({
       headerTitle:'Meus Pedidos',
       headerTitleStyle: {color:'#fff'},
       headerTintColor: '#fff',
-      gesturesEnabled: false
+      gesturesEnabled: false,
+      headerBackTitle: ' ',
+      headerBackTitleVisible: false
     },
   },
   MeuPedidoDet:{
@@ -114,6 +145,8 @@ const DeliveryNavigator = createStackNavigator({
       headerTitle:'Meu Pedido',
       headerTitleStyle: {color:'#fff'},
       headerTintColor: '#fff',
+      headerBackTitle: ' ',
+      headerBackTitleVisible: false
     },
   },
 },{
@@ -211,12 +244,21 @@ const Routes = createAppContainer(
             },
           },
         },
-        Delivery:{
-          screen: DeliveryNavigator,
+        // Delivery:{
+        //   screen: DeliveryNavigator,
+        //   navigationOptions: {
+        //     title: 'Delivery',
+        //     tabBarIcon: ({ focused, tintColor }) => {
+        //       return <Icon name='motorcycle' size={24} color={tintColor} />;
+        //     },
+        //   },
+        // },
+        Scheduling:{
+          screen: SchedulingNavigator,
           navigationOptions: {
-            title: 'Delivery',
+            title: 'Agendar',
             tabBarIcon: ({ focused, tintColor }) => {
-              return <Icon name='motorcycle' size={24} color={tintColor} />;
+              return <Icon name='date-range' size={24} color={tintColor} />;
             },
           },
         },

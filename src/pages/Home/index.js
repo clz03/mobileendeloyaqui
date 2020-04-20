@@ -150,7 +150,7 @@ var styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    backgroundColor:'#d3d3d3'
+    backgroundColor:'#e5e5e5'
   },
 
   logo: {

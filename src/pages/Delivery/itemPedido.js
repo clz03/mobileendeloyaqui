@@ -62,7 +62,7 @@ export default function ItemPedido({ navigation }) {
         'Login',
         'Para realizar pedidos online é preciso fazer login',
         [
-          {text: 'OK'},
+          {text: 'Voltar'},
           {text: 'Ir para Login', onPress: () => navigation.navigate('Login')}
         ]
       );
@@ -171,6 +171,7 @@ async function CheckPedido(){
             {/* <Text style={styles.textDestaques}>{cardapio.categoria}</Text> */}
 
             <View style={styles.ItemImg2}>
+            <Text style={styles.textItem}>{cardapio.categoria}</Text>
               <Text style={styles.textItem}>{cardapio.item}</Text>
               <Text style={styles.textItemDesc}>{cardapio.descr}</Text>
               <Text style={styles.textItemValor}>R${cardapio.valor}</Text> 

@@ -77,6 +77,7 @@ export default function AccountLogged({ navigation }) {
   
     // Get the token that identifies this device
     let token = await Notifications.getExpoPushTokenAsync();
+    console.log(token);
   
     // POST the token to your backend server from where you can retrieve it to send push notifications.
     return fetch('https://backendeloyaqui.herokuapp.com/usuarios/' + iduser , {
@@ -92,11 +93,15 @@ export default function AccountLogged({ navigation }) {
   }
 
   async function handleLogout(){
-    await AsyncStorage.removeItem('eloyuseremail');
-    await AsyncStorage.removeItem('eloyusernome');
-    await AsyncStorage.removeItem('eloyuserid');
+    //await AsyncStorage.removeItem('eloyuseremail');
+    //await AsyncStorage.removeItem('eloyusernome');
+    //await AsyncStorage.removeItem('eloyuserestab');
+    //await AsyncStorage.removeItem('eloyuserid');
+    await AsyncStorage.clear();
     navigation.navigate('Login');
+
   }
+
 
   async function getStorageValue() {
     setNome(await AsyncStorage.getItem('eloyusernome'));
@@ -324,7 +329,7 @@ export default function AccountLogged({ navigation }) {
 }
 
   useEffect(() => {
-    setLoading(true);
+    //setLoading(true);
     getStorageValue();
     loadEventos();
     loadCupons();

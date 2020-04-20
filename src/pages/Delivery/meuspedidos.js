@@ -13,6 +13,8 @@ import {
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
+//import { connect, disconnect, subscribeToStatusPed } from '../../services/socket';
+
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
 
@@ -48,6 +50,10 @@ export default function MeusPedidos({ navigation }) {
 
   async function loadPage(pageNumber = page, shouldRefresh = false) {
 
+    if(loading) return;
+
+    setLoading(true);
+    
     const iduser = await AsyncStorage.getItem('eloyuserid');
     if(iduser === null){
       setLoading(false);
@@ -67,9 +73,16 @@ export default function MeusPedidos({ navigation }) {
     setLoading(false);
   };
 
+  // async function setupWebsocket() {
+  //   disconnect();
+  //   const idusuario = await AsyncStorage.getItem('eloyuserid');
+  //   connect(0, idusuario);
+  // }
+
   useEffect(() => {
-    setLoading(true);
     loadPage();
+    //setupWebsocket();
+    //subscribeToStatusPed(status => loadPage());
   }, []);
 
   async function refreshList() {
@@ -89,7 +102,13 @@ export default function MeusPedidos({ navigation }) {
         onEndReachedThreshold={0.1}
         onRefresh={refreshList}
         refreshing={refreshing}
-        ListEmptyComponent={<><Text style={styles.textEmpty}>Estamos anciosos pelo seu primeiro pedido conosco !</Text><Icon style={styles.iconCenter} name='mood' size={48} color='#484848' /></>}
+        ListEmptyComponent={loading == false &&
+                            <>
+                              <Text style={styles.textEmpty}>Estamos anciosos pelo seu primeiro pedido conosco !</Text>
+                              <Icon style={styles.iconCenter} name='mood' size={48} color='#484848' />
+                            </>
+
+                            }
         ListHeaderComponent={
           loading ? (
             <ActivityIndicator size="large" style={styles.LoadingIndicator} />
@@ -139,10 +158,10 @@ MeusPedidos.navigationOptions = ({ navigation }) => {
     headerLeft: () => (
       <TouchableOpacity onPress={() => navigation.navigate("Delivery")} style={styles.buttonBack}>
         { /* variar android aqui */ }
-        <Icon name='chevron-left' size={24} color='#fff' />
-        {Platform.OS === 'ios' &&
+        <Icon name='chevron-left' size={42} color='#fff' />
+        {/* {Platform.OS === 'ios' &&
           <Text style={styles.textbuttonBack}>Voltar</Text>
-        }
+        } */}
       </TouchableOpacity>
     ),
   }

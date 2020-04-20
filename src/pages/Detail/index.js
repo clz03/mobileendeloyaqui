@@ -19,7 +19,7 @@ import {
 from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {Container, Tab, Tabs, TabHeading } from 'native-base';
+import {Container, Tab, Tabs, Content } from 'native-base';
 import CalendarStrip from 'react-native-calendar-strip';
 import moment from 'moment';
 import 'moment/locale/pt-br';
@@ -46,6 +46,7 @@ export default function Detail({ navigation }) {
   const [agendaonline, setAgendaonline] = useState([]);
   const [cardapio, setCardapio] = useState("");
   const [cardapioonline, setCardapioonline] = useState(false);
+  const [delivery, setDelivery] = useState(false);
   const [categorias, setCategorias] = useState([]);  
   const [prod, setProd] = useState([]);
   const [servico, setServico] = useState([]);
@@ -59,8 +60,10 @@ export default function Detail({ navigation }) {
   const [evento, setEvento] = useState([]);
   const [loading, setLoading] = useState(false);
   const [pagina, setPagina] = useState(1);
+  const [initPage, setInitPage] = useState(0);
   
   const idestab = navigation.getParam('idestab');
+  const schedule = navigation.getParam('schedule');
 
   let datesWhitelist = [{
     start: moment(),
@@ -132,10 +135,13 @@ export default function Detail({ navigation }) {
       const plano = data[0].plano;
       const agendaonline = data[0].agendamento;
       const cardapionline = data[0].cardapio;
+      const deliveryonline = data[0].delivery
       setEstab(data);
       setPlano(plano);
       setAgendaonline(agendaonline);
       setCardapioonline(cardapionline);
+      setDelivery(deliveryonline);
+
       if (plano > 0) {
         loadProd();
         loadServico();
@@ -188,6 +194,12 @@ export default function Detail({ navigation }) {
 
   useEffect(() => {
     loadEstab();
+
+    if(schedule){
+      setTimeout(() => {
+        setInitPage(2);
+      }, 1500);
+    }
   }, []);
 
   async function handleAgendamento(data, hora, status) {
@@ -287,333 +299,327 @@ export default function Detail({ navigation }) {
               )}
 
               <Container>
-                <Tabs initialPage={0} locked={true}>
-                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Sobre</Text></TabHeading>}>
-
-                    {estab.map(estab => 
-                      <ScrollView key={estab._id} style={[ styles.container2 ]}>
-                        <Text style={styles.tabTitle}>Endereço</Text>
-                        <Text style={styles.tabSub}>{estab.rua}, {estab.numero}</Text>
-                        <Text style={styles.tabSub}>{estab.bairro}</Text>
-                        <Text style={styles.tabSub}>{estab.cep}</Text>
-
-                        <Text style={styles.tabTitle}>Telefone</Text>
-                        <Text style={styles.tabSub}>{estab.fone1}</Text>
-                        
-                        {plano > 0 && 
-                          <>
-                            <Text style={styles.tabSub}>{estab.fone2}</Text>
-                            <Text style={styles.tabTitle}></Text>
-                            <Text style={styles.tabSub}>"{estab.descr}"</Text>
-                            <Text style={styles.tabTitle}></Text>
-                            
-                            <View style={[ styles.container ]}>
-                            
-                            {estab.whatsapp.length > 0 &&
-
-                              <TouchableOpacity onPress={() => Linking.openURL(`whatsapp://send?phone=+55${estab.whatsapp}`)}>
-                                <View style={styles.menuItem}>
-                                  <Image style={styles.imgwhats} source={require('./assets/whatsapp-logo.png')} />
-                                  <Text style={styles.tabSubRS}>Enviar Whatsapp</Text>
-                                  <Text style={styles.tabSubRS}>{estab.whatsapp}</Text>
-                                </View>
-                              </TouchableOpacity>
-
-                            }
-                            {estab.instagram.length > 0 &&
-                             
-                             <TouchableOpacity onPress={() => Linking.openURL(`instagram://user?username=${estab.instagram}`)}>
-                                <View style={styles.menuItem}>
-                                  <Image style={styles.imginstagram} source={require('./assets/instagram-logo.png')} />
-                                  <Text style={styles.tabSubRS}>Acompanhar</Text>
-                                  <Text style={styles.tabSubRS}>{estab.instagram}</Text>
-                                </View>
-                              </TouchableOpacity>
-
-                            }
-                            {cardapioonline &&
-                             
-                             <TouchableOpacity onPress={() => { navigation.navigate('Pedido', { idestab: idestab, nomeestab: estab.nome }) }}>
-                                <View style={styles.menuItem}>
-                                  <Icon name='restaurant' size={24} color='#794F9B' />
-                                  <Text style={styles.tabSubRS}>Fazer pedido</Text>
-                                  <Text style={styles.tabSubRS}>Online</Text>
-                                </View>
-                              </TouchableOpacity>
-
-                            }
-                             {agendaonline &&
-                             
-                             <TouchableOpacity onPress={() => { go }}>
-                                <View style={styles.menuItem}>
-                                  <Icon name='event' size={24} color='#794F9B' />
-                                  <Text style={styles.tabSubRS}>Agendamento</Text>
-                                  <Text style={styles.tabSubRS}>Online</Text>
-                                </View>
-                              </TouchableOpacity>
-
-                            }
-                            </View>
-                          </>
-                        }
-
-                      </ScrollView>
-                    )}
-                </Tab>
-      
-                {plano > 0 &&
-                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Destaques</Text></TabHeading>}>
-                                       
-                    <ScrollView>
-
-                      {prod.length > 0 ? prod.map(prod => 
-                          <View key={prod._id} style={styles.container2}>
-                            <ImageBackground source={{uri: prod.imagem }} style={styles.backImageDestaq}>
-                              <Text style={styles.textDestaq}>{prod.nome}</Text>
-                              <Text style={styles.textDesc}>{prod.descr}</Text>
-                              <Text style={styles.textDesc}>{prod.preco}</Text>
-                            </ImageBackground>
-                          </View>
-                        ) : <Text style={styles.txtNoData}>Em breve novos Destaques. Fique de olho !</Text>
-                      }
-
-                      {/* {cupom.length > 0 ? cupom.map(cupom => 
-                          <View style={styles.cupomItem} key={cupom._id}>
-                            <View style={styles.barraLateralVerde}></View>
-                            <View style={styles.ticket}>
-                              <Text style={styles.ticketText}>{cupom.premio}</Text>
-                              <Text style={styles.dadosTextRegras}>*Obtenha esse cupom no menu Cupons.</Text>
-                              <Text style={styles.dadosTextRegras}>*Válido até {cupom.validade.substring(8,10) + "/" + cupom.validade.substring(5,7) + "/" + cupom.validade.substring(0,4)}*</Text>
-                            </View>
-                          </View>
-                        ) : <Text style={styles.txtNoData}>Em breve novos Cupons. Fique de olho !</Text>
-                      } */}
-
-                    </ScrollView>
-                    
-                  </Tab>
-                }
-             
-               {/* {plano > 0 && pedonline ==  0 &&
-                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Destaques</Text></TabHeading>}>
-                                       
-                    <ScrollView>
-
-                      {prod.length > 0 ? prod.map(prod => 
-                          <View key={prod._id} style={styles.container2}>
-                            <ImageBackground source={{uri: prod.imagem }} style={styles.backImageDestaq}>
-                              <Text style={styles.textDestaq}>{prod.nome}</Text>
-                              <Text style={styles.textDesc}>{prod.descr}</Text>
-                              <Text style={styles.textDesc}>{prod.preco}</Text>
-                            </ImageBackground>
-                          </View>
-                        ) : <Text style={styles.txtNoData}>Em breve novos Destaques. Fique de olho !</Text>
-                      }
-
-                    </ScrollView>
-                    
-                  </Tab>
-                } */}
-
-                {plano > 0 && cardapioonline == 1 &&
-                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Cardápio</Text></TabHeading>}>
-                    <ScrollView style={styles.container}>
-                      
-                      {/* {catcardapio.length > 0 && catcardapio.map(catcardapio => 
-                        <Text style={styles.textDestaques} key={catcardapio}>{catcardapio}</Text>
-                       
-                       
-       
-                      )} */}
-
-                      
-                        <TouchableHighlight style={styles.pedidoOnline} onPress={() => { navigation.navigate('Pedido', { idestab: idestab, nomeestab: estab.nome, pagina:'detail' }) }}>
-                          <Text style={styles.textoEntrar}>Peça Online Aqui</Text>
-                        </TouchableHighlight>
-                   
-
-                      {/* {cardapio.length > 0 && cardapio.map(cardapio => 
-                        <View style={styles.ItemImg} key={cardapio._id}>
-                          <View style={styles.containerGeral}>
-                            <View style={styles.txtContainer}>
-                            <Text style={styles.textDestaques}>{cardapio.categoria}</Text>
-                              <Text style={styles.textCardapio}>{cardapio.item} - R${cardapio.valor}</Text>
-                            </View>
-                          </View>
-                        </View>
-                      )} */}
-
-                      <FlatList
-                        data={categorias}
-                        keyExtractor={categorias => categorias}
-                        ListHeaderComponent={
-                          loading ? (
-                            <ActivityIndicator size="large" style={styles.LoadingIndicator} />
-                          ) : (
-                            ""
-                          )
-                        }
-                        renderItem={({ item }) => (
-
-                          <View style={styles.viewCardapio}>
-                            <Text style={styles.textDestaques}>{item}</Text>
-
-                            {cardapio.map(cardapio => 
-                              <View key={cardapio._id}>
-
-                              {item === cardapio.categoria &&
-                                  <View style={styles.ItemImg2}>
-                                      <Text style={styles.textItem}>{cardapio.item}</Text>
-                                      <Text style={styles.textItemDesc}>Arroz, Feijão, Farofa, Batata</Text>
-                                      <Text style={styles.textItemValor}>R${cardapio.valor}</Text> 
-                                  </View>
-                              }
-
-                              </View>
-                            )}
-                              
-                          </View>
-                        )}            
-                      />
-
-                    </ScrollView>
-                  </Tab>
-                }
-
-                {plano > 0 && agendaonline == 1 && 
-
-                  <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Agendar</Text></TabHeading>}>
-
-                    
-                  {pagina === 1 &&
-                      <ScrollView style={styles.container} visible='false'>
-                        <Text style={styles.tabTitle}>Selecione o serviço a ser agendado:</Text>
-                    
-                    {/* // 0 DOMINGO
-                        // 1 SEGUNDA
-                        // 2 TERCA
-                        // 3 QUARTA
-                        // 4 QUINTA
-                        // 5 SEXTA
-                        // 6 SABADO */}
-
-                          <FlatList
-                            data={servico}
-                            keyExtractor={servico => servico._id}
-                            ListHeaderComponent={
-                              loading ? (
-                                <ActivityIndicator size="large" style={styles.LoadingIndicator} />
-                              ) : (
-                                ""
-                              )
-                            }
-                            renderItem={({ item }) => (
-
-                              <View style={styles.viewCardapio}>
-
-                                  <TouchableHighlight style={styles.ItemImg2} onPress={() => { gotoCalendar(item.nome, item.diasemana, item._id) }}>
-                                    <View>
-                                      <Text style={styles.textItem}>{item.nome}</Text>
-                                      <Text style={styles.textItemDesc}>{item.descr}</Text>
-                                      <View style={styles.containersemana}>
-                                        {item.diasemana.map(diasemana => 
-                                          <Text style={styles.textItemDesc} key={diasemana}>{weekday[parseInt(diasemana)]}</Text>
-                                        )}
-                                      </View>
-                                      <Text style={styles.textItemValor}>R${item.preco}</Text> 
-                                      </View>
-                                  </TouchableHighlight>
-                                
-                              </View>
-                              
-                                
-                            )}                      
-                          />
-                      </ScrollView>
-
-                    
-                }                         
-                        
-                      {pagina === 2 &&
-                     
-
-
-                    <View style={styles.backContainer}>        
-                      <TouchableOpacity style={styles.buttonBack2} onPress={() => {setPagina(1); setEvento('')}}>
-                        <Icon name='chevron-left' size={24} color='#484848' />
-                        <Text style={styles.textback}>Voltar</Text>
-                      </TouchableOpacity>
-                      <Text style={styles.tabTitle}>Agendar: {nomeagenda}</Text>
-                      <Text></Text>
-
-                    
+                <Content>
             
-                    <CalendarStrip
-                      calendarAnimation={{type: 'sequence', duration: 30}}
-                      daySelectionAnimation={{type: 'border', duration: 200, borderWidth: 1, borderHighlightColor: 'white'}}
-                      style={{height: 90, paddingTop: 8, paddingBottom: 10}}
-                      calendarHeaderStyle={{color: 'black'}}
-                      calendarColor={'#eaeaea'}
-                      dateNumberStyle={{color: 'black'}}
-                      dateNameStyle={{color: 'black'}}
-                      highlightDateNumberStyle={{color: 'purple'}}
-                      highlightDateNameStyle={{color: 'purple'}}
-                      disabledDateNameStyle={{color: 'grey'}}
-                      disabledDateNumberStyle={{color: 'grey'}}
-                      startingDate={startdate}
-                      selectedDate={seldate}
-                      maxDate={moment().add(30, 'days') }
-                      minDate={moment()}
-                      updateWeek={false}
-                      datesWhitelist={datesWhitelist}
-                      datesBlacklist={blackdates}
-                      iconContainer={{flex: 0.1}}
-                      onDateSelected={date => loadEvento(moment(date).format("YYYY-MM-DD"), servicoid)}
-                    />
-                   
-                   <FlatList
-                    scrollEnabled={true}
-                    data={evento}
-                    keyExtractor={evento => String(evento.id)}
-                    ListHeaderComponent={
-                      loading ? ( 
-                        <Modal
-                          transparent={true}
-                          animationType={'none'}
-                          visible={loading}>
-                          <View style={styles.modalBackground}>
-                            <View style={styles.activityIndicatorWrapper}>
-                              <ActivityIndicator
-                                animating={loading} />
-                                <Text style={styles.textMenuSmall}>processando</Text>
+                    <Tabs initialPage={0} page={initPage} onChangeTab={({ i }) => setInitPage(i)}>
+                  <Tab heading="Sobre">
+                    {estab.map(estab => 
+                        <ScrollView key={estab._id} style={[ styles.container2 ]}>
+                          <Text style={styles.tabTitle}>Endereço</Text>
+                          <Text style={styles.tabSub}>{estab.rua}, {estab.numero}</Text>
+                          <Text style={styles.tabSub}>{estab.bairro}</Text>
+                          <Text style={styles.tabSub}>{estab.cep}</Text>
+
+                          <Text style={styles.tabTitle}>Telefone</Text>
+                          <Text style={styles.tabSub}>{estab.fone1}</Text>
+                          
+                          {plano > 0 && 
+                            <>
+                              <Text style={styles.tabSub}>{estab.fone2}</Text>
+                              <Text style={styles.tabTitle}></Text>
+                              <Text style={styles.tabSub}>"{estab.descr}"</Text>
+                              
+                              <View style={[ styles.container ]}>
+                              
+                              {estab.whatsapp.length > 0 &&
+
+                                <TouchableOpacity onPress={() => Linking.openURL(`whatsapp://send?phone=+55${estab.whatsapp}`)}>
+                                  <View style={styles.menuItem}>
+                                    <Image style={styles.imgwhats} source={require('./assets/whatsapp-logo.png')} />
+                                    <Text style={styles.tabSubRS}>Enviar Whatsapp</Text>
+                                    <Text style={styles.tabSubRS}>{estab.whatsapp}</Text>
+                                  </View>
+                                </TouchableOpacity>
+
+                              }
+                              {estab.instagram.length > 0 &&
+                              
+                              <TouchableOpacity onPress={() => Linking.openURL(`instagram://user?username=${estab.instagram}`)}>
+                                  <View style={styles.menuItem}>
+                                    <Image style={styles.imginstagram} source={require('./assets/instagram-logo.png')} />
+                                    <Text style={styles.tabSubRS}>Acompanhar</Text>
+                                    <Text style={styles.tabSubRS}>{estab.instagram}</Text>
+                                  </View>
+                                </TouchableOpacity>
+
+                              }
+                            
+                              <TouchableOpacity onPress={() => Linking.openURL(`tel:${estab.fone1}`)}>
+                                  <View style={styles.menuItem}>
+                                    <Icon name='phone' size={24} color='#794F9B' />
+                                    <Text style={styles.tabSubRS}>Ligar</Text>
+                                    <Text style={styles.tabSubRS}>{estab.fone1}</Text>
+                                  </View>
+                                </TouchableOpacity>
+
+                            
+                              {/* {delivery &&
+                              
+                              <TouchableOpacity onPress={() => { setInitPage(3) }}>
+                                  <View style={styles.menuItem}>
+                                    <Icon name='restaurant' size={24} color='#794F9B' />
+                                    <Text style={styles.tabSubRS}>Fazer pedido</Text>
+                                    <Text style={styles.tabSubRS}>Online</Text>
+                                  </View>
+                                </TouchableOpacity>
+
+                              } */}
+                              {agendaonline &&
+                              
+                              <TouchableOpacity onPress={() => { setInitPage(3) }}>
+                                  <View style={styles.menuItem}>
+                                    <Icon name='event' size={24} color='#794F9B' />
+                                    <Text style={styles.tabSubRS}>Agendamento</Text>
+                                    <Text style={styles.tabSubRS}>Online</Text>
+                                  </View>
+                                </TouchableOpacity>
+
+                              }
+                              </View>
+                            </>
+                          }
+
+                        </ScrollView>
+                      )}
+                  </Tab>
+        
+                  {plano > 0 &&
+                    // <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Destaques</Text></TabHeading>}>
+                      <Tab heading="Destaques">
+                                        
+                      <ScrollView>
+
+                        {prod.length > 0 ? prod.map(prod => 
+                            <View key={prod._id} style={styles.container2}>
+                              <ImageBackground source={{uri: prod.imagem }} style={styles.backImageDestaq}>
+                                <Text style={styles.textDestaq}>{prod.nome}</Text>
+                                <Text style={styles.textDesc}>{prod.descr}</Text>
+                                <Text style={styles.textDesc}>{prod.preco}</Text>
+                              </ImageBackground>
+                            </View>
+                          ) : <Text style={styles.txtNoData}>Em breve novos Destaques. Fique de olho !</Text>
+                        }
+
+                        {/* {cupom.length > 0 ? cupom.map(cupom => 
+                            <View style={styles.cupomItem} key={cupom._id}>
+                              <View style={styles.barraLateralVerde}></View>
+                              <View style={styles.ticket}>
+                                <Text style={styles.ticketText}>{cupom.premio}</Text>
+                                <Text style={styles.dadosTextRegras}>*Obtenha esse cupom no menu Cupons.</Text>
+                                <Text style={styles.dadosTextRegras}>*Válido até {cupom.validade.substring(8,10) + "/" + cupom.validade.substring(5,7) + "/" + cupom.validade.substring(0,4)}*</Text>
+                              </View>
+                            </View>
+                          ) : <Text style={styles.txtNoData}>Em breve novos Cupons. Fique de olho !</Text>
+                        } */}
+
+                      </ScrollView>
+                      
+                    </Tab>
+                  }
+              
+
+                  {plano > 0 && cardapioonline == 1 &&
+                    // <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Cardápio</Text></TabHeading>}>
+                      <Tab heading="Cardápio">
+                      <ScrollView style={styles.container}>
+                        
+                        {/* {catcardapio.length > 0 && catcardapio.map(catcardapio => 
+                          <Text style={styles.textDestaques} key={catcardapio}>{catcardapio}</Text>
+                        
+                        
+        
+                        )} */}
+
+                        {/* { delivery && 
+                          <TouchableHighlight style={styles.pedidoOnline} onPress={() => { navigation.navigate('Delivery') }}>
+                            <Text style={styles.textoEntrar}>Peça Online Aqui</Text>
+                          </TouchableHighlight>
+                        } */}
+
+                        {/* {cardapio.length > 0 && cardapio.map(cardapio => 
+                          <View style={styles.ItemImg} key={cardapio._id}>
+                            <View style={styles.containerGeral}>
+                              <View style={styles.txtContainer}>
+                              <Text style={styles.textDestaques}>{cardapio.categoria}</Text>
+                                <Text style={styles.textCardapio}>{cardapio.item} - R${cardapio.valor}</Text>
+                              </View>
                             </View>
                           </View>
-                        </Modal>
-                      ) : (
-                        ""
-                      )
-                    }
-                    ListEmptyComponent={<Text style={styles.tabTitle}>Desculpe, o estabelecimento não possuí atendimento disponível nesse dia.</Text>}
-                    renderItem={({ item }) => (
-                      <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { handleAgendamento(item.data,item.hora,item.status) }}>
-                        <View style={styles.ItemAgenda}>
-                          <Text style={styles.textMenu}>Agendar para {item.hora}:00</Text>
-                          { 
-                            item.status == 'D' ? <Text style={styles.textMenuGreen}>Disponível</Text> : <Text style={styles.textMenuRed}>Agendado</Text>
-                          }
-                        </View>
-                      </TouchableHighlight>
-                    )}            
-                  />
-                
-                    </View>  
-                  }
-                  
+                        )} */}
 
-                  </Tab>
-                }
+                        <FlatList
+                          data={categorias}
+                          keyExtractor={categorias => categorias}
+                          ListHeaderComponent={
+                            loading ? (
+                              <ActivityIndicator size="large" style={styles.LoadingIndicator} />
+                            ) : (
+                              ""
+                            )
+                          }
+                          renderItem={({ item }) => (
+
+                            <View style={styles.viewCardapio}>
+                              <Text style={styles.textDestaques}>{item}</Text>
+
+                              {cardapio.map(cardapio => 
+                                <View key={cardapio._id}>
+
+                                {item === cardapio.categoria &&
+                                    <View style={styles.ItemImg2}>
+                                        <Text style={styles.textItem}>{cardapio.item}</Text>
+                                        <Text style={styles.textItemDesc}>Arroz, Feijão, Farofa, Batata</Text>
+                                        <Text style={styles.textItemValor}>R${cardapio.valor}</Text> 
+                                    </View>
+                                }
+
+                                </View>
+                              )}
+                                
+                            </View>
+                          )}            
+                        />
+
+                      </ScrollView>
+                    </Tab>
+                  }
+
+                  {plano > 0 && agendaonline == 1 && 
+
+                    // <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Agendar</Text></TabHeading>}>
+                      <Tab heading="Agendar">
+
+                      
+                    {pagina === 1 &&
+                        <ScrollView style={styles.container} visible='false'>
+                          <Text style={styles.tabTitle}>Selecione o serviço a ser agendado:</Text>
+                      
+                      {/* // 0 DOMINGO
+                          // 1 SEGUNDA
+                          // 2 TERCA
+                          // 3 QUARTA
+                          // 4 QUINTA
+                          // 5 SEXTA
+                          // 6 SABADO */}
+
+                            <FlatList
+                              data={servico}
+                              keyExtractor={servico => servico._id}
+                              ListHeaderComponent={
+                                loading ? (
+                                  <ActivityIndicator size="large" style={styles.LoadingIndicator} />
+                                ) : (
+                                  ""
+                                )
+                              }
+                              renderItem={({ item }) => (
+
+                                <View style={styles.viewCardapio}>
+
+                                    <TouchableHighlight style={styles.ItemImg2} onPress={() => { gotoCalendar(item.nome, item.diasemana, item._id) }}>
+                                      <View>
+                                        <Text style={styles.textItem}>{item.nome}</Text>
+                                        <Text style={styles.textItemDesc}>{item.descr}</Text>
+                                        <View style={styles.containersemana}>
+                                          {item.diasemana.map(diasemana => 
+                                            <Text style={styles.textItemDesc} key={diasemana}>{weekday[parseInt(diasemana)]}</Text>
+                                          )}
+                                        </View>
+                                        <Text style={styles.textItemValor}>R${item.preco}</Text> 
+                                        </View>
+                                    </TouchableHighlight>
+                                  
+                                </View>
+                                
+                                  
+                              )}                      
+                            />
+                        </ScrollView>
+
+                      
+                  }                         
+                          
+                        {pagina === 2 &&
+                      
+
+
+                      <View style={styles.backContainer}>        
+                        <TouchableOpacity style={styles.buttonBack2} onPress={() => {setPagina(1); setEvento('')}}>
+                          <Icon name='chevron-left' size={24} color='#484848' />
+                          <Text style={styles.textback}>Voltar</Text>
+                        </TouchableOpacity>
+                        <Text style={styles.tabTitle}>Agendar: {nomeagenda}</Text>
+                        <Text></Text>
+
+                      
+              
+                      <CalendarStrip
+                        calendarAnimation={{type: 'sequence', duration: 30}}
+                        daySelectionAnimation={{type: 'border', duration: 200, borderWidth: 1, borderHighlightColor: 'white'}}
+                        style={{height: 90, paddingTop: 8, paddingBottom: 10}}
+                        calendarHeaderStyle={{color: 'black'}}
+                        calendarColor={'#eaeaea'}
+                        dateNumberStyle={{color: 'black'}}
+                        dateNameStyle={{color: 'black'}}
+                        highlightDateNumberStyle={{color: 'purple'}}
+                        highlightDateNameStyle={{color: 'purple'}}
+                        disabledDateNameStyle={{color: 'grey'}}
+                        disabledDateNumberStyle={{color: 'grey'}}
+                        startingDate={startdate}
+                        selectedDate={seldate}
+                        maxDate={moment().add(30, 'days') }
+                        minDate={moment()}
+                        updateWeek={false}
+                        datesWhitelist={datesWhitelist}
+                        datesBlacklist={blackdates}
+                        iconContainer={{flex: 0.1}}
+                        onDateSelected={date => loadEvento(moment(date).format("YYYY-MM-DD"), servicoid)}
+                      />
+                    
+                    <FlatList
+                      scrollEnabled={true}
+                      data={evento}
+                      keyExtractor={evento => String(evento.id)}
+                      ListHeaderComponent={
+                        loading ? ( 
+                          <Modal
+                            transparent={true}
+                            animationType={'none'}
+                            visible={loading}>
+                            <View style={styles.modalBackground}>
+                              <View style={styles.activityIndicatorWrapper}>
+                                <ActivityIndicator
+                                  animating={loading} />
+                                  <Text style={styles.textMenuSmall}>processando</Text>
+                              </View>
+                            </View>
+                          </Modal>
+                        ) : (
+                          ""
+                        )
+                      }
+                      ListEmptyComponent={<Text style={styles.tabTitle}>Desculpe, o estabelecimento não possuí atendimento disponível nesse dia.</Text>}
+                      renderItem={({ item }) => (
+                        <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { handleAgendamento(item.data,item.hora,item.status) }}>
+                          <View style={styles.ItemAgenda}>
+                            <Text style={styles.textMenu}>Agendar para {item.hora}:00</Text>
+                            { 
+                              item.status == 'D' ? <Text style={styles.textMenuGreen}>Disponível</Text> : <Text style={styles.textMenuRed}>Agendado</Text>
+                            }
+                          </View>
+                        </TouchableHighlight>
+                      )}            
+                    />
+                  
+                      </View>  
+                    }
+                    
+
+                    </Tab>
+                  }
 
                 </Tabs>
+                </Content>
               </Container>
              </View> 
   
@@ -814,7 +820,7 @@ var styles = StyleSheet.create({
     alignItems: 'center',
     alignContent:'center',
     textAlign:'center',
-    borderRadius:5,
+    borderRadius:15,
     borderWidth:1,
     borderColor:'#d3d3d3',
     marginTop:10,

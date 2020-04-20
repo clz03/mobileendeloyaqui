@@ -10,8 +10,12 @@ var idestab
 export default function Pedido({ navigation }) {
  
   idestab = navigation.getParam('idestab');
-  const nomeestab = navigation.getParam('nomeestab');
   paginafrom = navigation.getParam('pagina');
+
+  const nomeestab = navigation.getParam('nomeestab');
+  const pedidominimo = navigation.getParam('pedidominimo');
+  const tempoentrega = navigation.getParam('tempoentrega');
+  const temporetira = navigation.getParam('temporetira');
 
   const [cardapio, setCardapio] = useState([]);  
   const [categorias, setCategorias] = useState([]);  
@@ -75,13 +79,21 @@ export default function Pedido({ navigation }) {
 
     <View style={styles.container}>
 
+    { tempoentrega > 0 &&
       <View style={styles.tempoentrega}>
         <Icon style={styles.iconeMoto} name='motorcycle' size={24} color='#484848' />
-        <Text style={styles.textoPreto}>Tempo médio de entrega: 50-60 minutos</Text>
+        <Text style={styles.textoPreto}>Tempo médio de entrega: {tempoentrega} minutos</Text>
       </View>
+    }
+    { temporetira > 0 &&
+      <View style={styles.tempoentrega}>
+        <Icon style={styles.iconeMoto} name='store' size={24} color='#484848' />
+        <Text style={styles.textoPreto}>Tempo médio para retirar: {temporetira} minutos</Text>
+      </View>
+    }
 
       <View style={styles.pedminimo}>
-        <Text style={styles.textoCinza}>* Pedido mínimo R$15,00</Text>
+        <Text style={styles.textoCinza}>* Pedido mínimo R${pedidominimo}</Text>
         <Text></Text>
       </View>
 

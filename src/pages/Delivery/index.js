@@ -36,7 +36,7 @@ export default function Delivery({ navigation }) {
   const [totalCount, setTotalCount] = useState(0);   
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
-  const [busca, setBusca] = useState('');   
+  //const [busca, setBusca] = useState('');   
 
   async function loadPage(pageNumber = page, shouldRefresh = false) {
     
@@ -106,7 +106,12 @@ export default function Delivery({ navigation }) {
         onEndReachedThreshold={0.1}
         onRefresh={refreshList}
         refreshing={refreshing}
-        ListEmptyComponent={<><Text style={styles.textEmpty}>Nenhum restaurante online no momento</Text><Icon style={styles.iconCenter} name='restaurant' size={24} color='#484848' /></>}
+        ListEmptyComponent={loading == false &&
+                            <>
+                              <Text style={styles.textEmpty}>Nenhum restaurante online no momento</Text>
+                              <Icon style={styles.iconCenter} name='restaurant' size={24} color='#484848' />
+                            </>
+                            }
         ListHeaderComponent={
           loading ? (
             <ActivityIndicator size="large" style={styles.LoadingIndicator} />
@@ -115,7 +120,7 @@ export default function Delivery({ navigation }) {
           )
         }
         renderItem={({ item }) => (
-          <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('Pedido', { idestab: item._id, nomeestab: item.nome }) }}>
+          <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('Pedido', { idestab: item._id, nomeestab: item.nome, pedidominimo: item.pedidominimo, tempoentrega: item.tempoentrega, temporetira: item.temporetira }) }}>
             <View style={styles.ItemImg}>
         
               <View style={styles.containerGeral}>

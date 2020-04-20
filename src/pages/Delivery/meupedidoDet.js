@@ -84,7 +84,6 @@ export default function MeuPedidoDet({ navigation }) {
     if(statusParam < 5) {
       setupWebsocket();
       subscribeToStatusPed(status => loadPedido());
-      setLoading(true);
     }
     loadPedido();
     loadItensPedido();
