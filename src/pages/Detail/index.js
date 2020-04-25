@@ -280,8 +280,9 @@ export default function Detail({ navigation }) {
         loadEvento(data, servicoid);
         Alert.alert('Agendamento realizado!', 'Gerencie seus agendamentos na aba Meu Perfil');
       } else {
+        const data_ret = await responseApi.json();
         loadEvento(data, servicoid);
-        Alert.alert('Problema ao Agendar!', 'Verifique os agendamentos no seu perfil');
+        Alert.alert('Problema ao Agendar!', data_ret.error);
       };
 
       setLoading(false);
