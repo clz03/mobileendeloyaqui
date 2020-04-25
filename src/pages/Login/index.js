@@ -192,6 +192,10 @@ var styles = StyleSheet.create({
     backgroundColor:'#471a88',
   },
 
+  formAuth: {
+    marginTop:10
+  },
+
   modalBackground: {
     flex: 1,
     alignItems: 'center',
@@ -252,14 +256,15 @@ var styles = StyleSheet.create({
   },
 
   inputLogin:{
-    height: screenHeight*0.06,
+    height: screenHeight*0.08,
     width:screenWidth * 0.90,
     marginLeft: screenWidth * 0.05,
     borderColor: '#a1a1a1', 
     backgroundColor:'#fff',
     borderWidth: 1,
     borderRadius:5,
-    paddingLeft:3
+    paddingLeft:3,
+    fontSize:15
   },
 
   btnEntrar:{

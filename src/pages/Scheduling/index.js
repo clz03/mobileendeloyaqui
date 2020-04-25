@@ -28,22 +28,24 @@ export function isAndroid() {
 }
 
 export default function Scheduling({ navigation }) {
- 
-  const cat_id = navigation.getParam('cat_id');
-  const busca = navigation.getParam('busca');
-  const cat_nome = navigation.getParam('title');
   
   const [estab, setEstab] = useState([]);   
   const [page, setPage] = useState(1);   
   const [totalCount, setTotalCount] = useState(0);   
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [search, setSearch] = useState('');
 
   async function loadPage(pageNumber = page, shouldRefresh = false) {
-    
+    var query;
     if(totalCount && pageNumber > totalCount) return;
 
-    const query = 'https://backendeloyaqui.herokuapp.com/estabelecimentos/com/agendamento/habilitado' + `?page=${pageNumber}`;
+    if(search.length > 3){
+      query = 'https://backendeloyaqui.herokuapp.com/estabelecimentos/com/agendamento/habilitado/busca/' + search + `?page=${pageNumber}`;
+    } else {
+      query = 'https://backendeloyaqui.herokuapp.com/estabelecimentos/com/agendamento/habilitado' + `?page=${pageNumber}`;
+    }
+    
     const response = await fetch(
       query
     );
@@ -56,9 +58,6 @@ export default function Scheduling({ navigation }) {
   };
 
   useEffect(() => {
-    navigation.setParams({ 
-      categoria: cat_nome
-    }); 
     setLoading(true);
     loadPage();
   }, []);
@@ -68,6 +67,17 @@ export default function Scheduling({ navigation }) {
     await loadPage(1, true);
     setRefreshing(false);
   }
+
+  // async function handleSubmit() {
+  //   if(search.length < 3){
+  //     Alert.alert(
+  //       'Busca inválida',
+  //       'Digite mais caracteres para uma busca mais aprimorada'
+  //     );
+  //   } else {
+  //     navigation.navigate('Search', { busca: search, title: search })
+  //   }
+  // };
 
   return (
 
@@ -79,10 +89,12 @@ export default function Scheduling({ navigation }) {
           autoCapitalize='none' 
           autoCorrect={false} 
           maxLength={40}
+          value={search}
+          onChangeText={setSearch}
           placeholder="Filtrar / Buscar"
         />
 
-        <TouchableOpacity style={styles.labelLogin}>
+        <TouchableOpacity style={styles.labelLogin} onPress={refreshList}>
           <Text>Buscar</Text>
         </TouchableOpacity>
 
@@ -95,6 +107,9 @@ export default function Scheduling({ navigation }) {
         onEndReachedThreshold={0.1}
         onRefresh={refreshList}
         refreshing={refreshing}
+        ListEmptyComponent={loading == false &&
+            <Text style={styles.textEmpty}>Não encontramos, tente outra busca !</Text>
+          }
         ListHeaderComponent={
           loading ? (
             <ActivityIndicator size="large" style={styles.LoadingIndicator} />
@@ -169,6 +184,15 @@ var styles = StyleSheet.create({
     marginRight:screenWidth*0.025,
   },
 
+  textEmpty: {
+    fontSize:14,
+    fontWeight:'300',
+    color:'#484848',
+    marginLeft:screenWidth*0.025,
+    marginTop:10,
+    textAlign:'center'
+  },
+
   direita:{
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -218,7 +242,7 @@ var styles = StyleSheet.create({
 
   inputLogin:{
     width:screenWidth * 0.75,
-    height: screenHeight*0.06,
+    height:35,
     marginLeft: screenWidth * 0.025,
     marginTop:screenHeight*0.005,
     marginBottom:screenHeight*0.005,

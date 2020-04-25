@@ -18,7 +18,8 @@
       "backgroundColor": "#471a88"
     },
     "android": {
-      "package": "com.c2t.eloyaqui"
+      "package": "com.c2t.eloyaqui",
+      "versionCode": 1
     },
     "updates": {
       "fallbackToCacheTimeout": 0
@@ -28,6 +29,7 @@
     ],
     "ios": {
       "bundleIdentifier": "com.c2t.eloyaqui",
+      "buildNumber": "1.0.0",
       "supportsTablet": false
     },
     "description": ""

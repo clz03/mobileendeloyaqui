@@ -7,7 +7,6 @@ import {
     TouchableHighlight, 
     FlatList, 
     ScrollView,
-    ActivityIndicator, 
     Alert, 
     Platform, 
     TextInput,
@@ -52,7 +51,7 @@ export default function AccountLogged({ navigation }) {
   const [cupom, setCupom] = useState([]);
   const [loading, setLoading] = useState(false);
   const [msginativo, setMsginativo] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  // const [refreshing, setRefreshing] = useState(false);
   const [erroValidador2, setErroValidador2] = useState("");
   const [cadNome, setCadNome] = useState(false);
   const [cadEnd, setCadEnd] = useState(false);
@@ -77,7 +76,7 @@ export default function AccountLogged({ navigation }) {
   
     // Get the token that identifies this device
     let token = await Notifications.getExpoPushTokenAsync();
-    console.log(token);
+    //console.log(token);
   
     // POST the token to your backend server from where you can retrieve it to send push notifications.
     return fetch('https://backendeloyaqui.herokuapp.com/usuarios/' + iduser , {
@@ -101,7 +100,6 @@ export default function AccountLogged({ navigation }) {
     navigation.navigate('Login');
 
   }
-
 
   async function getStorageValue() {
     setNome(await AsyncStorage.getItem('eloyusernome'));
@@ -140,16 +138,17 @@ export default function AccountLogged({ navigation }) {
   };
 
   async function confirmCancel(idevento) {
+
     await fetch(
       'https://backendeloyaqui.herokuapp.com/eventos/' + idevento, {
         method: 'DELETE'
     });
 
-    setLoading(true);
     loadEventos();
   }
 
   async function loadEventos() {
+    setLoading(true);
     const iduser = await AsyncStorage.getItem('eloyuserid');
     const response = await fetch(
       'https://backendeloyaqui.herokuapp.com/eventos/usuario/' + iduser
@@ -160,6 +159,7 @@ export default function AccountLogged({ navigation }) {
   }
 
   async function loadCupons() {
+    setLoading(true);
     const iduser = await AsyncStorage.getItem('eloyuserid');
     const response = await fetch(
       'https://backendeloyaqui.herokuapp.com/usercupons/usuario/' + iduser
@@ -182,17 +182,21 @@ export default function AccountLogged({ navigation }) {
 
 
   async function refreshList() {
-    setRefreshing(true);
+    //setRefreshing(true);
+    setLoading(true);
     await loadEventos();
     if (msginativo) checkUserAtivo();
-    setRefreshing(false);
+    //setRefreshing(false);
+    setLoading(false);
   }
 
   async function refreshList2() {
-    setRefreshing(true);
+    //setRefreshing(true);
+    setLoading(true);
     await loadCupons();
     if (msginativo) checkUserAtivo();
-    setRefreshing(false);
+    setLoading(false);
+    //setRefreshing(false);
   }
   
   async function checkUserAtivo(){
@@ -359,16 +363,13 @@ export default function AccountLogged({ navigation }) {
                       <FlatList
                       data={evento}
                       keyExtractor={evento => String(evento._id)}
-                      ListHeaderComponent={
-                        loading ? (
-                          <ActivityIndicator size="large" style={styles.LoadingIndicator}/>
-                        ) : (
-                          ""
-                        )
-                      }
+                      
                       onRefresh={refreshList}
-                      refreshing={refreshing}
-                      ListEmptyComponent={<Text style={styles.tabTitle}>Você não possuí agendamentos. Arraste para atualizar !</Text>}
+                      refreshing={loading}
+                      ListEmptyComponent={loading == false &&
+                          <Text style={styles.textEmpty}>Nenhum agendamento. Arraste para atualizar !</Text>
+                      }
+                      
                       renderItem={({ item }) => (                
                         <View style={styles.Item}>
                         <Text style={styles.textDescPrinc}>{item.data.substring(8,10) + "/" + item.data.substring(5,7) + "/" + item.data.substring(0,4)}</Text>
@@ -394,15 +395,9 @@ export default function AccountLogged({ navigation }) {
                     <FlatList
                       data={cupom}
                       keyExtractor={cupom => String(cupom._id)}
-                      ListHeaderComponent={
-                        loading ? (
-                          <ActivityIndicator size="large" style={styles.LoadingIndicator}/>
-                        ) : (
-                          ""
-                        )
-                      }
+                     
                       onRefresh={refreshList2}
-                      refreshing={refreshing}
+                      refreshing={loading}
                       ListEmptyComponent={<Text style={styles.tabTitle}>Você não possuí cupons válidos. Arraste para atualizar !</Text>}
                       renderItem={({ item }) => (  
                        (item.idcupom != null &&              
@@ -476,17 +471,6 @@ export default function AccountLogged({ navigation }) {
                           </View>
                           </TouchableHighlight>
 
-                          {/* <TouchableHighlight underlayColor={"#fff"} onPress={() => { navigation.navigate("MeusPedidos") }}>
-                          <View style={styles.containerGeralForm}>
-                          <View style={styles.buttonContainer}>
-                              <View style={styles.containerColumn}>
-                                <Text style={styles.textDesc}>Meus Pedidos</Text>
-                              </View>
-                              <Text style={styles.textGray}>visualizar <Icon name='chevron-right' size={16} color='#585858' /></Text>
-                              </View>
-                          </View>
-                          </TouchableHighlight> */}
-
                           <TouchableHighlight underlayColor={"#fff"} onPress={handleLogout}>
                           <View style={styles.containerGeralForm}>
                           <View style={styles.buttonContainer}>
@@ -498,10 +482,6 @@ export default function AccountLogged({ navigation }) {
                           </View>
                           </TouchableHighlight>
 
-                         {/* <TouchableHighlight style={styles.btnEntrar} onPress={handleLogout}>
-                          <Text style={styles.textoSair}>Sair</Text>
-                        </TouchableHighlight> */}
-
                         </ScrollView>
                     
                     </View>
@@ -510,15 +490,7 @@ export default function AccountLogged({ navigation }) {
               </Container>
           </View>
 
-          {/* *
-          *
-          *
-          AREA Modal
-          *
-          *
-          * */}
-
-          {
+          {/* {
                 loading && <Modal
                 transparent={true}
                 animationType={'none'}
@@ -531,7 +503,7 @@ export default function AccountLogged({ navigation }) {
                   </View>
                 </View>
               </Modal>
-              }
+              } */}
 
               {cadNome && <Modal
                 transparent={true}
@@ -808,6 +780,15 @@ var styles = StyleSheet.create({
     alignItems: 'flex-start',
     paddingLeft:screenWidth*0.05,
     paddingTop:10,
+  },
+
+  textEmpty: {
+    fontSize:14,
+    fontWeight:'300',
+    color:'#484848',
+    marginLeft:screenWidth*0.025,
+    marginTop:10,
+    textAlign:'center'
   },
 
   txtTitle:{

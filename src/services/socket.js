@@ -4,12 +4,16 @@ const socket = socketio('https://backendeloyaqui.herokuapp.com', {
     autoConnect: false,
 });
 
-// const socket = socketio('http://localhost:8080', {
+// const socket = socketio('http://192.168.0.10:8080', {
 //     autoConnect: false,
 // });
 
 function subscribeToStatusPed(subscribeFunction){
-    socket.on('status-ped', subscribeFunction);
+    socket.on('novo-ped', subscribeFunction);
+}
+
+function subscribeToNewAgenda(subscribeFunction){
+    socket.on('novo-agenda', subscribeFunction);
 }
 
 function connect(idestab, idusuario) {
@@ -26,5 +30,6 @@ function disconnect(){
 export {
     connect,
     disconnect,
-    subscribeToStatusPed
+    subscribeToStatusPed,
+    subscribeToNewAgenda
 };

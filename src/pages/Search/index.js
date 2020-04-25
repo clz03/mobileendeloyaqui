@@ -77,6 +77,12 @@ export default function Search({ navigation }) {
         onEndReachedThreshold={0.1}
         onRefresh={refreshList}
         refreshing={refreshing}
+        ListEmptyComponent={loading == false &&
+          <>
+            <Text style={styles.textEmpty}>Não encontramos, tente outra busca !</Text>
+          </>
+
+          }
         ListHeaderComponent={
           loading ? (
             <ActivityIndicator size="large" style={styles.LoadingIndicator} />
@@ -183,6 +189,15 @@ var styles = StyleSheet.create({
   viewBadge: {
     width:screenWidth*0.52,
     flexDirection:'row',
+  },
+
+  textEmpty: {
+    fontSize:14,
+    fontWeight:'300',
+    color:'#484848',
+    marginLeft:screenWidth*0.025,
+    marginTop:10,
+    textAlign:'center'
   },
 
   viewBadge2: {

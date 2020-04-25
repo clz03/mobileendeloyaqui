@@ -82,6 +82,7 @@ export default function Home({ navigation }) {
               placeholder='O que está procurando ?' 
               placeholderTextColor="gray"  
               maxLength={12}
+              autoCapitalize='none' 
               value={search}
               onChangeText={setSearch}
             />
@@ -178,8 +179,8 @@ var styles = StyleSheet.create({
     width: screenWidth *0.78,
     paddingLeft:10,
     color:'#a3a3a3',
-    height:35,
-    marginTop: screenHeight * 0.08,
+    height:48,
+    marginTop: screenHeight * 0.06,
     backgroundColor:'#fff',
     borderColor:'#d3d3d3',
     borderWidth:1,
@@ -188,9 +189,9 @@ var styles = StyleSheet.create({
 
   btnSearch: {
     width: screenWidth *0.10,
-    height:35,
+    height:48,
     backgroundColor:'#fff',
-    marginTop: screenHeight * 0.08,
+    marginTop: screenHeight * 0.06,
     borderColor:'#d3d3d3',
     borderWidth:1,
     borderRadius:5,

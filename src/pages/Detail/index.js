@@ -19,10 +19,11 @@ import {
 from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
-import {Container, Tab, Tabs, Content } from 'native-base';
+import {Container, Tab, Tabs } from 'native-base';
 import CalendarStrip from 'react-native-calendar-strip';
 import moment from 'moment';
 import 'moment/locale/pt-br';
+import { connect, disconnect, subscribeToNewAgenda } from '../../services/socket';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
@@ -39,6 +40,9 @@ export function isAndroid() {
   );
 };
 
+var servicokey = '';
+var dataselecionada = '';
+
 export default function Detail({ navigation }) {
   
   const [estab, setEstab] = useState([]);
@@ -50,7 +54,7 @@ export default function Detail({ navigation }) {
   const [categorias, setCategorias] = useState([]);  
   const [prod, setProd] = useState([]);
   const [servico, setServico] = useState([]);
-  const [servicoid, setServicoid] = useState([]);
+  const [servicoid, setServicoid] = useState('');
   const [nomeagenda, setNomeagenda] = useState('');
   //const [diasemanaState, setDiasemanaState] = useState([]);
   const [blackdates, setBlackdates] = useState([]);  
@@ -64,6 +68,12 @@ export default function Detail({ navigation }) {
   
   const idestab = navigation.getParam('idestab');
   const schedule = navigation.getParam('schedule');
+ 
+
+  async function setupWebsocket() {
+    disconnect();
+    connect(idestab, 0);
+  }
 
   let datesWhitelist = [{
     start: moment(),
@@ -85,7 +95,7 @@ export default function Detail({ navigation }) {
     }
 
     // Next 30 days
-    for (let i = 1; i <= 30; ++i){
+    for (let i = 1; i <= 28; ++i){
       curDate = moment().add(i,'days').day()
       if(!dias.includes(curDate.toString())){
         datesBlacklist.push(moment().add(i,'days'))
@@ -99,27 +109,33 @@ export default function Detail({ navigation }) {
       }
     }
     setServicoid(idservico);
+    servicokey = idservico;
     setBlackdates(datesBlacklist);
     setNomeagenda(nome);
-    loadEvento(moment(loadDate).format("YYYY-MM-DD"),idservico)
+    loadEvento(moment(loadDate).format("YYYY-MM-DD"),idservico);
+    dataselecionada = moment(loadDate).format("YYYY-MM-DD");
     setPagina(2);
   }
 
   const weekday = [
    "Domingo",
-   "Segunda-Feira", 
-   "Terça-Feira", 
-   "Quarta-Feira", 
-   "Quinta-Feira", 
-   "Sexta-Feira",
+   "Segunda", 
+   "Terça", 
+   "Quarta", 
+   "Quinta", 
+   "Sexta",
    "Sábado"
   ]
 
   async function loadEvento(date, idservico) {
-    setLoading(true);
+     setLoading(true);
+
+    if(idservico == '') idservico = servicokey;
+    if(date == '') date = dataselecionada;
+
      const response4 = await fetch(
-        'https://backendeloyaqui.herokuapp.com/eventos/dia/' + date + '/' + idservico
-      );
+       'https://backendeloyaqui.herokuapp.com/eventos/dia/' + date + '/' + idservico
+     );
 
      const data4 = await response4.json();
      setEvento(data4);
@@ -191,17 +207,6 @@ export default function Detail({ navigation }) {
     setLoading(false)
   };
 
-
-  useEffect(() => {
-    loadEstab();
-
-    if(schedule){
-      setTimeout(() => {
-        setInitPage(2);
-      }, 1500);
-    }
-  }, []);
-
   async function handleAgendamento(data, hora, status) {
 
     const useremail = await AsyncStorage.getItem('eloyuseremail');
@@ -271,13 +276,44 @@ export default function Detail({ navigation }) {
           }),
       });
 
-      if(responseApi.ok)
+      if(responseApi.ok){
         loadEvento(data, servicoid);
+        Alert.alert('Agendamento realizado!', 'Gerencie seus agendamentos na aba Meu Perfil');
+      } else {
+        loadEvento(data, servicoid);
+        Alert.alert('Problema ao Agendar!', 'Verifique os agendamentos no seu perfil');
+      };
 
       setLoading(false);
+      
+  };
 
-      setTimeout(() => Alert.alert('Agendamento realizado!', 'Gerencie seus agendamentos na aba Meu Perfil'), 800);
+  async function refreshList() {
+    loadEvento('', servicoid);
   }
+
+  useEffect(() => {
+    loadEstab();
+
+    if(schedule){
+      setTimeout(() => {
+        setInitPage(2);
+      }, 1500);
+    };
+
+    setupWebsocket();
+    subscribeToNewAgenda(status => loadEvento('', servicoid));
+
+    // returned function will be called on component unmount
+    //return () => {
+    //  disconnect();
+    //}
+
+  }, []);
+
+  // useEffect(() => {
+  //   setupWebsocket();
+  // }, [pagina]);
 
 
   return (    
@@ -286,6 +322,7 @@ export default function Detail({ navigation }) {
               {estab.map(estab => 
                 <View key={estab._id}>
                   <ImageBackground source={{uri: estab.imagemcapa }} style={styles.backImageHeader}>
+                  <View style={styles.layer}>
                     <TouchableOpacity onPress={() => navigation.goBack(null)} style={styles.buttonBack}>
                       <Icon name='chevron-left' size={24} color='#fff' />
                       <Text style={styles.textbuttonBack}>Voltar</Text>
@@ -293,13 +330,13 @@ export default function Detail({ navigation }) {
                 
                     <Text style={styles.textTitle}>{estab.nome}</Text>
                     <Text style={styles.textDesc}>{estab.tipo} / {estab.subtipo}</Text>
-                
+                </View>
                   </ImageBackground> 
                 </View>
               )}
 
               <Container>
-                <Content>
+
             
                     <Tabs initialPage={0} page={initPage} onChangeTab={({ i }) => setInitPage(i)}>
                   <Tab heading="Sobre">
@@ -315,8 +352,10 @@ export default function Detail({ navigation }) {
                           
                           {plano > 0 && 
                             <>
-                              <Text style={styles.tabSub}>{estab.fone2}</Text>
-                              <Text style={styles.tabTitle}></Text>
+                              {estab.fone2.length > 0 &&
+                                <Text style={styles.tabSub}>{estab.fone2}</Text>
+                              }
+                              <Text style={styles.tabSub}></Text>
                               <Text style={styles.tabSub}>"{estab.descr}"</Text>
                               
                               <View style={[ styles.container ]}>
@@ -363,7 +402,7 @@ export default function Detail({ navigation }) {
                                   </View>
                                 </TouchableOpacity>
 
-                              } */}
+                              } 
                               {agendaonline &&
                               
                               <TouchableOpacity onPress={() => { setInitPage(3) }}>
@@ -374,7 +413,7 @@ export default function Detail({ navigation }) {
                                   </View>
                                 </TouchableOpacity>
 
-                              }
+                              }*/}
                               </View>
                             </>
                           }
@@ -421,31 +460,7 @@ export default function Detail({ navigation }) {
                   {plano > 0 && cardapioonline == 1 &&
                     // <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Cardápio</Text></TabHeading>}>
                       <Tab heading="Cardápio">
-                      <ScrollView style={styles.container}>
-                        
-                        {/* {catcardapio.length > 0 && catcardapio.map(catcardapio => 
-                          <Text style={styles.textDestaques} key={catcardapio}>{catcardapio}</Text>
-                        
-                        
-        
-                        )} */}
-
-                        {/* { delivery && 
-                          <TouchableHighlight style={styles.pedidoOnline} onPress={() => { navigation.navigate('Delivery') }}>
-                            <Text style={styles.textoEntrar}>Peça Online Aqui</Text>
-                          </TouchableHighlight>
-                        } */}
-
-                        {/* {cardapio.length > 0 && cardapio.map(cardapio => 
-                          <View style={styles.ItemImg} key={cardapio._id}>
-                            <View style={styles.containerGeral}>
-                              <View style={styles.txtContainer}>
-                              <Text style={styles.textDestaques}>{cardapio.categoria}</Text>
-                                <Text style={styles.textCardapio}>{cardapio.item} - R${cardapio.valor}</Text>
-                              </View>
-                            </View>
-                          </View>
-                        )} */}
+                      <View style={styles.container}>
 
                         <FlatList
                           data={categorias}
@@ -480,7 +495,7 @@ export default function Detail({ navigation }) {
                           )}            
                         />
 
-                      </ScrollView>
+                      </View>
                     </Tab>
                   }
 
@@ -520,7 +535,8 @@ export default function Detail({ navigation }) {
                                       <View>
                                         <Text style={styles.textItem}>{item.nome}</Text>
                                         <Text style={styles.textItemDesc}>{item.descr}</Text>
-                                        <View style={styles.containersemana}>
+                                        <Text style={styles.textItemDesc2}>Disponível em:</Text>
+                                        <View style={styles.containersemana}>                                     
                                           {item.diasemana.map(diasemana => 
                                             <Text style={styles.textItemDesc} key={diasemana}>{weekday[parseInt(diasemana)]}</Text>
                                           )}
@@ -544,14 +560,13 @@ export default function Detail({ navigation }) {
 
 
                       <View style={styles.backContainer}>        
-                        <TouchableOpacity style={styles.buttonBack2} onPress={() => {setPagina(1); setEvento('')}}>
-                          <Icon name='chevron-left' size={24} color='#484848' />
-                          <Text style={styles.textback}>Voltar</Text>
-                        </TouchableOpacity>
-                        <Text style={styles.tabTitle}>Agendar: {nomeagenda}</Text>
-                        <Text></Text>
-
-                      
+                        {/* <View style={styles.containersemana}>
+                          <Text style={styles.tabTitle}>Agendar: {nomeagenda} |</Text>
+                          <TouchableOpacity onPress={() => {setPagina(1); setEvento('')}}>
+                            <Text style={styles.tabTitleLink}> voltar</Text>
+                          </TouchableOpacity>
+                        </View>
+                        <Text>&nbsp;</Text> */}
               
                       <CalendarStrip
                         calendarAnimation={{type: 'sequence', duration: 30}}
@@ -573,31 +588,33 @@ export default function Detail({ navigation }) {
                         datesWhitelist={datesWhitelist}
                         datesBlacklist={blackdates}
                         iconContainer={{flex: 0.1}}
-                        onDateSelected={date => loadEvento(moment(date).format("YYYY-MM-DD"), servicoid)}
+                        onDateSelected={date => { loadEvento(moment(date).format("YYYY-MM-DD"), servicoid); dataselecionada = moment(date).format("YYYY-MM-DD")}}
                       />
                     
                     <FlatList
                       scrollEnabled={true}
                       data={evento}
                       keyExtractor={evento => String(evento.id)}
-                      ListHeaderComponent={
-                        loading ? ( 
-                          <Modal
-                            transparent={true}
-                            animationType={'none'}
-                            visible={loading}>
-                            <View style={styles.modalBackground}>
-                              <View style={styles.activityIndicatorWrapper}>
-                                <ActivityIndicator
-                                  animating={loading} />
-                                  <Text style={styles.textMenuSmall}>processando</Text>
-                              </View>
-                            </View>
-                          </Modal>
-                        ) : (
-                          ""
-                        )
-                      }
+                      refreshing={loading}
+                      onRefresh={refreshList}
+                      // ListHeaderComponent={
+                      //   loading ? ( 
+                      //     <Modal
+                      //       transparent={true}
+                      //       animationType={'none'}
+                      //       visible={loading}>
+                      //       <View style={styles.modalBackground}>
+                      //         <View style={styles.activityIndicatorWrapper}>
+                      //           <ActivityIndicator
+                      //             animating={loading} />
+                      //             <Text style={styles.textMenuSmall}>processando</Text>
+                      //         </View>
+                      //       </View>
+                      //     </Modal>
+                      //   ) : (
+                      //     ""
+                      //   )
+                      // }
                       ListEmptyComponent={<Text style={styles.tabTitle}>Desculpe, o estabelecimento não possuí atendimento disponível nesse dia.</Text>}
                       renderItem={({ item }) => (
                         <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { handleAgendamento(item.data,item.hora,item.status) }}>
@@ -619,7 +636,7 @@ export default function Detail({ navigation }) {
                   }
 
                 </Tabs>
-                </Content>
+                
               </Container>
              </View> 
   
@@ -631,13 +648,21 @@ var styles = StyleSheet.create({
   
   backContainer: {
     flex: 1,
-    paddingHorizontal: 0,
-    marginBottom:20
+    paddingHorizontal: 0
   },
 
   backImageHeader: {
-    height:screenHeight * 0.30,
+    height:screenHeight * 0.30
   },
+
+  layer: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%'
+  },  
 
   viewCardapio:{
     marginTop:5
@@ -726,6 +751,14 @@ var styles = StyleSheet.create({
     color:'#595959'
   },
 
+  textItemDesc2:{
+    marginLeft:screenWidth*0.025,
+    marginTop:8,
+    fontSize:11,
+    color:'#595959'
+  },
+
+
   textItemValor:{
     marginLeft:screenWidth*0.025,
     fontSize:13,
@@ -740,6 +773,12 @@ var styles = StyleSheet.create({
     marginLeft:5,
     marginTop:3,
     marginBottom:3
+  },
+
+  tabTitleLink: {
+    paddingTop:10,
+    color:'#484848',
+    fontWeight:'500'
   },
 
   tabTitle: {
@@ -795,7 +834,7 @@ var styles = StyleSheet.create({
   },
 
   containersemana:{
-    flexDirection:'row'
+    flexDirection: 'row'
   },
 
   container2: {
@@ -865,7 +904,7 @@ var styles = StyleSheet.create({
 
   textbuttonBack: {
     color:'#fff',
-    fontSize:18
+    fontSize:18,
   },
 
   buttonBack: {
@@ -888,6 +927,7 @@ var styles = StyleSheet.create({
   textDestaques:{
     color:'#000',
     marginLeft:10,
+    marginBottom:5,
     fontSize:13,
     fontWeight:'bold',
     width: screenWidth * 0.95
