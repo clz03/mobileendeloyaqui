@@ -4,7 +4,7 @@ const socket = socketio('https://backendeloyaqui.herokuapp.com', {
     autoConnect: false,
 });
 
-// const socket = socketio('http://192.168.0.10:8080', {
+// const socket = socketio('http://192.168.0.8:8080', {
 //     autoConnect: false,
 // });
 

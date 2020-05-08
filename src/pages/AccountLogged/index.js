@@ -140,6 +140,7 @@ export default function AccountLogged({ navigation }) {
   async function confirmCancel(idevento) {
 
     await fetch(
+      //'http://192.168.0.8:8080/eventos/' + idevento, {
       'https://backendeloyaqui.herokuapp.com/eventos/' + idevento, {
         method: 'DELETE'
     });

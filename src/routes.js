@@ -16,13 +16,13 @@ import Search from './pages/Search';
 import Detail from './pages/Detail';
 import Scheduling from './pages/Scheduling'; 
 // import TelUteis from './pages/TelUteis';
-import Delivery from './pages/Delivery';
-import Pedido from './pages/Delivery/pedido';
-import ItemPedido from './pages/Delivery/itemPedido';
-import Sacola from './pages/Delivery/sacola';
+//import Delivery from './pages/Delivery';
+//import Pedido from './pages/Delivery/pedido';
+//import ItemPedido from './pages/Delivery/itemPedido';
+//import Sacola from './pages/Delivery/sacola';
 // import Status from './pages/Delivery/status';
-import MeusPedidos from './pages/Delivery/meuspedidos';
-import MeuPedidoDet from './pages/Delivery/meupedidoDet';
+//import MeusPedidos from './pages/Delivery/meuspedidos';
+//import MeuPedidoDet from './pages/Delivery/meupedidoDet';
 
 const PagesNavigator = createStackNavigator({
   Search:{
@@ -71,87 +71,87 @@ const SchedulingNavigator = createStackNavigator({
   initialRouteName:'Scheduling'
 });
 
-const DeliveryNavigator = createStackNavigator({
-  Delivery:{
-    screen: Delivery,
-    navigationOptions: {
-      headerStyle: {backgroundColor:'#471a88'},
-      headerTitle:'Pedidos Online',
-      headerTitleStyle: {color:'#fff'},
-      headerTintColor: '#fff',
-      headerBackTitle: ' ',
-      headerBackTitleVisible: false
-    },
-  },
-  Pedido:{
-    screen: Pedido,
-    navigationOptions: {
-      headerStyle: {backgroundColor:'#471a88'},
-      //headerTitle:'Cardápio Online - Pedido',
-      headerTitleStyle: {color:'#fff'},
-      headerTintColor: '#fff',
-      headerBackTitle: ' ',
-      headerBackTitleVisible: false
-    },
-  },
-  itemPedido:{
-    screen: ItemPedido,
-    navigationOptions: {
-      headerStyle: {backgroundColor:'#471a88'},
-      //headerTitle:'Item Pedido',
-      headerTitleStyle: {color:'#fff'},
-      headerTintColor: '#fff',
-      headerBackTitle: ' ',
-      headerBackTitleVisible: false
-    },
-  },
-  Sacola:{
-    screen: Sacola,
-    navigationOptions: {
-      headerStyle: {backgroundColor:'#471a88'},
-      //headerTitle:'Sacola Pedido',
-      headerTitleStyle: {color:'#fff'},
-      headerTintColor: '#fff',
-      headerBackTitle: ' ',
-      headerBackTitleVisible: false
-    },
-  },
-  // Status:{
-  //   screen: Status,
-  //   navigationOptions: {
-  //     headerStyle: {backgroundColor:'#471a88'},
-  //     headerTitle:'Acompanhar Pedido',
-  //     headerTitleStyle: {color:'#fff'},
-  //     headerTintColor: '#fff',
-  //     gesturesEnabled: false
-  //   },
-  // },
-  MeusPedidos:{
-    screen: MeusPedidos,
-    navigationOptions: {
-      headerStyle: {backgroundColor:'#471a88'},
-      headerTitle:'Meus Pedidos',
-      headerTitleStyle: {color:'#fff'},
-      headerTintColor: '#fff',
-      gesturesEnabled: false,
-      headerBackTitle: ' ',
-      headerBackTitleVisible: false
-    },
-  },
-  MeuPedidoDet:{
-    screen: MeuPedidoDet,
-    navigationOptions: {
-      headerStyle: {backgroundColor:'#471a88'},
-      headerTitle:'Meu Pedido',
-      headerTitleStyle: {color:'#fff'},
-      headerTintColor: '#fff',
-      headerBackTitle: ' ',
-      headerBackTitleVisible: false
-    },
-  },
-},{
-  initialRouteName:'Delivery'
-});
+// const DeliveryNavigator = createStackNavigator({
+//   Delivery:{
+//     screen: Delivery,
+//     navigationOptions: {
+//       headerStyle: {backgroundColor:'#471a88'},
+//       headerTitle:'Pedidos Online',
+//       headerTitleStyle: {color:'#fff'},
+//       headerTintColor: '#fff',
+//       headerBackTitle: ' ',
+//       headerBackTitleVisible: false
+//     },
+//   },
+//   Pedido:{
+//     screen: Pedido,
+//     navigationOptions: {
+//       headerStyle: {backgroundColor:'#471a88'},
+//       //headerTitle:'Cardápio Online - Pedido',
+//       headerTitleStyle: {color:'#fff'},
+//       headerTintColor: '#fff',
+//       headerBackTitle: ' ',
+//       headerBackTitleVisible: false
+//     },
+//   },
+//   itemPedido:{
+//     screen: ItemPedido,
+//     navigationOptions: {
+//       headerStyle: {backgroundColor:'#471a88'},
+//       //headerTitle:'Item Pedido',
+//       headerTitleStyle: {color:'#fff'},
+//       headerTintColor: '#fff',
+//       headerBackTitle: ' ',
+//       headerBackTitleVisible: false
+//     },
+//   },
+//   Sacola:{
+//     screen: Sacola,
+//     navigationOptions: {
+//       headerStyle: {backgroundColor:'#471a88'},
+//       //headerTitle:'Sacola Pedido',
+//       headerTitleStyle: {color:'#fff'},
+//       headerTintColor: '#fff',
+//       headerBackTitle: ' ',
+//       headerBackTitleVisible: false
+//     },
+//   },
+//   // Status:{
+//   //   screen: Status,
+//   //   navigationOptions: {
+//   //     headerStyle: {backgroundColor:'#471a88'},
+//   //     headerTitle:'Acompanhar Pedido',
+//   //     headerTitleStyle: {color:'#fff'},
+//   //     headerTintColor: '#fff',
+//   //     gesturesEnabled: false
+//   //   },
+//   // },
+//   MeusPedidos:{
+//     screen: MeusPedidos,
+//     navigationOptions: {
+//       headerStyle: {backgroundColor:'#471a88'},
+//       headerTitle:'Meus Pedidos',
+//       headerTitleStyle: {color:'#fff'},
+//       headerTintColor: '#fff',
+//       gesturesEnabled: false,
+//       headerBackTitle: ' ',
+//       headerBackTitleVisible: false
+//     },
+//   },
+//   MeuPedidoDet:{
+//     screen: MeuPedidoDet,
+//     navigationOptions: {
+//       headerStyle: {backgroundColor:'#471a88'},
+//       headerTitle:'Meu Pedido',
+//       headerTitleStyle: {color:'#fff'},
+//       headerTintColor: '#fff',
+//       headerBackTitle: ' ',
+//       headerBackTitleVisible: false
+//     },
+//   },
+// },{
+//   initialRouteName:'Delivery'
+// });
 
 const Cupomnavigator = createStackNavigator({
   Reward:{

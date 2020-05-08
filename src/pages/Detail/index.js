@@ -14,7 +14,6 @@ import {
   ActivityIndicator,
   Alert,
   AsyncStorage,
-  Modal,
   Platform } 
 from 'react-native';
 
@@ -27,7 +26,9 @@ import { connect, disconnect, subscribeToNewAgenda } from '../../services/socket
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
-
+var apiLocal = 'http://192.168.0.8/';
+var apiCloud = 'https://backendeloyaqui.herokuapp.com/';
+ 
 export function isIphoneX() {
   return (
     Platform.OS === 'ios' && screenHeight >= 812
@@ -50,16 +51,17 @@ export default function Detail({ navigation }) {
   const [agendaonline, setAgendaonline] = useState([]);
   const [cardapio, setCardapio] = useState("");
   const [cardapioonline, setCardapioonline] = useState(false);
-  const [delivery, setDelivery] = useState(false);
+  //const [delivery, setDelivery] = useState(false);
   const [categorias, setCategorias] = useState([]);  
   const [prod, setProd] = useState([]);
   const [servico, setServico] = useState([]);
   const [servicoid, setServicoid] = useState('');
-  const [nomeagenda, setNomeagenda] = useState('');
+  //const [nomeagenda, setNomeagenda] = useState('');
   //const [diasemanaState, setDiasemanaState] = useState([]);
   const [blackdates, setBlackdates] = useState([]);  
   const [startdate, setStartdate] = useState('');  
   const [seldate, setSeldate] = useState('');  
+  const [feriados, setFeriados] = useState([]);  
   // const [cupom, setCupom] = useState([]);
   const [evento, setEvento] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -77,27 +79,33 @@ export default function Detail({ navigation }) {
 
   let datesWhitelist = [{
     start: moment(),
-    end: moment().add(30,'days')
+    end: moment().add(28,'days')
   }];
 
   //Blacklist, tudo que nao for 1 e 3
 
   function gotoCalendar(nome, dias, idservico){
     let datesBlacklist = [];
-    var curDate;
+    var curDate; 
+    var curDay;
+    var feriadoDay;
     var checkStart = false;
     var loadDate;
 
     //Current Date
-    curDate = moment().day();
-    if(!dias.includes(curDate.toString())){
-      datesBlacklist.push(moment())
-    }
+    //curDate = moment().day();
+    //if(!dias.includes(curDate.toString())){
+    //  datesBlacklist.push(moment())
+    //}
 
-    // Next 30 days
-    for (let i = 1; i <= 28; ++i){
-      curDate = moment().add(i,'days').day()
-      if(!dias.includes(curDate.toString())){
+    // Next 28 days
+    for (let i = 0; i <= 28; ++i){
+      curDay = moment().add(i,'days').startOf('day').toISOString().substring(0,10);
+      curDate = moment().add(i,'days').day();
+
+      if(feriados.includes(curDay)){
+        datesBlacklist.push(moment().add(i,'days'))
+      } else if(!dias.includes(curDate.toString())){
         datesBlacklist.push(moment().add(i,'days'))
       } else {
         if(!checkStart){
@@ -106,12 +114,12 @@ export default function Detail({ navigation }) {
           loadDate = moment().add(i,'days');
           checkStart = true;
         }
-      }
+      };
     }
     setServicoid(idservico);
     servicokey = idservico;
     setBlackdates(datesBlacklist);
-    setNomeagenda(nome);
+    //setNomeagenda(nome);
     loadEvento(moment(loadDate).format("YYYY-MM-DD"),idservico);
     dataselecionada = moment(loadDate).format("YYYY-MM-DD");
     setPagina(2);
@@ -134,6 +142,7 @@ export default function Detail({ navigation }) {
     if(date == '') date = dataselecionada;
 
      const response4 = await fetch(
+       //'http://192.168.0.8:8080/eventos/dia/' + date + '/' + idservico
        'https://backendeloyaqui.herokuapp.com/eventos/dia/' + date + '/' + idservico
      );
 
@@ -144,6 +153,7 @@ export default function Detail({ navigation }) {
 
   async function loadEstab() {
       const response = await fetch(
+        //'http://192.168.0.8:8080/estabelecimentos/' + idestab
         'https://backendeloyaqui.herokuapp.com/estabelecimentos/' + idestab
       );
 
@@ -151,12 +161,12 @@ export default function Detail({ navigation }) {
       const plano = data[0].plano;
       const agendaonline = data[0].agendamento;
       const cardapionline = data[0].cardapio;
-      const deliveryonline = data[0].delivery
+      //const deliveryonline = data[0].delivery
       setEstab(data);
       setPlano(plano);
       setAgendaonline(agendaonline);
       setCardapioonline(cardapionline);
-      setDelivery(deliveryonline);
+      //setDelivery(deliveryonline);
 
       if (plano > 0) {
         loadProd();
@@ -166,7 +176,28 @@ export default function Detail({ navigation }) {
         //   if(startdate !== '') loadEvento(startdate);
         // }
         if (cardapionline) loadCardapio();
+        if (agendaonline) {
+          loadFeriados();
+          setupWebsocket();
+          subscribeToNewAgenda(status => loadEvento('', servicoid));
+        }
       }
+    };
+
+    async function loadFeriados() {
+      var arrFeriados = [];
+
+      const response = await fetch(
+        //'http://192.168.0.8:8080/feriados/' + idestab
+        'https://backendeloyaqui.herokuapp.com/feriados/' + idestab
+      );
+      const data = await response.json();
+      
+      for (i = 0; i < data.length; i++) {
+        arrFeriados.push(data[i].data.toString().substring(0,10));
+      }
+     
+      setFeriados(arrFeriados);
     };
 
     async function loadProd() {
@@ -179,6 +210,7 @@ export default function Detail({ navigation }) {
 
     async function loadServico() {
       const response = await fetch(
+        //'http://192.168.0.8:8080/servicos/estabelecimento/' + idestab
         'https://backendeloyaqui.herokuapp.com/servicos/estabelecimento/' + idestab
       );
       const data = await response.json();
@@ -244,6 +276,7 @@ export default function Detail({ navigation }) {
       const iduser = await AsyncStorage.getItem('eloyuserid');
 
       const response = await fetch(
+        //'http://192.168.0.8:8080/usuarios/'+ iduser
         'https://backendeloyaqui.herokuapp.com/usuarios/'+ iduser
       );
   
@@ -260,6 +293,7 @@ export default function Detail({ navigation }) {
       setLoading(true);
 
       const responseApi = await fetch(
+        //'http://192.168.0.8:8080/eventos', {
         'https://backendeloyaqui.herokuapp.com/eventos', {
           method: 'POST',
           headers: {
@@ -302,20 +336,12 @@ export default function Detail({ navigation }) {
       }, 1500);
     };
 
-    setupWebsocket();
-    subscribeToNewAgenda(status => loadEvento('', servicoid));
-
-    // returned function will be called on component unmount
-    //return () => {
-    //  disconnect();
-    //}
+    //returned function will be called on component unmount
+    return () => {
+      disconnect();
+    }
 
   }, []);
-
-  // useEffect(() => {
-  //   setupWebsocket();
-  // }, [pagina]);
-
 
   return (    
             <View style={styles.backContainer}>  

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View, 
   Text, 
@@ -14,7 +14,6 @@ import {
   Modal,
   AsyncStorage
  } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
@@ -35,8 +34,11 @@ export default function Login({ navigation }) {
 
 
   async function CheckRedirect(){
-    if (await AsyncStorage.getItem('eloyuseremail') != null)
+    setLoading(true);
+    if (await AsyncStorage.getItem('eloyuseremail') != null){
+      setLoading(false);
       navigation.navigate('AccountLogged');
+    }
   }
 
   function handleForgotPwd(){
@@ -100,7 +102,12 @@ export default function Login({ navigation }) {
 
 }
 
-  CheckRedirect();
+  useEffect(() => {
+    CheckRedirect();
+  }, []);
+
+  
+  
 
   return (
     
@@ -201,7 +208,7 @@ var styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'column',
     justifyContent: 'space-around',
-    backgroundColor: '#00000040'
+    backgroundColor: '#00000090'
   },
 
   activityIndicatorWrapper: {

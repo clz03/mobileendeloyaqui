@@ -221,7 +221,7 @@ var styles = StyleSheet.create({
   },
 
   textTitle: {
-    fontSize:14,
+    fontSize:13,
     fontWeight:'bold',
     color:'#12299B',
   },
