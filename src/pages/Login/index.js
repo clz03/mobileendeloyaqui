@@ -38,8 +38,10 @@ export default function Login({ navigation }) {
     if (await AsyncStorage.getItem('eloyuseremail') != null){
       setLoading(false);
       navigation.navigate('AccountLogged');
+    } else {
+      setLoading(false);
     }
-  }
+  };
 
   function handleForgotPwd(){
     navigation.navigate('ForgotPwd');

@@ -91,6 +91,17 @@ export default function AccountLogged({ navigation }) {
     });
   }
 
+  function handlelogoutfromButton(){
+    Alert.alert(
+      'Confirmação',
+      'Deseja sair do seu perfil ?',
+      [
+        {text: 'Não'},
+        {text: 'Sim', onPress: () => handleLogout()}
+      ]
+    );
+  };
+
   async function handleLogout(){
     //await AsyncStorage.removeItem('eloyuseremail');
     //await AsyncStorage.removeItem('eloyusernome');
@@ -98,7 +109,6 @@ export default function AccountLogged({ navigation }) {
     //await AsyncStorage.removeItem('eloyuserid');
     await AsyncStorage.clear();
     navigation.navigate('Login');
-
   }
 
   async function getStorageValue() {
@@ -472,7 +482,7 @@ export default function AccountLogged({ navigation }) {
                           </View>
                           </TouchableHighlight>
 
-                          <TouchableHighlight underlayColor={"#fff"} onPress={handleLogout}>
+                          <TouchableHighlight underlayColor={"#fff"} onPress={handlelogoutfromButton}>
                           <View style={styles.containerGeralForm}>
                           <View style={styles.buttonContainer}>
                               <View style={styles.containerColumn}>

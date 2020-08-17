@@ -52,6 +52,8 @@ export default function Detail({ navigation }) {
   const [cardapio, setCardapio] = useState("");
   const [cardapioonline, setCardapioonline] = useState(false);
   //const [delivery, setDelivery] = useState(false);
+  const [profissionais, setProfissionais] = useState([]);
+  const [profid, setProfid] = useState('');
   const [categorias, setCategorias] = useState([]);  
   const [prod, setProd] = useState([]);
   const [servico, setServico] = useState([]);
@@ -65,7 +67,7 @@ export default function Detail({ navigation }) {
   // const [cupom, setCupom] = useState([]);
   const [evento, setEvento] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [pagina, setPagina] = useState(1);
+  const [pagina, setPagina] = useState(0);
   const [initPage, setInitPage] = useState(0);
   
   const idestab = navigation.getParam('idestab');
@@ -84,13 +86,21 @@ export default function Detail({ navigation }) {
 
   //Blacklist, tudo que nao for 1 e 3
 
-  function gotoCalendar(nome, dias, idservico){
+  async function gotoCalendar(nome, idservico){
+    let dias = '';
     let datesBlacklist = [];
     var curDate; 
     var curDay;
     var feriadoDay;
     var checkStart = false;
     var loadDate;
+
+    const response = await fetch(
+      'https://backendeloyaqui.herokuapp.com/profissional/' + profid
+    );
+
+    const data = await response.json();
+    dias = data[0].diasemana;
 
     //Current Date
     //curDate = moment().day();
@@ -120,7 +130,7 @@ export default function Detail({ navigation }) {
     servicokey = idservico;
     setBlackdates(datesBlacklist);
     //setNomeagenda(nome);
-    loadEvento(moment(loadDate).format("YYYY-MM-DD"),idservico);
+    loadEvento(moment(loadDate).format("YYYY-MM-DD"),profid);
     dataselecionada = moment(loadDate).format("YYYY-MM-DD");
     setPagina(2);
   }
@@ -135,15 +145,15 @@ export default function Detail({ navigation }) {
    "Sábado"
   ]
 
-  async function loadEvento(date, idservico) {
+  async function loadEvento(date, idprof) {
      setLoading(true);
 
-    if(idservico == '') idservico = servicokey;
-    if(date == '') date = dataselecionada;
+   // if(idprof == '') idprof = profid;
+   if(date == '') date = dataselecionada;
 
      const response4 = await fetch(
        //'http://192.168.0.8:8080/eventos/dia/' + date + '/' + idservico
-       'https://backendeloyaqui.herokuapp.com/eventos/dia/' + date + '/' + idservico
+       'https://backendeloyaqui.herokuapp.com/eventos/dia/' + date + '/' + idprof
      );
 
      const data4 = await response4.json();
@@ -170,7 +180,8 @@ export default function Detail({ navigation }) {
 
       if (plano > 0) {
         loadProd();
-        loadServico();
+        loadProfissionais();
+
         //loadCupom();
         // if (agendaonline) {
         //   if(startdate !== '') loadEvento(startdate);
@@ -179,7 +190,7 @@ export default function Detail({ navigation }) {
         if (agendaonline) {
           loadFeriados();
           setupWebsocket();
-          subscribeToNewAgenda(status => loadEvento('', servicoid));
+          subscribeToNewAgenda(status => loadEvento('', profid));
         }
       }
     };
@@ -189,7 +200,7 @@ export default function Detail({ navigation }) {
 
       const response = await fetch(
         //'http://192.168.0.8:8080/feriados/' + idestab
-        'https://backendeloyaqui.herokuapp.com/feriados/' + idestab
+        'https://backendeloyaqui.herokuapp.com/feriados'
       );
       const data = await response.json();
       
@@ -211,10 +222,19 @@ export default function Detail({ navigation }) {
     async function loadServico() {
       const response = await fetch(
         //'http://192.168.0.8:8080/servicos/estabelecimento/' + idestab
-        'https://backendeloyaqui.herokuapp.com/servicos/estabelecimento/' + idestab
+        'https://backendeloyaqui.herokuapp.com/servicos/profissional/' + profid
       );
       const data = await response.json();
       setServico(data);
+    };
+
+    async function loadProfissionais() {
+      const response = await fetch(
+        //'http://192.168.0.8:8080/servicos/estabelecimento/' + idestab
+        'https://backendeloyaqui.herokuapp.com/profissional/estabelecimento/' + idestab
+      );
+      const data = await response.json();
+      setProfissionais(data);
     };
 
   //   async function loadCupom() {
@@ -311,11 +331,11 @@ export default function Detail({ navigation }) {
       });
 
       if(responseApi.ok){
-        loadEvento(data, servicoid);
+        loadEvento(data, profid);
         Alert.alert('Agendamento realizado!', 'Gerencie seus agendamentos na aba Meu Perfil');
       } else {
         const data_ret = await responseApi.json();
-        loadEvento(data, servicoid);
+        loadEvento(data, profid);
         Alert.alert('Problema ao Agendar!', data_ret.error);
       };
 
@@ -324,7 +344,7 @@ export default function Detail({ navigation }) {
   };
 
   async function refreshList() {
-    loadEvento('', servicoid);
+    loadEvento('', profid);
   }
 
   useEffect(() => {
@@ -342,6 +362,10 @@ export default function Detail({ navigation }) {
     }
 
   }, []);
+
+  useEffect(() => {
+    loadServico();
+  }, [profid]);
 
   return (    
             <View style={styles.backContainer}>  
@@ -458,9 +482,11 @@ export default function Detail({ navigation }) {
                         {prod.length > 0 ? prod.map(prod => 
                             <View key={prod._id} style={styles.container2}>
                               <ImageBackground source={{uri: prod.imagem }} style={styles.backImageDestaq}>
+                              <View style={styles.layer}>
                                 <Text style={styles.textDestaq}>{prod.nome}</Text>
                                 <Text style={styles.textDesc}>{prod.descr}</Text>
                                 <Text style={styles.textDesc}>{prod.preco}</Text>
+                              </View>
                               </ImageBackground>
                             </View>
                           ) : <Text style={styles.txtNoData}>Em breve novos Destaques. Fique de olho !</Text>
@@ -531,6 +557,45 @@ export default function Detail({ navigation }) {
                     // <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Agendar</Text></TabHeading>}>
                       <Tab heading="Agendar">
 
+                    {pagina === 0 &&
+                        <ScrollView style={styles.container} visible='false'>
+                          <Text style={styles.tabTitle}>Selecione o profissional:</Text>
+
+                            <FlatList
+                              data={profissionais}
+                              keyExtractor={profissionais => profissionais._id}
+                              ListHeaderComponent={
+                                loading ? (
+                                  <ActivityIndicator size="large" style={styles.LoadingIndicator} />
+                                ) : (
+                                  ""
+                                )
+                              }
+                              renderItem={({ item }) => (
+
+                                <View style={styles.viewCardapio}>
+
+                                    <TouchableHighlight style={styles.ItemImg2} onPress={() => { setProfid(item._id); setPagina(1) }}>
+                                      <View>
+                                        <Text style={styles.textItem}>{item.nome}</Text>
+                                        <Text style={styles.textItemDesc2}>Disponível em:</Text>
+                                        <View style={styles.containersemana}>                                     
+                                          {item.diasemana.map(diasemana => 
+                                            <Text style={styles.textItemDesc} key={diasemana}>{weekday[parseInt(diasemana)]}</Text>
+                                          )}
+                                        </View>
+                                        </View>
+                                    </TouchableHighlight>
+                                  
+                                </View>
+                                
+                                  
+                              )}                      
+                            />
+                        </ScrollView>
+
+                      
+                  }   
                       
                     {pagina === 1 &&
                         <ScrollView style={styles.container} visible='false'>
@@ -558,16 +623,16 @@ export default function Detail({ navigation }) {
 
                                 <View style={styles.viewCardapio}>
 
-                                    <TouchableHighlight style={styles.ItemImg2} onPress={() => { gotoCalendar(item.nome, item.diasemana, item._id) }}>
+                                    <TouchableHighlight style={styles.ItemImg2} onPress={() => { gotoCalendar(item.nome, item._id) }}>
                                       <View>
                                         <Text style={styles.textItem}>{item.nome}</Text>
                                         <Text style={styles.textItemDesc}>{item.descr}</Text>
                                         <Text style={styles.textItemDesc2}>Disponível em:</Text>
-                                        <View style={styles.containersemana}>                                     
+                                        {/* <View style={styles.containersemana}>                                     
                                           {item.diasemana.map(diasemana => 
                                             <Text style={styles.textItemDesc} key={diasemana}>{weekday[parseInt(diasemana)]}</Text>
                                           )}
-                                        </View>
+                                        </View> */}
                                         <Text style={styles.textItemValor}>R${item.preco}</Text> 
                                         </View>
                                     </TouchableHighlight>
@@ -615,7 +680,7 @@ export default function Detail({ navigation }) {
                         datesWhitelist={datesWhitelist}
                         datesBlacklist={blackdates}
                         iconContainer={{flex: 0.1}}
-                        onDateSelected={date => { loadEvento(moment(date).format("YYYY-MM-DD"), servicoid); dataselecionada = moment(date).format("YYYY-MM-DD")}}
+                        onDateSelected={date => { loadEvento(moment(date).format("YYYY-MM-DD"), profid); dataselecionada = moment(date).format("YYYY-MM-DD")}}
                       />
                     
                     <FlatList
@@ -683,7 +748,7 @@ var styles = StyleSheet.create({
   },
 
   layer: {
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
     position: 'absolute',
     top: 0,
     left: 0,
