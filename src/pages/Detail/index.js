@@ -579,11 +579,12 @@ export default function Detail({ navigation }) {
                                       <View>
                                         <Text style={styles.textItem}>{item.nome}</Text>
                                         <Text style={styles.textItemDesc2}>Disponível em:</Text>
-                                        <View style={styles.containersemana}>                                     
-                                          {item.diasemana.map(diasemana => 
-                                            <Text style={styles.textItemDesc} key={diasemana}>{weekday[parseInt(diasemana)]}</Text>
-                                          )}
-                                        </View>
+                                          <View style={styles.containersemana}>                                     
+                                            {item.diasemana.map(diasemana => 
+                                              <Text style={styles.textItemDesc} key={diasemana}>{weekday[parseInt(diasemana)]}</Text>
+                                            )}
+                                          </View>
+                                          <Text></Text>
                                         </View>
                                     </TouchableHighlight>
                                   
@@ -711,7 +712,14 @@ export default function Detail({ navigation }) {
                       renderItem={({ item }) => (
                         <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { handleAgendamento(item.data,item.hora,item.status) }}>
                           <View style={styles.ItemAgenda}>
-                            <Text style={styles.textMenu}>Agendar para {item.hora}:00</Text>
+                            <Text style={styles.textMenu}>Agendar para&nbsp;
+                              {item.hora.toString().indexOf(".5") > -1
+                                  ? item.hora.toString().replace(".5", "") +
+                                  ":30"
+                                  : item.hora + ":00"
+                              }
+                            </Text>
+                            
                             { 
                               item.status == 'D' ? <Text style={styles.textMenuGreen}>Disponível</Text> : <Text style={styles.textMenuRed}>Agendado</Text>
                             }
