@@ -3,7 +3,7 @@
     "name": "Eloy Aqui",
     "slug": "eloy-aqui",
     "privacy": "public",
-    "sdkVersion": "35.0.0",
+    "sdkVersion": "38.0.0",
     "platforms": [
       "ios",
       "android",

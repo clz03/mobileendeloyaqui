@@ -103,6 +103,7 @@ export default function Home({ navigation }) {
             scrollEnabled={true}
             data={cat}
             keyExtractor={cat => String(cat._id)}
+            showsVerticalScrollIndicator={false}
             ListHeaderComponent={
               loading ? (
                 <ActivityIndicator size="large" style={styles.backImageHeader}/>
@@ -137,7 +138,7 @@ var styles = StyleSheet.create({
   },
 
   backImageHeader: {
-    height:screenHeight * 0.42,
+    height:screenHeight * 0.38,
     alignContent:'center',
     alignItems:'center'
   },
@@ -150,13 +151,14 @@ var styles = StyleSheet.create({
 
   container: {
     flex: 1,
-    flexDirection: 'row',
+    // flexDirection: 'row',
     flexWrap: 'wrap',
-    backgroundColor:'#e5e5e5'
+    backgroundColor:'#d3cfc7',
+    //marginBottom:15
   },
 
   logo: {
-    marginTop: screenHeight * 0.15
+    marginTop: screenHeight * 0.10
   },
 
   menuItem:{

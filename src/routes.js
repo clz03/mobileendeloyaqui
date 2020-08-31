@@ -15,6 +15,7 @@ import NewsDetail from './pages/NewsDetail';
 import Search from './pages/Search'; 
 import Detail from './pages/Detail';
 import Scheduling from './pages/Scheduling'; 
+import Book from './pages/Book'; 
 // import TelUteis from './pages/TelUteis';
 //import Delivery from './pages/Delivery';
 //import Pedido from './pages/Delivery/pedido';
@@ -37,13 +38,22 @@ const PagesNavigator = createStackNavigator({
   Detail:{
     screen: Detail,
     navigationOptions: {
-      header: null,
+      headerShown: false
+    },
+  },
+  Book:{
+    screen: Book,
+    navigationOptions: {
+      headerStyle: {backgroundColor:'#471a88'},
+      title:'Agendar',
+      headerTitleStyle: {color:'#fff'},
+      headerTintColor: '#fff'
     },
   },
   Home:{
     screen: Home,
     navigationOptions: {
-      header: null,
+      headerShown: false,
       headerBackTitle: 'Voltar'
     },
   },
@@ -61,12 +71,16 @@ const SchedulingNavigator = createStackNavigator({
       headerTintColor: '#fff'
     },
   },
-  Detail:{
-    screen: Detail,
+  Book:{
+    screen: Book,
     navigationOptions: {
-      header: null,
+      headerStyle: {backgroundColor:'#471a88'},
+      title:'Agendar',
+      headerTitleStyle: {color:'#fff'},
+      headerTintColor: '#fff'
     },
   },
+
 },{
   initialRouteName:'Scheduling'
 });

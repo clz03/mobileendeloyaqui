@@ -118,7 +118,7 @@ export default function Scheduling({ navigation }) {
           )
         }
         renderItem={({ item }) => (
-          <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('Detail', { idestab: item._id, schedule:true }) }}>
+          <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { navigation.navigate('Book', { idestab: item._id }) }}>
             <View style={styles.ItemImg}> 
             
               <View style={styles.containerGeral}>

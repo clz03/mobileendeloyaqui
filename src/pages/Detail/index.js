@@ -8,21 +8,14 @@ import {
   StyleSheet, 
   Dimensions, 
   TouchableOpacity, 
-  TouchableHighlight,
   Linking, 
   FlatList,
   ActivityIndicator,
-  Alert,
-  AsyncStorage,
   Platform } 
 from 'react-native';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {Container, Tab, Tabs } from 'native-base';
-import CalendarStrip from 'react-native-calendar-strip';
-import moment from 'moment';
-import 'moment/locale/pt-br';
-import { connect, disconnect, subscribeToNewAgenda } from '../../services/socket';
 
 const screenWidth = Math.round(Dimensions.get('window').width);
 const screenHeight = Math.round(Dimensions.get('window').height);
@@ -41,9 +34,6 @@ export function isAndroid() {
   );
 };
 
-var servicokey = '';
-var dataselecionada = '';
-
 export default function Detail({ navigation }) {
   
   const [estab, setEstab] = useState([]);
@@ -52,114 +42,26 @@ export default function Detail({ navigation }) {
   const [cardapio, setCardapio] = useState("");
   const [cardapioonline, setCardapioonline] = useState(false);
   //const [delivery, setDelivery] = useState(false);
-  const [profissionais, setProfissionais] = useState([]);
-  const [profid, setProfid] = useState('');
   const [categorias, setCategorias] = useState([]);  
   const [prod, setProd] = useState([]);
-  const [servico, setServico] = useState([]);
-  const [servicoid, setServicoid] = useState('');
   //const [nomeagenda, setNomeagenda] = useState('');
   //const [diasemanaState, setDiasemanaState] = useState([]);
-  const [blackdates, setBlackdates] = useState([]);  
-  const [startdate, setStartdate] = useState('');  
-  const [seldate, setSeldate] = useState('');  
-  const [feriados, setFeriados] = useState([]);  
   // const [cupom, setCupom] = useState([]);
-  const [evento, setEvento] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [pagina, setPagina] = useState(0);
   const [initPage, setInitPage] = useState(0);
   
   const idestab = navigation.getParam('idestab');
   const schedule = navigation.getParam('schedule');
  
-
-  async function setupWebsocket() {
-    disconnect();
-    connect(idestab, 0);
-  }
-
-  let datesWhitelist = [{
-    start: moment(),
-    end: moment().add(28,'days')
-  }];
-
-  //Blacklist, tudo que nao for 1 e 3
-
-  async function gotoCalendar(nome, idservico){
-    let dias = '';
-    let datesBlacklist = [];
-    var curDate; 
-    var curDay;
-    var feriadoDay;
-    var checkStart = false;
-    var loadDate;
-
-    const response = await fetch(
-      'https://backendeloyaqui.herokuapp.com/profissional/' + profid
-    );
-
-    const data = await response.json();
-    dias = data[0].diasemana;
-
-    //Current Date
-    //curDate = moment().day();
-    //if(!dias.includes(curDate.toString())){
-    //  datesBlacklist.push(moment())
-    //}
-
-    // Next 28 days
-    for (let i = 0; i <= 28; ++i){
-      curDay = moment().add(i,'days').startOf('day').toISOString().substring(0,10);
-      curDate = moment().add(i,'days').day();
-
-      if(feriados.includes(curDay)){
-        datesBlacklist.push(moment().add(i,'days'))
-      } else if(!dias.includes(curDate.toString())){
-        datesBlacklist.push(moment().add(i,'days'))
-      } else {
-        if(!checkStart){
-          setStartdate(moment().add(i,'days'));
-          setSeldate(moment().add(i,'days'));
-          loadDate = moment().add(i,'days');
-          checkStart = true;
-        }
-      };
-    }
-    setServicoid(idservico);
-    servicokey = idservico;
-    setBlackdates(datesBlacklist);
-    //setNomeagenda(nome);
-    loadEvento(moment(loadDate).format("YYYY-MM-DD"),profid);
-    dataselecionada = moment(loadDate).format("YYYY-MM-DD");
-    setPagina(2);
-  }
-
   const weekday = [
-   "Domingo",
-   "Segunda", 
-   "Terça", 
-   "Quarta", 
-   "Quinta", 
-   "Sexta",
-   "Sábado"
-  ]
-
-  async function loadEvento(date, idprof) {
-     setLoading(true);
-
-   // if(idprof == '') idprof = profid;
-   if(date == '') date = dataselecionada;
-
-     const response4 = await fetch(
-       //'http://192.168.0.8:8080/eventos/dia/' + date + '/' + idservico
-       'https://backendeloyaqui.herokuapp.com/eventos/dia/' + date + '/' + idprof
-     );
-
-     const data4 = await response4.json();
-     setEvento(data4);
-     setLoading(false);
-  };
+    "Domingo",
+    "Segunda", 
+    "Terça", 
+    "Quarta", 
+    "Quinta", 
+    "Sexta",
+    "Sábado"
+   ]
 
   async function loadEstab() {
       const response = await fetch(
@@ -180,35 +82,18 @@ export default function Detail({ navigation }) {
 
       if (plano > 0) {
         loadProd();
-        loadProfissionais();
 
         //loadCupom();
         // if (agendaonline) {
         //   if(startdate !== '') loadEvento(startdate);
         // }
         if (cardapionline) loadCardapio();
-        if (agendaonline) {
-          loadFeriados();
-          setupWebsocket();
-          subscribeToNewAgenda(status => loadEvento('', profid));
-        }
+        //if (agendaonline) {
+        //  loadFeriados();
+        //  setupWebsocket();
+        //  subscribeToNewAgenda(status => loadEvento('', profid));
+        //}
       }
-    };
-
-    async function loadFeriados() {
-      var arrFeriados = [];
-
-      const response = await fetch(
-        //'http://192.168.0.8:8080/feriados/' + idestab
-        'https://backendeloyaqui.herokuapp.com/feriados'
-      );
-      const data = await response.json();
-      
-      for (i = 0; i < data.length; i++) {
-        arrFeriados.push(data[i].data.toString().substring(0,10));
-      }
-     
-      setFeriados(arrFeriados);
     };
 
     async function loadProd() {
@@ -217,24 +102,6 @@ export default function Detail({ navigation }) {
       );
       const data = await response.json();
       setProd(data);
-    };
-
-    async function loadServico() {
-      const response = await fetch(
-        //'http://192.168.0.8:8080/servicos/estabelecimento/' + idestab
-        'https://backendeloyaqui.herokuapp.com/servicos/profissional/' + profid
-      );
-      const data = await response.json();
-      setServico(data);
-    };
-
-    async function loadProfissionais() {
-      const response = await fetch(
-        //'http://192.168.0.8:8080/servicos/estabelecimento/' + idestab
-        'https://backendeloyaqui.herokuapp.com/profissional/estabelecimento/' + idestab
-      );
-      const data = await response.json();
-      setProfissionais(data);
     };
 
   //   async function loadCupom() {
@@ -259,93 +126,6 @@ export default function Detail({ navigation }) {
     setLoading(false)
   };
 
-  async function handleAgendamento(data, hora, status) {
-
-    const useremail = await AsyncStorage.getItem('eloyuseremail');
-
-    if (useremail != null){
-      if(status == 'I'){
-        Alert.alert(
-          'Horário Indisponível',
-          'por favor selecione outro horário'
-        );
-      } else {
-        Alert.alert(
-          'Confirmação',
-          'Agendar para ' + data.substring(8,10) + "/" + data.substring(5,7) + "/" + data.substring(0,4) + ' - ' + hora + ':00 ?',
-          [
-            {text: 'Não'},
-            {text: 'Sim', onPress: () => confirmAgendamento(data, hora)}
-          ]
-        );
-      }
-    } else {
-      Alert.alert(
-        'Login',
-        'Para agendar é preciso fazer login',
-        [
-          {text: 'OK'},
-          {text: 'Ir para Login', onPress: () => navigation.navigate('Login')}
-        ]
-      );
-    }
-  }
-
-  async function confirmAgendamento(data, hora) {
-
-      const iduser = await AsyncStorage.getItem('eloyuserid');
-
-      const response = await fetch(
-        //'http://192.168.0.8:8080/usuarios/'+ iduser
-        'https://backendeloyaqui.herokuapp.com/usuarios/'+ iduser
-      );
-  
-      const datareturn = await response.json();
-      
-      if(!datareturn[0].validado){
-        Alert.alert(
-          'Seu cadastro ainda não está validado',
-          'Por favor ative seu cadastro, verifique o e-mail recebido para ativar sua conta.'
-        );
-        return;
-      }
-
-      setLoading(true);
-
-      const responseApi = await fetch(
-        //'http://192.168.0.8:8080/eventos', {
-        'https://backendeloyaqui.herokuapp.com/eventos', {
-          method: 'POST',
-          headers: {
-            Accept: 'application/json',
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            data: data,
-            hora: hora,
-            comentario: datareturn[0].telefone,
-            idestabelecimento: idestab,
-            idservico: servicoid,
-            idusuario: iduser
-          }),
-      });
-
-      if(responseApi.ok){
-        loadEvento(data, profid);
-        Alert.alert('Agendamento realizado!', 'Gerencie seus agendamentos na aba Meu Perfil');
-      } else {
-        const data_ret = await responseApi.json();
-        loadEvento(data, profid);
-        Alert.alert('Problema ao Agendar!', data_ret.error);
-      };
-
-      setLoading(false);
-      
-  };
-
-  async function refreshList() {
-    loadEvento('', profid);
-  }
 
   useEffect(() => {
     loadEstab();
@@ -356,16 +136,8 @@ export default function Detail({ navigation }) {
       }, 1500);
     };
 
-    //returned function will be called on component unmount
-    return () => {
-      disconnect();
-    }
-
   }, []);
 
-  useEffect(() => {
-    loadServico();
-  }, [profid]);
 
   return (    
             <View style={styles.backContainer}>  
@@ -557,181 +329,16 @@ export default function Detail({ navigation }) {
                     // <Tab heading={<TabHeading style={styles.tabHeading} ><Text>Agendar</Text></TabHeading>}>
                       <Tab heading="Agendar">
 
-                    {pagina === 0 &&
-                        <ScrollView style={styles.container} visible='false'>
-                          <Text style={styles.tabTitle}>Selecione o profissional:</Text>
+                    
+                        <View style={styles.container2}>
 
-                            <FlatList
-                              data={profissionais}
-                              keyExtractor={profissionais => profissionais._id}
-                              ListHeaderComponent={
-                                loading ? (
-                                  <ActivityIndicator size="large" style={styles.LoadingIndicator} />
-                                ) : (
-                                  ""
-                                )
-                              }
-                              renderItem={({ item }) => (
-
-                                <View style={styles.viewCardapio}>
-
-                                    <TouchableHighlight style={styles.ItemImg2} onPress={() => { setProfid(item._id); setPagina(1) }}>
-                                      <View>
-                                        <Text style={styles.textItem}>{item.nome}</Text>
-                                        <Text style={styles.textItemDesc2}>Disponível em:</Text>
-                                          <View style={styles.containersemana}>                                     
-                                            {item.diasemana.map(diasemana => 
-                                              <Text style={styles.textItemDesc} key={diasemana}>{weekday[parseInt(diasemana)]}</Text>
-                                            )}
-                                          </View>
-                                          <Text></Text>
-                                        </View>
-                                    </TouchableHighlight>
-                                  
-                                </View>
-                                
-                                  
-                              )}                      
-                            />
-                        </ScrollView>
-
-                      
-                  }   
-                      
-                    {pagina === 1 &&
-                        <ScrollView style={styles.container} visible='false'>
-                          <Text style={styles.tabTitle}>Selecione o serviço a ser agendado:</Text>
-                      
-                      {/* // 0 DOMINGO
-                          // 1 SEGUNDA
-                          // 2 TERCA
-                          // 3 QUARTA
-                          // 4 QUINTA
-                          // 5 SEXTA
-                          // 6 SABADO */}
-
-                            <FlatList
-                              data={servico}
-                              keyExtractor={servico => servico._id}
-                              ListHeaderComponent={
-                                loading ? (
-                                  <ActivityIndicator size="large" style={styles.LoadingIndicator} />
-                                ) : (
-                                  ""
-                                )
-                              }
-                              renderItem={({ item }) => (
-
-                                <View style={styles.viewCardapio}>
-
-                                    <TouchableHighlight style={styles.ItemImg2} onPress={() => { gotoCalendar(item.nome, item._id) }}>
-                                      <View>
-                                        <Text style={styles.textItem}>{item.nome}</Text>
-                                        <Text style={styles.textItemDesc}>{item.descr}</Text>
-                                        <Text style={styles.textItemDesc2}>Disponível em:</Text>
-                                        {/* <View style={styles.containersemana}>                                     
-                                          {item.diasemana.map(diasemana => 
-                                            <Text style={styles.textItemDesc} key={diasemana}>{weekday[parseInt(diasemana)]}</Text>
-                                          )}
-                                        </View> */}
-                                        <Text style={styles.textItemValor}>R${item.preco}</Text> 
-                                        </View>
-                                    </TouchableHighlight>
-                                  
-                                </View>
-                                
-                                  
-                              )}                      
-                            />
-                        </ScrollView>
-
-                      
-                  }                         
-                          
-                        {pagina === 2 &&
-                      
-
-
-                      <View style={styles.backContainer}>        
-                        {/* <View style={styles.containersemana}>
-                          <Text style={styles.tabTitle}>Agendar: {nomeagenda} |</Text>
-                          <TouchableOpacity onPress={() => {setPagina(1); setEvento('')}}>
-                            <Text style={styles.tabTitleLink}> voltar</Text>
+                          <TouchableOpacity style={styles.btnEntrar} onPress={() => { navigation.navigate('Book', { idestab: idestab }) }}>
+                            <Text style={styles.textoEntrar}>Agendar Serviço</Text>
                           </TouchableOpacity>
+                           
                         </View>
-                        <Text>&nbsp;</Text> */}
-              
-                      <CalendarStrip
-                        calendarAnimation={{type: 'sequence', duration: 30}}
-                        daySelectionAnimation={{type: 'border', duration: 200, borderWidth: 1, borderHighlightColor: 'white'}}
-                        style={{height: 90, paddingTop: 8, paddingBottom: 10}}
-                        calendarHeaderStyle={{color: 'black'}}
-                        calendarColor={'#eaeaea'}
-                        dateNumberStyle={{color: 'black'}}
-                        dateNameStyle={{color: 'black'}}
-                        highlightDateNumberStyle={{color: 'purple'}}
-                        highlightDateNameStyle={{color: 'purple'}}
-                        disabledDateNameStyle={{color: 'grey'}}
-                        disabledDateNumberStyle={{color: 'grey'}}
-                        startingDate={startdate}
-                        selectedDate={seldate}
-                        maxDate={moment().add(30, 'days') }
-                        minDate={moment()}
-                        updateWeek={false}
-                        datesWhitelist={datesWhitelist}
-                        datesBlacklist={blackdates}
-                        iconContainer={{flex: 0.1}}
-                        onDateSelected={date => { loadEvento(moment(date).format("YYYY-MM-DD"), profid); dataselecionada = moment(date).format("YYYY-MM-DD")}}
-                      />
-                    
-                    <FlatList
-                      scrollEnabled={true}
-                      data={evento}
-                      keyExtractor={evento => String(evento.id)}
-                      refreshing={loading}
-                      onRefresh={refreshList}
-                      // ListHeaderComponent={
-                      //   loading ? ( 
-                      //     <Modal
-                      //       transparent={true}
-                      //       animationType={'none'}
-                      //       visible={loading}>
-                      //       <View style={styles.modalBackground}>
-                      //         <View style={styles.activityIndicatorWrapper}>
-                      //           <ActivityIndicator
-                      //             animating={loading} />
-                      //             <Text style={styles.textMenuSmall}>processando</Text>
-                      //         </View>
-                      //       </View>
-                      //     </Modal>
-                      //   ) : (
-                      //     ""
-                      //   )
-                      // }
-                      ListEmptyComponent={<Text style={styles.tabTitle}>Desculpe, o estabelecimento não possuí atendimento disponível nesse dia.</Text>}
-                      renderItem={({ item }) => (
-                        <TouchableHighlight underlayColor={"#d3d3d3"} onPress={() => { handleAgendamento(item.data,item.hora,item.status) }}>
-                          <View style={styles.ItemAgenda}>
-                            <Text style={styles.textMenu}>Agendar para&nbsp;
-                              {item.hora.toString().indexOf(".5") > -1
-                                  ? item.hora.toString().replace(".5", "") +
-                                  ":30"
-                                  : item.hora + ":00"
-                              }
-                            </Text>
-                            
-                            { 
-                              item.status == 'D' ? <Text style={styles.textMenuGreen}>Disponível</Text> : <Text style={styles.textMenuRed}>Agendado</Text>
-                            }
-                          </View>
-                        </TouchableHighlight>
-                      )}            
-                    />
-                  
-                      </View>  
-                    }
-                    
 
+                    
                     </Tab>
                   }
 
@@ -1092,6 +699,21 @@ var styles = StyleSheet.create({
     height:screenWidth * 0.06,
     marginBottom:5,
   },
+
+  btnEntrar:{
+    width: screenWidth * 0.90,
+    backgroundColor:'green',
+    marginLeft: screenWidth * 0.05,
+    marginTop: 20,
+    padding:16,
+    borderRadius:5,
+  },
+
+  textoEntrar:{
+    color:'#fff',
+    textAlign:'center',
+    fontSize:15
+  }
 
 
 });
